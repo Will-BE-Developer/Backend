@@ -2,7 +2,9 @@ package com.team7.project.question.model;
 
 import com.team7.project._timestamped.model.Timestamped;
 import com.team7.project.category.model.Category;
+import com.team7.project.category.model.CategoryEnum;
 import com.team7.project.interview.model.Interview;
+import com.team7.project.question.dto.QuestionRequestDto;
 import com.team7.project.scrap.model.Scrap;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,5 +40,15 @@ public class Question extends Timestamped {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
     List<Interview> interviews = new ArrayList<>();
+
+    public Question(String contents, String reference, Category category){
+        this.contents = contents;
+        this.reference = reference;
+        this.isShow = false;
+        this.category = category;
+    }
+
+
+
 
 }

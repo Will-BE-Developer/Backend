@@ -19,9 +19,18 @@ public class Category {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String categoryName;
+    @Enumerated(EnumType.STRING)
+    private CategoryEnum categoryName;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
     List<Question> questions = new ArrayList<>();
+
+    public Category(CategoryEnum categoryName){
+        this.categoryName = categoryName;
+    }
+
+    public void addQuestion(Question question){
+        questions.add(question);
+    }
 }
