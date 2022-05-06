@@ -30,7 +30,7 @@ public class Interview extends Timestamped {
     @Column(nullable = false, unique = true)
     private String thumbnailKey;
 
-    @Column(nullable = true)
+    @Column(nullable = true, length = 1000)
     private String memo;
 
     @Column(nullable = false)

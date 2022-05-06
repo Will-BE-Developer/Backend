@@ -9,11 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class QuestionResponseDto {
-    private String id;
+    private Long id;
     private String contents;
-
     private String reference;
-
-
-
 }
