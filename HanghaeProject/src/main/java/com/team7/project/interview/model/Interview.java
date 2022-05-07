@@ -1,7 +1,9 @@
 package com.team7.project.interview.model;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.team7.project._timestamped.model.Timestamped;
 import com.team7.project.comments.model.Comment;
+import com.team7.project.interview.dto.InterviewUploadRequestDto;
 import com.team7.project.question.model.Question;
 import com.team7.project.scrap.model.Scrap;
 import com.team7.project.user.model.User;
@@ -34,7 +36,10 @@ public class Interview extends Timestamped {
     private String memo;
 
     @Column(nullable = false)
-    private String isPublic;
+    private Boolean isPublic;
+
+    @Column(nullable = false)
+    private Boolean isDone;
 
     @Column(nullable = false)
     private String badge;
@@ -54,6 +59,29 @@ public class Interview extends Timestamped {
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
     List<Comment> comments = new ArrayList<>();
+
+
+//    making draft
+    public Interview(String videoKey, String thumbnailKey){
+        this.videoKey = videoKey;
+        this.thumbnailKey = thumbnailKey;
+        this.memo = "";
+        this.isPublic = false;
+        this.isDone = false;
+        this.badge = "NONE";
+    }
+
+//    must be refactored
+    public Interview update(String memo, Boolean isPublic, User user, Question question){
+        this.memo = memo;
+        this.isPublic = isPublic;
+//        this.user = user;
+        this.question = question;
+
+        this.isDone = true;
+        return this;
+    }
+
 
 
 //   private WeeklyInterview weeklyInterview;

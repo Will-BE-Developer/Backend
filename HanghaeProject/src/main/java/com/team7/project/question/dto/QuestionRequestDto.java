@@ -13,4 +13,5 @@ public class QuestionRequestDto {
     private String reference;
 
     private CategoryEnum category;
+
 }

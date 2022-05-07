@@ -2,7 +2,6 @@ package com.team7.project.question.controller;
 
 import com.team7.project.category.model.CategoryEnum;
 import com.team7.project.question.dto.QuestionResponseDto;
-import com.team7.project.question.dto.QuestionResponseSuccess;
 import com.team7.project.question.model.Question;
 import com.team7.project.question.service.QuestionRandomService;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +16,14 @@ public class QuestionRandomController {
 
 //    need refactoring
     @GetMapping("/api/questions/{categoryName}")
-    public QuestionResponseSuccess getRandomQuestionFromCategory(@PathVariable String categoryName) {
+    public QuestionResponseDto getRandomQuestionFromCategory(@PathVariable String categoryName) {
         Question question = questionRandomService.getRandomQuestion(CategoryEnum.valueOf(categoryName));
 
-        return new QuestionResponseSuccess(
-                new QuestionResponseDto(question.getId(),
+        return new QuestionResponseDto(new QuestionResponseDto.data(
+                question.getId(),
+                question.getCategory().getCategoryName().name(),
                 question.getContents(),
-                question.getReference())
-        );
-//        question.getCategory().getCategoryName().name()
+                question.getReference()
+        ));
     }
 }
