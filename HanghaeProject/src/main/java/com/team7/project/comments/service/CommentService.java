@@ -36,6 +36,8 @@ public class CommentService {
         Interview interview = new Interview();
         if (requestDto.getRootName().equals("interview")){
             interview = interviewRepository.getById(requestDto.getRootId());
+        }else if(requestDto.getRootName().equals("comment")){
+            interview = commentRepository.
         }
 
         Comment comment = new Comment(requestDto, user, interview);
