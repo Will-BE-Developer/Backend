@@ -31,7 +31,7 @@ public class CommentResponseDto {
         private Boolean isMine;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
-        
+
         public ResponseComment(Comment comment, Boolean isMine) {
             this.id = comment.getId();
             this.userOrigin = comment.getUser();

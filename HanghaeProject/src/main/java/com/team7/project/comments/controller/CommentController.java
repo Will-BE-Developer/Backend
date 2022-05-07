@@ -4,6 +4,7 @@ package com.team7.project.comments.controller;
 //import com.monitorjbl.json.JsonView;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.team7.project.advice.RestException;
+import com.team7.project.comments.dto.CommentListDto;
 import com.team7.project.comments.dto.CommentRequestDto;
 import com.team7.project.comments.dto.CommentResponseDto;
 import com.team7.project.comments.model.Comment;
@@ -17,6 +18,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 //@Controller
 @RestController
@@ -71,9 +77,52 @@ public class CommentController {
         return new ResponseEntity(responseDto, HttpStatus.OK);
     }
 
-//    @GetMapping("/api/comments/{interviewId}")
-//    public ResponseEntity commentList(@PathVariable Long interviewId){
-//        commentService.getCommentList();
-//        return
-//    }
+    @GetMapping("/api/comments/{interviewId}")
+    public ResponseEntity makeCommentList(@PathVariable Long interviewId){ //@AuthenticationPrincipal User user
+        User user = userRepository.findById(1L).orElseThrow( //temp
+                () -> new IllegalArgumentException("없는 사용자입니다.")
+        );
+
+        CommentListDto commentListDto = new CommentListDto();
+        
+        //피드백 조회
+        //List<Comment> commentList = commentService.getCommentList(interviewId);
+        List<Comment> commentList = commentService.getListOfCommentOfInterview(interviewId);
+        System.out.println(commentList);
+        for( Comment eachComment : commentList){
+            System.out.println(eachComment.toString());
+            Boolean isMine = user.getId().equals(eachComment.getUser().getId());
+            commentListDto.addComment(eachComment, isMine);
+        }
+        //피드백의 댓글 조회 + 대댓글 수
+        List<Comment> nestedCommentList = commentService.getListOfCommentOfComment(interviewId);
+
+        for( Comment eachComment : nestedCommentList){
+            System.out.println("nestedComment: " + eachComment.toString());
+
+            Long RootId = eachComment.getRootId();
+            Comment rootComment = new Comment();
+            List<Comment> result = commentList.stream()
+                    .filter(a -> Objects.equals(a.getId(), RootId))
+                    .collect(Collectors.toList());
+            System.out.println("result" + result);
+
+            Boolean isMine = user.getId().equals(eachComment.getUser().getId());
+//            if (commentListDto.getComment().contains(result)){  //not works
+//                int index = commentListDto.getComment().indexOf(result);
+//                System.out.println("in contain if, index: " + index);
+//                commentListDto.addNestedComment(index, eachComment, isMine);
+//            }
+            List<CommentListDto.ResponseComment> commentListInDto = commentListDto.getComment();
+            for (CommentListDto.ResponseComment eachCommentDto: commentListInDto){
+                if (eachCommentDto.getId().equals(RootId)){
+                    int index = commentListDto.getComment().indexOf(eachCommentDto);
+                    System.out.println("in contain if, index: " + index);
+                    commentListDto.addNestedComment(index, eachComment, isMine);
+                }
+            }
+        }
+
+        return new ResponseEntity(commentListDto, HttpStatus.OK);
+    }
 }

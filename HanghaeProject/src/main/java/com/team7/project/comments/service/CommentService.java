@@ -82,24 +82,24 @@ public class CommentService {
 
     @Transactional
     public Comment deleteComment(Long commentId) {
-
         //삭제 전 response를 위해 조회
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다.")
         );
-
         commentRepository.deleteById(comment.getId());
 
         return comment;
     }
 
-//    public Comment getCommentList(Long interviewId) {
-//
-//        //삭제 전 response를 위해 조회
-//        List<Comment> commentList = commentRepository.findAllByInterviewId(interviewId);
-//
-//        commentRepository.deleteById(comment.getId());
-//
-//        return comment;
-//    }
+    public List<Comment> getListOfCommentOfInterview(Long interviewId) { //getCommentList
+        //List<Comment> commentList = commentRepository.findAllByInterviewId(interviewId);
+        List<Comment> commentList = commentRepository.findAllByInterviewIdAndRootName(interviewId, "interview");
+
+        return commentList;
+    }
+    public List<Comment> getListOfCommentOfComment(Long interviewId) {
+        List<Comment> commentList = commentRepository.findAllByInterviewIdAndRootName(interviewId, "comment");
+
+        return commentList;
+    }
 }

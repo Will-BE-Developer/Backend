@@ -8,6 +8,7 @@ import com.team7.project.user.model.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -17,6 +18,7 @@ import static javax.persistence.FetchType.LAZY;
 @Setter
 @NoArgsConstructor
 @Entity
+@ToString(exclude = {"interview","user"})
 public class Comment extends Timestamped {
 
     @Id
