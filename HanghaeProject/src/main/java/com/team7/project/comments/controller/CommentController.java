@@ -37,8 +37,8 @@ public class CommentController {
         User user = userRepository.findById(1L).orElseThrow( //temp
                 () -> new IllegalArgumentException("없는 사용자입니다.")
         );
-        Comment rootComment = commentService.saveComment(requestDto, user);
-        CommentResponseDto responseDto = new CommentResponseDto(rootComment, true);
+        Comment comment = commentService.saveComment(requestDto, user);
+        CommentResponseDto responseDto = new CommentResponseDto(comment, true);
         //CommentResponseDto responseDto = new CommentResponseDto();
         //responseDto.setComment(rootComment);
         //responseDto.setMine(true);
@@ -53,9 +53,27 @@ public class CommentController {
         User user = userRepository.findById(1L).orElseThrow( //temp
                 () -> new IllegalArgumentException("없는 사용자입니다.")
         );
-        Comment rootComment = commentService.editComment(commentId, requestDto, user);
-        CommentResponseDto responseDto = new CommentResponseDto(rootComment, true);
+        Comment editedComment = commentService.editComment(commentId, requestDto, user);
+        CommentResponseDto responseDto = new CommentResponseDto(editedComment, true);
 
         return new ResponseEntity(responseDto, HttpStatus.OK);
     }
+
+    @DeleteMapping("/api/comments/{commentId}")
+    public ResponseEntity deleteComment(@PathVariable Long commentId) { //@AuthenticationPrincipal User user
+
+        User user = userRepository.findById(1L).orElseThrow( //temp
+                () -> new IllegalArgumentException("없는 사용자입니다.")
+        );
+        Comment comment = commentService.deleteComment(commentId);
+        CommentResponseDto responseDto = new CommentResponseDto(comment, true);
+
+        return new ResponseEntity(responseDto, HttpStatus.OK);
+    }
+
+//    @GetMapping("/api/comments/{interviewId}")
+//    public ResponseEntity commentList(@PathVariable Long interviewId){
+//        commentService.getCommentList();
+//        return
+//    }
 }

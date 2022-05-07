@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class CommentService {
@@ -78,4 +79,27 @@ public class CommentService {
 
         return comment;
     }
+
+    @Transactional
+    public Comment deleteComment(Long commentId) {
+
+        //삭제 전 response를 위해 조회
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다.")
+        );
+
+        commentRepository.deleteById(comment.getId());
+
+        return comment;
+    }
+
+//    public Comment getCommentList(Long interviewId) {
+//
+//        //삭제 전 response를 위해 조회
+//        List<Comment> commentList = commentRepository.findAllByInterviewId(interviewId);
+//
+//        commentRepository.deleteById(comment.getId());
+//
+//        return comment;
+//    }
 }

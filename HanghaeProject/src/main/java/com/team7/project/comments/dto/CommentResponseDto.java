@@ -11,9 +11,9 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 
+
 @Getter
 @NoArgsConstructor
-//@ToString(exclude = "comment") //특정 필드를 toString() 결과에서 제외 -> json에 차이는X
 public class CommentResponseDto {
     //private Comment comment;
     private Long id;
@@ -30,8 +30,12 @@ public class CommentResponseDto {
         this.id = comment.getId();
         //this.user = comment.getUser();
         this.userOrigin = comment.getUser();
-        this.user = new ResponseUser(userOrigin.getId(), userOrigin.getNickname(),
-                userOrigin.getGithubLink(), userOrigin.getProfileImageUrl(), userOrigin.getIntroduce());
+        this.user = new ResponseUser(
+                userOrigin.getId(),
+                userOrigin.getNickname(),
+                userOrigin.getGithubLink(),
+                userOrigin.getProfileImageUrl(),
+                userOrigin.getIntroduce());
         this.contents = comment.getContents();
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
@@ -41,7 +45,6 @@ public class CommentResponseDto {
 //    public void setComment(Comment comment) {
 //        this.comment = comment;
 //    }
-
 //    public void setMine(Boolean mine) {
 //        isMine = mine;
 //    }
@@ -53,6 +56,6 @@ public class CommentResponseDto {
         private String githubLink;
         private String profileImageUrl;
         private String introduce;
-}
+    }
 }
 
