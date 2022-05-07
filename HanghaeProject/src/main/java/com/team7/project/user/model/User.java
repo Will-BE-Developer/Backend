@@ -4,6 +4,7 @@ import com.team7.project._timestamped.model.Timestamped;
 import com.team7.project.comments.model.Comment;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.scrap.model.Scrap;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Fetch;
@@ -53,7 +54,7 @@ public class User extends Timestamped implements UserDetails {
     private String token;
 
     @Column(nullable = false)
-    private String isDeleted;
+    private Boolean isDeleted;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
@@ -66,6 +67,38 @@ public class User extends Timestamped implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
     List<Comment> comments = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @Builder
+    public User(String nickname, String password, String email, boolean isValid, String profileImageUrl,String githubLink,
+                String introduce, String token,String provider, boolean isDeleted, Role role){
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+        this.isValid = isValid;
+        this.profileImageUrl=profileImageUrl;
+        this.githubLink = githubLink;
+        this.introduce = introduce;
+        this.provider = provider;
+        this.token = token;
+        this.isDeleted = isDeleted;
+        this.role=role;
+    }
+
+    public User update(String nickname, String password,String profileImageUrl,String token){
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.password = password;
+        this.token = token;
+
+        return this;
+    }
+    public String getRoleKey(){
+        return this.role.getKey();
+    }
 
 
     @Override

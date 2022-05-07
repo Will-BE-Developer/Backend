@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>로그인 연습하기</title>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
+</head>
+<body>
+    <div class="row">
+            <h2>Login Form</h2>
+            <input type="text" placeholder="Email address"/>
+            <input type="password" placeholder="password"/>
+            <h2>Register Form</h2>
+            <input type="text" placeholder="Email address"/>
+            <input type="password" placeholder="password"/>
+            <input type="password" placeholder="password check"/>
+             <div>Logged in as: <span id="user" th:text="${userName}"></span></div>
+            <img th:src="${userPicture}" alt="profile Photo" width="500" height="600">
+            <a href="/logout" class="btn btn-info active">Logout</a>
+        <h2>구글 로그인 연동</h2>
+            <a href="/oauth2/authorization/google" class="btn btn-success active">Google Login</a>
+        <h2>카카오 로그인 연동</h2>
+            <a href="/oauth2/authorization/kakao" class="btn btn-success active">카카오로 로그인 하기</a>
+    </div>
+</body>
+</html>
