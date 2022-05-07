@@ -2,8 +2,8 @@ package com.team7.project.comments.model;
 
 
 import com.team7.project._timestamped.model.Timestamped;
+import com.team7.project.comments.dto.CommentRequestDto;
 import com.team7.project.interview.model.Interview;
-import com.team7.project.question.model.Question;
 import com.team7.project.user.model.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,5 +37,16 @@ public class Comment extends Timestamped {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "interview_id")
     private Interview interview;
+
+    //public Comment(CommentRequestDto requestDto, Long userId){
+    public Comment(CommentRequestDto requestDto, User user, Interview interview){
+        this.contents = requestDto.getContents();
+        this.rootId = requestDto.getRootId();
+        this.rootName = requestDto.getRootName();
+        //this.user = new User();
+        //this.user.setId(userId);
+        this.user = user;
+        this.interview = interview;
+    }
 
 }

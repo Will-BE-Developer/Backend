@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentRequestDto {
-    private Long id;
     private String contents;
     //댓글(피드백)이면 interview-id, 대댓글이면 댓글(피드백)id
     private Long rootId;
