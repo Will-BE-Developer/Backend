@@ -33,15 +33,28 @@ public class CommentService {
 
         //rootname이 인터뷰면, interview repo에서 rootId(=interview id)로 interview를 찾고, 없으면 에러
         //rootname이 댓글이면, comment repo에서 rootId(=comment id)로 comment를 찾고,(없으면 에러), 그 코멘트의 인터뷰를 get
-        Interview interview = new Interview();
+        //Interview interview = new Interview();
+        Comment comment = new Comment();
         if (requestDto.getRootName().equals("interview")){
-            interview = interviewRepository.getById(requestDto.getRootId());
+            Interview interview = interviewRepository.findById(requestDto.getRootId()).orElseThrow(
+                    () -> new IllegalArgumentException("해당 인터뷰는 존재하지 않습니다.")
+            );
+            //comment = new Comment(requestDto, user, interview);
+            //comment = new Comment(requestDto, user.getId(), interview.getId());
+            comment = new Comment(requestDto, user, interview.getId());
+            commentRepository.save(comment);
+            //return comment;
         }else if(requestDto.getRootName().equals("comment")){
-            interview = commentRepository.
+            Comment rootComment = commentRepository.findById(requestDto.getRootId()).orElseThrow(
+                    () -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다.")
+            );
+            Interview interview = rootComment.getInterview();
+            //comment = new Comment(requestDto, user, interview);
+            //comment = new Comment(requestDto, user.getId(), interview.getId());
+            comment = new Comment(requestDto, user, interview.getId());
+            commentRepository.save(comment);
+            //return comment;
         }
-
-        Comment comment = new Comment(requestDto, user, interview);
-        commentRepository.save(comment);
         return comment;
     }
 }

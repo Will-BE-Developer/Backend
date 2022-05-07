@@ -1,37 +1,57 @@
 package com.team7.project.comments.controller;
 
+//import com.fasterxml.jackson.annotation.JsonView;
+//import com.monitorjbl.json.JsonView;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.team7.project.advice.RestException;
 import com.team7.project.comments.dto.CommentRequestDto;
 import com.team7.project.comments.dto.CommentResponseDto;
 import com.team7.project.comments.model.Comment;
 import com.team7.project.comments.service.CommentService;
 import com.team7.project.user.model.User;
+import com.team7.project.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+//@Controller
+@RestController
 public class CommentController {
 
     private final CommentService commentService;
+    private final UserRepository userRepository; //temp
 
     @Autowired
-    public CommentController(CommentService commentService){
+    public CommentController(CommentService commentService, UserRepository userRepository){
         this.commentService = commentService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/api/comments")
-    public ResponseEntity registerUser(CommentRequestDto requestDto,
-                                       @AuthenticationPrincipal User user) {
-        // 토큰 여부 확인???
-        //Long userId = user.getId();
-        //commentService.saveComment(requestDto, userId);
-        Comment comment = commentService.saveComment(requestDto, user);
-        CommentResponseDto responseDto = new CommentResponseDto(comment, true);
+    public ResponseEntity registerUser(@RequestBody CommentRequestDto requestDto,
+                                       //@AuthenticationPrincipal User user,
+                                       Errors errors) {
+        if (errors.hasErrors()) {
+            for (FieldError error : errors.getFieldErrors()) {
+                throw new RestException(HttpStatus.BAD_REQUEST, error.getDefaultMessage());
+            }
+        }
+        User user = userRepository.findById(1L).orElseThrow( //temp
+                () -> new IllegalArgumentException("없는 사용자")
+        );
+        Comment rootComment = commentService.saveComment(requestDto, user);
+        CommentResponseDto responseDto = new CommentResponseDto(rootComment, true);
+        //CommentResponseDto responseDto = new CommentResponseDto();
+        //responseDto.setComment(rootComment);
+        //responseDto.setMine(true);
 
         //return new ResponseEntity("{'result':'success'}", HttpStatus.OK);
-        return new ResponseEntity(requestDto, HttpStatus.OK);
+        return new ResponseEntity(responseDto, HttpStatus.OK);
     }
 }
