@@ -118,6 +118,7 @@ public class CommentController {
                 if (eachCommentDto.getId().equals(RootId)){
                     int index = commentListDto.getComment().indexOf(eachCommentDto);
                     System.out.println("in contain if, index: " + index);
+                    //commentListDto.addNestedComment(index, eachComment, isMine);
                     commentListDto.addNestedComment(index, eachComment, isMine);
                 }
             }

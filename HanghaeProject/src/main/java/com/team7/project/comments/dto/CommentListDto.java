@@ -26,7 +26,8 @@ public class CommentListDto {
     public void addNestedComment(int index, Comment comment, Boolean isMine){
 
         //this.comment.get(index).addNestedComment(comment, isMine);
-        this.comment.get(index).addNestedComment(new ResponseComment(comment, isMine));
+        //this.comment.get(index).addNestedComment(new ResponseComment(comment, isMine));
+        this.comment.get(index).addNestedCommentWithoutNest(new NestedComment(comment, isMine));
     }
     @Getter
     public class ResponseComment{
@@ -38,7 +39,8 @@ public class CommentListDto {
         private Boolean isMine;
         private Long nestedCommentsCount = 0L;
         //private List<ResponseComment> nestedComments;
-        private List<ResponseComment> nestedComments = new ArrayList<>();
+        //private List<ResponseComment> nestedComments = new ArrayList<>();
+        private List<NestedComment> nestedComments = new ArrayList<>();
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
 
@@ -66,7 +68,11 @@ public class CommentListDto {
 //        }
 
         public void addNestedComment(ResponseComment responseComment) {
-            this.nestedComments.add(responseComment);
+            //this.nestedComments.add(responseComment);
+            this.nestedCommentsCount += 1;
+        }
+        public void addNestedCommentWithoutNest(NestedComment nestedComment){
+            this.nestedComments.add(nestedComment);
             this.nestedCommentsCount += 1;
         }
     }
@@ -79,6 +85,31 @@ public class CommentListDto {
         private String profileImageUrl;
         private String introduce;
     }
+    @Getter
+    public class NestedComment{
+        private Long id;
+        @JsonIgnore
+        private User userOrigin;
+        private ResponseUser user;
+        private String contents;
+        private Boolean isMine;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
 
+        public NestedComment(Comment comment, Boolean isMine){
+            this.id = comment.getId();
+            this.userOrigin = comment.getUser();
+            this.user = new ResponseUser(
+                    userOrigin.getId(),
+                    userOrigin.getNickname(),
+                    userOrigin.getGithubLink(),
+                    userOrigin.getProfileImageUrl(),
+                    userOrigin.getIntroduce());
+            this.contents = comment.getContents();
+            this.createdAt = comment.getCreatedAt();
+            this.modifiedAt = comment.getModifiedAt();
+            this.isMine = isMine;
+        }
+    }
 
 }
