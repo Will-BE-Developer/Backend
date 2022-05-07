@@ -16,9 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 //@Controller
 @RestController
@@ -34,16 +32,10 @@ public class CommentController {
     }
 
     @PostMapping("/api/comments")
-    public ResponseEntity registerUser(@RequestBody CommentRequestDto requestDto,
-                                       //@AuthenticationPrincipal User user,
-                                       Errors errors) {
-        if (errors.hasErrors()) {
-            for (FieldError error : errors.getFieldErrors()) {
-                throw new RestException(HttpStatus.BAD_REQUEST, error.getDefaultMessage());
-            }
-        }
+    public ResponseEntity saveComment(@RequestBody CommentRequestDto requestDto) { //@AuthenticationPrincipal User user
+
         User user = userRepository.findById(1L).orElseThrow( //temp
-                () -> new IllegalArgumentException("없는 사용자")
+                () -> new IllegalArgumentException("없는 사용자입니다.")
         );
         Comment rootComment = commentService.saveComment(requestDto, user);
         CommentResponseDto responseDto = new CommentResponseDto(rootComment, true);
@@ -51,7 +43,19 @@ public class CommentController {
         //responseDto.setComment(rootComment);
         //responseDto.setMine(true);
 
-        //return new ResponseEntity("{'result':'success'}", HttpStatus.OK);
+        return new ResponseEntity(responseDto, HttpStatus.OK);
+    }
+
+    @PutMapping("/api/comments/{commentId}")
+    public ResponseEntity editComment(@PathVariable Long commentId,
+                                      @RequestBody CommentRequestDto requestDto) { //@AuthenticationPrincipal User user
+
+        User user = userRepository.findById(1L).orElseThrow( //temp
+                () -> new IllegalArgumentException("없는 사용자입니다.")
+        );
+        Comment rootComment = commentService.editComment(commentId, requestDto, user);
+        CommentResponseDto responseDto = new CommentResponseDto(rootComment, true);
+
         return new ResponseEntity(responseDto, HttpStatus.OK);
     }
 }

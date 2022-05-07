@@ -40,7 +40,6 @@ public class Comment extends Timestamped {
     @JoinColumn(name = "interview_id")
     private Interview interview;
 
-    //public Comment(CommentRequestDto requestDto, Long userId){
     //public Comment(CommentRequestDto requestDto, User user, Interview interview){
     //public Comment(CommentRequestDto requestDto, Long userId, Long interviewId){
     public Comment(CommentRequestDto requestDto, User user, Long interviewId){
@@ -53,6 +52,10 @@ public class Comment extends Timestamped {
         //this.interview = interview;
         this.interview = new Interview();
         this.interview.setId(interviewId);
+    }
+
+    public void update(CommentRequestDto requestDto){
+        this.contents = requestDto.getContents();
     }
 
 }
