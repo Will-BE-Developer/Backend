@@ -56,7 +56,7 @@ public class InterviewUploadService {
 
     @Transactional
     public Interview createInterviewDraft(Long userId) {
-        String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss:SSS"));
+        String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
         String objectKey = userId + "-"+ suffix;
 
         return interviewRepository.save(new Interview("videos/" + objectKey, "thumbnails/" + objectKey));
@@ -74,7 +74,7 @@ public class InterviewUploadService {
         //      need Refactoring
         User user = new User();
 
-        interview.update(requestDto.getNote(),requestDto.getIsPublic(), user, question);
+        interview.complete(requestDto.getNote(),requestDto.getIsPublic(), user, question);
 
 //        need Refactoring****
 //        user.getInterviews().add(interview);

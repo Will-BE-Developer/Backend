@@ -71,16 +71,23 @@ public class Interview extends Timestamped {
         this.badge = "NONE";
     }
 
-//    must be refactored
-    public Interview update(String memo, Boolean isPublic, User user, Question question){
+//    must be refactored with user
+    public Interview complete(String memo, Boolean isPublic, User user, Question question){
         this.memo = memo;
         this.isPublic = isPublic;
 //        this.user = user;
         this.question = question;
-
         this.isDone = true;
         return this;
     }
+
+    //    must be refactored
+    public Interview update(String memo, Boolean isPublic){
+        this.memo = memo;
+        this.isPublic = isPublic;
+        return this;
+    }
+
 
 
 

@@ -29,8 +29,14 @@ public class InterviewResponse {
 //    need refactoring
     @Getter
     @AllArgsConstructor
-    public static  class UesrBody{
+    @Builder
+    public static class UesrBody{
         private Long id;
         private String nickName;
+        private String githubLink;
+        private String profileImageUrl;
+        private String introduce;
     }
+
+
 }
