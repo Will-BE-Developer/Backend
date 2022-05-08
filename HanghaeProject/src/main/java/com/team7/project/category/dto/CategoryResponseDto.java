@@ -1,6 +1,6 @@
 package com.team7.project.category.dto;
 
-import com.team7.project.category.model.Category;
+import com.team7.project.category.model.CategoryEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,5 +9,5 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class CategoryResponseDto {
-    private List<String> categories;
+    private List<CategoryEnum> categories;
 }

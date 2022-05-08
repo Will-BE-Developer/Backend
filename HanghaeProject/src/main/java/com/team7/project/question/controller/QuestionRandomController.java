@@ -21,7 +21,7 @@ public class QuestionRandomController {
 
         return new QuestionResponseDto(new QuestionResponseDto.data(
                 question.getId(),
-                question.getCategory().getCategoryName().name(),
+                question.getCategory().name(),
                 question.getContents(),
                 question.getReference()
         ));

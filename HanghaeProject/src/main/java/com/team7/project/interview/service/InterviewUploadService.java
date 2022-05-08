@@ -4,6 +4,7 @@ package com.team7.project.interview.service;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.team7.project.interview.dto.InterviewResponse;
 import com.team7.project.interview.dto.InterviewUploadRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
@@ -19,11 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class InterviewUploadService {
+    private final InterviewGeneralService interviewGeneralService;
     private final InterviewRepository interviewRepository;
     private final QuestionRepository questionRepository;
 
@@ -34,25 +37,21 @@ public class InterviewUploadService {
     public String bucket;  // S3 버킷 이름
 
     public String generatePresignedPost(String objectKey) {
-        LocalDateTime now = LocalDateTime.now();
+        Date expireTime = new Date();
+        expireTime.setTime(expireTime.getTime() + ONE_HOUR);
+        System.out.println("expireTime.getTime() = " + expireTime.getTime());
 
         // Generate the pre-signed URL.
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
                 new GeneratePresignedUrlRequest(bucket, objectKey)
                         .withMethod(HttpMethod.PUT)
-                        .withExpiration(java.sql.Timestamp.valueOf(now.plusNanos(ONE_HOUR)));
+                        .withExpiration(expireTime);
 
         URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
 
         return url.toString();
     }
 
-    @Transactional
-    public Interview save(QuestionRequestDto questionRequestDto) {
-
-        interviewRepository.findAllByIsDoneOrderByCreatedAt(true);
-        return null;
-    }
 
     @Transactional
     public Interview createInterviewDraft(Long userId) {
@@ -63,7 +62,7 @@ public class InterviewUploadService {
     }
 
     @Transactional
-    public Interview completeInterview(Long userId, Long interviewId ,InterviewUploadRequestDto requestDto) {
+    public InterviewResponse completeInterview(Long userId, Long interviewId ,InterviewUploadRequestDto requestDto) {
 
 //      need Refactoring
         Interview interview = interviewRepository.findById(interviewId)
@@ -79,7 +78,7 @@ public class InterviewUploadService {
 //        need Refactoring****
 //        user.getInterviews().add(interview);
 
-        return interview;
+        return new InterviewResponse(interview, interviewGeneralService.generatePresignedUrl(interview.getVideoKey()), interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()));
     }
 
 }

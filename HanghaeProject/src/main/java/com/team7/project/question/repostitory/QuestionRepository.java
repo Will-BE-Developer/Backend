@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
-    List<Question> findAllByCategory_categoryName(CategoryEnum categoryEnum);
+    List<Question> findAllByCategory(CategoryEnum categoryEnum);
 }

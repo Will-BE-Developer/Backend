@@ -3,8 +3,6 @@ package com.team7.project.interview.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.Map;
-
 @Getter
 @AllArgsConstructor
 public class InterviewDraftResponse {

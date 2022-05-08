@@ -1,8 +1,7 @@
 package com.team7.project.question.service;
 
-import com.team7.project.category.model.Category;
 import com.team7.project.category.model.CategoryEnum;
-import com.team7.project.category.repository.CategoryRepository;
+//import com.team7.project.category.repository.CategoryRepository;
 import com.team7.project.question.dto.QuestionRequestDto;
 import com.team7.project.question.model.Question;
 import com.team7.project.question.repostitory.QuestionRepository;
@@ -10,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -17,43 +17,51 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 public class QuestionRandomService {
-    private final CategoryRepository categoryRepository;
     private final QuestionRepository questionRepository;
 
     public Question getRandomQuestion(CategoryEnum categoryEnum){
-        List<Question> questions = questionRepository.findAllByCategory_categoryName(categoryEnum);
+        List<Question> questions = questionRepository.findAllByCategory(categoryEnum);
 //        need Refactoring
         if (questions.isEmpty()){
             init();
-            questions = questionRepository.findAllByCategory_categoryName(categoryEnum);
+            questions = questionRepository.findAllByCategory(categoryEnum);
         }
-        return questions.get((int)(Math.random()*(questions.size()-1)));
+        return questions.get((int)(Math.random()*(questions.size())));
     }
 
     @Transactional
     public Question saveQuestion(QuestionRequestDto questionRequestDto){
-        Category category = categoryRepository.findByCategoryName(questionRequestDto.getCategory()).orElseThrow(
-//                need exception refactoring
-                RuntimeException::new
-        );
+        Question question;
+        List<CategoryEnum> categoryEnums = Arrays.asList(CategoryEnum.values());
 
-        Question question = questionRepository.save(new Question(questionRequestDto.getContents(), questionRequestDto.getReference(), category));
+        //compare with String value
+        if(categoryEnums.contains(CategoryEnum.valueOf(questionRequestDto.getCategory()))){
+            //do something
+            String contents = questionRequestDto.getContents();
+            String reference = questionRequestDto.getReference();
+            CategoryEnum category = CategoryEnum.valueOf(questionRequestDto.getCategory());
+            return questionRepository.save(new Question(contents, reference, category));
+        }
+        else
+        {
+            // need exception refactoring
+            throw new IllegalArgumentException();
+        }
+//        Category category = categoryRepository.findByCategoryName(questionRequestDto.getCategory()).orElseThrow(
+////                need exception refactoring
+//                RuntimeException::new
+//        );
 
-        category.addQuestion(question);
-
-        return question;
+//        category.addQuestion(question);
     }
 
 //    need refactoring, just test
-    @Transactional
     public void init(){
         for(int i = 1; i < 13; ++i){
             for (int j = 1; j< 10; ++j){
-                saveQuestion(new QuestionRequestDto("DummyQuestion"+ i +"-"+ j , "test", CategoryEnum.valueOf("DUMMY"+i)));
+                saveQuestion(new QuestionRequestDto("DummyQuestion"+ i +"-"+ j , "test", "DUMMY"+i));
             }
         }
     }
-
-
 
 }
