@@ -30,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }else{
                 //토큰 유효기간 만료
                 //필터 거치면서 로그인정보를 null로 만들어 로그인 안한상태로 만들기
+
                 SecurityContextHolder.getContext().setAuthentication(null);
             }
         }

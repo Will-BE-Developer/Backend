@@ -1,8 +1,10 @@
 package com.team7.project.security;
 
+import com.team7.project.advice.RestException;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -18,12 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     //TODO:에러 메세지 출력 확인
     public UserDetails loadUserByUsername(String username) {
-        UserDetails user = User.builder()
-                .nickname("testUser")
-                .email("hello@tester.com")
-                .password("1234")
-                .profileImageUrl("pic")
-                .build();
-        return user;
+       return userRepository.findByEmail(username)
+               .orElseThrow(() -> new RestException(HttpStatus.BAD_REQUEST, "해당 사용자를 찾을 수 없습니다."));
     }
 }

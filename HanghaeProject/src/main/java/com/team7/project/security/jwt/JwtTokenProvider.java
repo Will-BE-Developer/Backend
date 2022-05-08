@@ -25,8 +25,8 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Component
 @Service
-public class JwtTokenProvider implements TokenService {
-    //    private String secretKey = "secret";
+public class JwtTokenProvider {
+
     private static String SECRET_KEY = "4dW2Ri6fZjsSjgldfYe8soispI6QoqCnvi8oewMS2rvbeW5Swo";
 
 
@@ -98,15 +98,5 @@ public class JwtTokenProvider implements TokenService {
         }
     }
 
-
-    @Override
-    public Token allocateToken(String extendedInformation) {
-        return null;
-    }
-
-    @Override
-    public Token verifyToken(String key) {
-        return null;
-    }
 }
 

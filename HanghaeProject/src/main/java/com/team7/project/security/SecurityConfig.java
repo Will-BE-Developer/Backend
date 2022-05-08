@@ -2,8 +2,6 @@ package com.team7.project.security;
 
 import com.team7.project.security.jwt.JwtAuthenticationFilter;
 import com.team7.project.security.jwt.JwtTokenProvider;
-import com.team7.project.security.oauth.CustomOAuth2UserService;
-import com.team7.project.security.oauth.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,9 +29,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final TokenService tokenService;
 
     @Bean
     @Override
@@ -61,26 +56,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterAfter(new JwtAuthenticationFilter(jwtTokenProvider), ExceptionTranslationFilter.class)
                 .formLogin().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("api/user/**").permitAll()
-                .antMatchers(HttpMethod.GET,"/api/interviews").permitAll()
-                .antMatchers(HttpMethod.GET,"/api/home").permitAll()
+                .antMatchers("/signup/**").permitAll()
+                .antMatchers("/signin/**").permitAll()
+                .antMatchers("/h2-console").permitAll()
+                .antMatchers("/user/**").permitAll()
+                .antMatchers(HttpMethod.GET,"/users/me").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout()
-                .logoutSuccessUrl("/")
-
-                //auth2.0 login setting
-                .and()
-                .oauth2Login()
-                .successHandler(oAuth2SuccessHandler)
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService);
+                .logoutSuccessUrl("/");
 
     }
 

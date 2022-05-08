@@ -6,20 +6,9 @@
 </head>
 <body>
     <div class="row">
-            <h2>Login Form</h2>
-            <input type="text" placeholder="Email address"/>
-            <input type="password" placeholder="password"/>
-            <h2>Register Form</h2>
-            <input type="text" placeholder="Email address"/>
-            <input type="password" placeholder="password"/>
-            <input type="password" placeholder="password check"/>
-             <div>Logged in as: <span id="user" th:text="${userName}"></span></div>
-            <img th:src="${userPicture}" alt="profile Photo" width="500" height="600">
-            <a href="/logout" class="btn btn-info active">Logout</a>
-        <h2>구글 로그인 연동</h2>
-            <a href="/oauth2/authorization/google" class="btn btn-success active">Google Login</a>
+        <h1>Login Form</h1>
         <h2>카카오 로그인 연동</h2>
-            <a href="/oauth2/authorization/kakao" class="btn btn-success active">카카오로 로그인 하기</a>
+            <a href="https://kauth.kakao.com/oauth/authorize?client_id=95272555e8189d2f079be8adc9c37e4f&redirect_uri=http://localhost:8080/user/kakao/callback&response_type=code" class="btn btn-success active">카카오로 로그인 하기</a>
     </div>
 </body>
 </html>
