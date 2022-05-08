@@ -96,7 +96,7 @@ import java.util.UUID;
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + accessToken);
             headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
+ 
             log.info("Contorller : GET_KAKAO_USER_INFO >>카카오에서 사용자 정보를 불러오는 중입니다...");
             // HTTP 요청 보내기
             HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
