@@ -69,7 +69,7 @@ import java.util.UUID;
             body.add("grant_type", "authorization_code");
             body.add("client_id", "95272555e8189d2f079be8adc9c37e4f");
             body.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
-            body.add("client_secret","oAfSkjWSsZb7DoeYcffn4XDYf8eMmgIr");
+            body.add("client_secret","");
             body.add("code", code);
 
             log.info("Contorller : GET_ACCESS_TOKEN>> HTTP 요청을 보내는 중입니다...");
