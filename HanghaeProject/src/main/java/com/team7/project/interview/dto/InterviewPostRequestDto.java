@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class InterviewUploadRequestDto {
+public class InterviewPostRequestDto {
     private String note;
     private Long questionId;
     private Boolean isPublic;

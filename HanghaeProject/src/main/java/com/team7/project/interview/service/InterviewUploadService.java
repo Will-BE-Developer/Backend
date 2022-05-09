@@ -5,10 +5,9 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.team7.project.interview.dto.InterviewResponse;
-import com.team7.project.interview.dto.InterviewUploadRequestDto;
+import com.team7.project.interview.dto.InterviewPostRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
-import com.team7.project.question.dto.QuestionRequestDto;
 import com.team7.project.question.model.Question;
 import com.team7.project.question.repostitory.QuestionRepository;
 import com.team7.project.user.model.User;
@@ -62,7 +61,7 @@ public class InterviewUploadService {
     }
 
     @Transactional
-    public InterviewResponse completeInterview(Long userId, Long interviewId ,InterviewUploadRequestDto requestDto) {
+    public InterviewResponse completeInterview(Long userId, Long interviewId , InterviewPostRequestDto requestDto) {
 
 //      need Refactoring
         Interview interview = interviewRepository.findById(interviewId)

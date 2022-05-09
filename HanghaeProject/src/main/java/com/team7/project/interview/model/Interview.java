@@ -1,13 +1,10 @@
 package com.team7.project.interview.model;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.team7.project._timestamped.model.Timestamped;
 import com.team7.project.comments.model.Comment;
-import com.team7.project.interview.dto.InterviewUploadRequestDto;
 import com.team7.project.question.model.Question;
 import com.team7.project.scrap.model.Scrap;
 import com.team7.project.user.model.User;
-import com.team7.project.weeklyInterview.model.WeeklyInterview;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

@@ -4,7 +4,6 @@ import com.team7.project.interview.dto.*;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.service.InterviewGeneralService;
 import com.team7.project.interview.service.InterviewUploadService;
-import com.team7.project.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,9 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.time.format.DateTimeFormatter;
 
 @RequiredArgsConstructor
 @RestController
@@ -54,26 +50,27 @@ public class InterviewController {
     }
 
     @PostMapping("/api/interviews/{interviewId}")
-    public InterviewResponse completeInterview(@PathVariable Long interviewId, @RequestBody InterviewUploadRequestDto requestDto) {
-
+    public ResponseEntity<InterviewResponse> completeInterview(@PathVariable Long interviewId, @RequestBody InterviewPostRequestDto requestDto) {
 //       assume user id is 1, nickname is TestNickname
-        return interviewUploadService.completeInterview(1L, interviewId, requestDto);
+        InterviewResponse body = interviewUploadService.completeInterview(1L, interviewId, requestDto);
+
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     @PutMapping("/api/interviews/{interviewId}")
-    public InterviewResponse update(@PathVariable Long interviewId, @RequestBody InterviewUpdateRequestDto requestDto) {
+    public ResponseEntity<InterviewResponse> update(@PathVariable Long interviewId, @RequestBody InterviewUpdateRequestDto requestDto) {
 //       assume user id is 1, nickname is TestNickname
-        return interviewGeneralService.updateInterview(interviewId, requestDto);
+        InterviewResponse body = interviewGeneralService.updateInterview(interviewId, requestDto);
+
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     @DeleteMapping("/api/interviews/{interviewId}")
-    public InterviewResponse deleteInterview(@PathVariable Long interviewId) {
+    public ResponseEntity<InterviewResponse> deleteInterview(@PathVariable Long interviewId) {
 //       assume user id is 1, nickname is TestNickname
-        return interviewGeneralService.deleteInterview(interviewId, 1L);
+        InterviewResponse body = interviewGeneralService.deleteInterview(interviewId, 1L);
+
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
-
-
-
-
 
 }

@@ -7,7 +7,6 @@ import com.team7.project._pagination.dto.PaginationResponseDto;
 import com.team7.project.interview.dto.InterviewListResponse;
 import com.team7.project.interview.dto.InterviewResponse;
 import com.team7.project.interview.dto.InterviewUpdateRequestDto;
-import com.team7.project.interview.dto.InterviewUploadRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
