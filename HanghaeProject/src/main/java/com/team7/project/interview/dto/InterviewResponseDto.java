@@ -3,7 +3,7 @@ package com.team7.project.interview.dto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.question.dto.QuestionResponseDto;
 import com.team7.project.question.model.Question;
-import com.team7.project.user.model.User;
+import com.team7.project.user.dto.UserInfoResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +13,8 @@ import java.time.format.DateTimeFormatter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class InterviewResponse {
-    private InterviewResponse.Data interview;
+public class InterviewResponseDto {
+    private InterviewResponseDto.Data interview;
 
 
 //    need refactoring
@@ -39,7 +39,7 @@ public class InterviewResponse {
         private String thumbnail;
 
         private QuestionResponseDto.data question;
-        private UesrBody user;
+        private UserInfoResponseDto.UserBody user;
 
         private String badge;
         private String note;
@@ -54,7 +54,7 @@ public class InterviewResponse {
         private String updatedAt;
     }
 
-    public InterviewResponse(Interview interview, String videoUrl, String imageUrl){
+    public InterviewResponseDto(Interview interview, String videoUrl, String imageUrl){
         Question question = interview.getQuestion();
         Long questionId = question.getId();
         String questionCategory = question.getCategory().name();
@@ -68,13 +68,20 @@ public class InterviewResponse {
         String userGithubLink = "https://github.com/llama-ste";
         String userProfileImageUrl = "https://firebasestorage.googleapis.com/v0/b/react-deep-99.appspot.com/o/images%2F1_1650953241454?alt=media&token=7e31bc8a-352c-48bf-90e6-1fce202e8935";
         String userIntroduce = "testIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroducetestIntroduce";
+        UserInfoResponseDto.UserBody userBody = UserInfoResponseDto.UserBody.builder()
+                .id(userId)
+                .nickname(userNickname)
+                .githubLink(userGithubLink)
+                .profileImageUrl(userProfileImageUrl)
+                .introduce(userIntroduce)
+                .build();
 
         this.interview = Data.builder()
                 .id(interview.getId())
                 .video(videoUrl)
                 .thumbnail(imageUrl)
                 .question(new QuestionResponseDto.data(questionId, questionCategory, questionContents,questionReference))
-                .user(new UesrBody(userId, userNickname,userGithubLink,userProfileImageUrl,userIntroduce))
+                .user(userBody)
                 .badge(interview.getBadge())
                 .note(interview.getMemo())
                 .scrapsMe(false)

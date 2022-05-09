@@ -5,7 +5,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class InterviewDraftResponse {
+public class InterviewDraftResponseDto {
+
     private InterviewDraftBody interview;
     private UrlBody presignedUrl;
 
@@ -21,4 +22,6 @@ public class InterviewDraftResponse {
         private String video;
         private String thumbnail;
     }
+
 }
+

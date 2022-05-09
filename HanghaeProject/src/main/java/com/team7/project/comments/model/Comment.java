@@ -1,7 +1,7 @@
 package com.team7.project.comments.model;
 
 
-import com.team7.project._timestamped.model.Timestamped;
+import com.team7.project._global.timestamped.model.Timestamped;
 import com.team7.project.comments.dto.CommentRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.user.model.User;
@@ -53,7 +53,7 @@ public class Comment extends Timestamped {
         this.user = user;
         //this.interview = interview;
         this.interview = new Interview();
-        this.interview.setId(interviewId);
+//        this.interview.setId(interviewId);
     }
 
     public void update(CommentRequestDto requestDto){

@@ -4,7 +4,7 @@ package com.team7.project.interview.service;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.team7.project.interview.dto.InterviewResponse;
+import com.team7.project.interview.dto.InterviewResponseDto;
 import com.team7.project.interview.dto.InterviewPostRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
@@ -24,7 +24,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
-public class InterviewUploadService {
+public class InterviewPostService {
     private final InterviewGeneralService interviewGeneralService;
     private final InterviewRepository interviewRepository;
     private final QuestionRepository questionRepository;
@@ -61,7 +61,7 @@ public class InterviewUploadService {
     }
 
     @Transactional
-    public InterviewResponse completeInterview(Long userId, Long interviewId , InterviewPostRequestDto requestDto) {
+    public InterviewResponseDto completeInterview(Long userId, Long interviewId , InterviewPostRequestDto requestDto) {
 
 //      need Refactoring
         Interview interview = interviewRepository.findById(interviewId)
@@ -77,7 +77,7 @@ public class InterviewUploadService {
 //        need Refactoring****
 //        user.getInterviews().add(interview);
 
-        return new InterviewResponse(interview, interviewGeneralService.generatePresignedUrl(interview.getVideoKey()), interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()));
+        return new InterviewResponseDto(interview, interviewGeneralService.generatePresignedUrl(interview.getVideoKey()), interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()));
     }
 
 }

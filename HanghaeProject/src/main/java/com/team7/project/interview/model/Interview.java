@@ -1,6 +1,6 @@
 package com.team7.project.interview.model;
 
-import com.team7.project._timestamped.model.Timestamped;
+import com.team7.project._global.timestamped.model.Timestamped;
 import com.team7.project.comments.model.Comment;
 import com.team7.project.question.model.Question;
 import com.team7.project.scrap.model.Scrap;

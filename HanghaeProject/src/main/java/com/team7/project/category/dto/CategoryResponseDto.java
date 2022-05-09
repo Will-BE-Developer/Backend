@@ -9,5 +9,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class CategoryResponseDto {
+
     private List<CategoryEnum> categories;
+
 }

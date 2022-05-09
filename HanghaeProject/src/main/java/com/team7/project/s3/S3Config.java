@@ -22,12 +22,6 @@ public class S3Config {
 
     @Bean
     public AmazonS3Client amazonS3Client() {
-
-//        @Value Annotation Test & properties import test from ProjectApplication
-        System.out.println("accessKey = " + accessKey);
-        System.out.println("secretKey = " + secretKey);
-        System.out.println("region = " + region);
-
         BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
         return (AmazonS3Client) AmazonS3ClientBuilder.standard()
                 .withRegion(region)

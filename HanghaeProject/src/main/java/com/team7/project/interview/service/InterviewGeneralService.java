@@ -3,9 +3,9 @@ package com.team7.project.interview.service;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.team7.project._pagination.dto.PaginationResponseDto;
-import com.team7.project.interview.dto.InterviewListResponse;
-import com.team7.project.interview.dto.InterviewResponse;
+import com.team7.project._global.pagination.dto.PaginationResponseDto;
+import com.team7.project.interview.dto.InterviewListResponseDto;
+import com.team7.project.interview.dto.InterviewResponseDto;
 import com.team7.project.interview.dto.InterviewUpdateRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
@@ -49,31 +49,31 @@ public class InterviewGeneralService {
         return url.toString();
     }
 
-    public InterviewListResponse readAllInterviews(Pageable pageable){
+    public InterviewListResponseDto readAllInterviews(Pageable pageable){
         //      need Refactoring(error handling)
         Page<Interview> interviews = interviewRepository.findAllByIsDone(true, pageable);
-        List<InterviewResponse.Data> responses = new ArrayList<>();
+        List<InterviewResponseDto.Data> responses = new ArrayList<>();
 //        Need Rafactoring. should be move to InterviewResponse Constructor
         for(Interview interview: interviews.getContent()){
-            InterviewResponse response = new InterviewResponse(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
+            InterviewResponseDto response = new InterviewResponseDto(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
             responses.add(response.getInterview());
         }
 
 //        must be refactored
         PaginationResponseDto pagination = new PaginationResponseDto((long) pageable.getPageSize(), interviews.getTotalElements(), (long) pageable.getPageNumber() + 1);
-        return new InterviewListResponse(responses, pagination);
+        return new InterviewListResponseDto(responses, pagination);
     }
 
-    public InterviewResponse readOneInterview(Long interviewId){
+    public InterviewResponseDto readOneInterview(Long interviewId){
         //      need Refactoring(error handling)
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(RuntimeException::new);
 
-        return new InterviewResponse(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
+        return new InterviewResponseDto(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
     }
 
     @Transactional
-    public InterviewResponse deleteInterview(Long interviewId, Long userId){
+    public InterviewResponseDto deleteInterview(Long interviewId, Long userId){
         //      need Refactoring(error handling)
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(RuntimeException::new);
@@ -84,14 +84,14 @@ public class InterviewGeneralService {
 //            throw new RuntimeException();
 //        }
 
-        InterviewResponse response = new InterviewResponse(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
+        InterviewResponseDto response = new InterviewResponseDto(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
 
         interviewRepository.deleteById(interviewId);
         return response;
     }
 
     @Transactional
-    public InterviewResponse updateInterview(Long interviewId, InterviewUpdateRequestDto requestDto){
+    public InterviewResponseDto updateInterview(Long interviewId, InterviewUpdateRequestDto requestDto){
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(RuntimeException::new);
 
@@ -105,7 +105,7 @@ public class InterviewGeneralService {
 
         interview.update(requestDto.getNote(),requestDto.getIsPublic());
 
-        return new InterviewResponse(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
+        return new InterviewResponseDto(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
 
     }
 }

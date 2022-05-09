@@ -1,6 +1,6 @@
 package com.team7.project.weeklyInterview.model;
 
-import com.team7.project._timestamped.model.Timestamped;
+import com.team7.project._global.timestamped.model.Timestamped;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

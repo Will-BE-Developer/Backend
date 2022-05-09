@@ -19,7 +19,9 @@ public class CategoryController {
     @GetMapping("/api/categories")
     public ResponseEntity<CategoryResponseDto> getAllCategories() {
         List<CategoryEnum> categoryEnumList = categoryService.getCategoryNames();
+
         CategoryResponseDto body = new CategoryResponseDto(categoryEnumList);
+
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 }

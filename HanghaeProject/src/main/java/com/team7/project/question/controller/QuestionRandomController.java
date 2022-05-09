@@ -26,9 +26,7 @@ public class QuestionRandomController {
                 question.getCategory().name(),
                 question.getContents(),
                 question.getReference()
-
-
-
+                
         ));
 
         return new ResponseEntity<>(body, HttpStatus.OK);

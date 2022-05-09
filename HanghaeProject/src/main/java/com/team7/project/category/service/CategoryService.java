@@ -22,7 +22,9 @@ import static com.team7.project.category.model.CategoryEnum.*;
 public class CategoryService {
 
     public List<CategoryEnum> getCategoryNames() {
+
         return Arrays.asList(CategoryEnum.values());
+
     }
 
 }

@@ -1,7 +1,6 @@
-package com.team7.project._pagination.dto;
+package com.team7.project._global.pagination.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
