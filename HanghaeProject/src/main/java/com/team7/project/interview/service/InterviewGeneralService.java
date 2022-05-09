@@ -4,15 +4,18 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.team7.project._global.pagination.dto.PaginationResponseDto;
+import com.team7.project.advice.RestException;
 import com.team7.project.interview.dto.InterviewListResponseDto;
-import com.team7.project.interview.dto.InterviewResponseDto;
+import com.team7.project.interview.dto.InterviewInfoResponseDto;
 import com.team7.project.interview.dto.InterviewUpdateRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
+import com.team7.project.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -34,9 +38,9 @@ public class InterviewGeneralService {
     public String bucket;  // S3 버킷 이름
 
     public String generatePresignedUrl(String objectKey) {
+
         Date expireTime = new Date();
         expireTime.setTime(expireTime.getTime() + ONE_HOUR);
-        System.out.println("expireTime.getTime() = " + expireTime.getTime());
 
         // Generate the pre-signed URL.
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
@@ -49,63 +53,89 @@ public class InterviewGeneralService {
         return url.toString();
     }
 
-    public InterviewListResponseDto readAllInterviews(Pageable pageable){
-        //      need Refactoring(error handling)
+    public InterviewListResponseDto readAllInterviews(Pageable pageable, Long loginUserId){
+
         Page<Interview> interviews = interviewRepository.findAllByIsDone(true, pageable);
-        List<InterviewResponseDto.Data> responses = new ArrayList<>();
-//        Need Rafactoring. should be move to InterviewResponse Constructor
+        List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
+
         for(Interview interview: interviews.getContent()){
-            InterviewResponseDto response = new InterviewResponseDto(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
+
+            Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
+
+            String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
+            String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
+
+            InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine);
+
             responses.add(response.getInterview());
+
         }
 
-//        must be refactored
-        PaginationResponseDto pagination = new PaginationResponseDto((long) pageable.getPageSize(), interviews.getTotalElements(), (long) pageable.getPageNumber() + 1);
+        PaginationResponseDto pagination = new PaginationResponseDto((long) pageable.getPageSize(),
+                interviews.getTotalElements(),
+                (long) pageable.getPageNumber() + 1);
+
         return new InterviewListResponseDto(responses, pagination);
     }
 
-    public InterviewResponseDto readOneInterview(Long interviewId){
-        //      need Refactoring(error handling)
-        Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(RuntimeException::new);
+    public InterviewInfoResponseDto readOneInterview(Long interviewId, Long loginUserId){
 
-        return new InterviewResponseDto(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
+        Interview interview = interviewRepository.findById(interviewId)
+                .orElseThrow(
+                        () -> new RestException(HttpStatus.BAD_REQUEST,"해당 인터뷰가 존재하지 않습니다.")
+                );
+
+        Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
+
+        String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
+        String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
+
+        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine);
     }
 
     @Transactional
-    public InterviewResponseDto deleteInterview(Long interviewId, Long userId){
-        //      need Refactoring(error handling)
+    public InterviewInfoResponseDto deleteInterview(Long interviewId, User user){
+
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(
+                        () -> new RestException(HttpStatus.BAD_REQUEST,"해당 인터뷰가 존재하지 않습니다.")
+                );
 
-//        need Refactoring(error Handling + User integration)
-//        if(!interview.getUser().getId().equals(userId))
-//        {
-//            throw new RuntimeException();
-//        }
+        Boolean isMine = Objects.equals(user.getId(), interviewId);
 
-        InterviewResponseDto response = new InterviewResponseDto(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
+        if(isMine == false) {
+            throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 인터뷰를 수정 할 수 않습니다.");
+        }
+
+        String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
+        String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
+        InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine);
 
         interviewRepository.deleteById(interviewId);
+
         return response;
     }
 
     @Transactional
-    public InterviewResponseDto updateInterview(Long interviewId, InterviewUpdateRequestDto requestDto){
+    public InterviewInfoResponseDto updateInterview(Long interviewId, InterviewUpdateRequestDto requestDto, User user){
+
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(
+                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
+                );
 
-//        need Refactoring(error Handling + User integration)
-//        if(!interview.getUser().getId().equals(userId))
-//        {
-//            throw new RuntimeException();
-//        }
+        Boolean isMine = Objects.equals(user.getId(), interviewId);
 
-//        Need Rafactoring. should be move to InterviewResponse Constructor
+        if(isMine == false) {
+            throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 인터뷰를 수정 할 수 않습니다.");
+        }
 
         interview.update(requestDto.getNote(),requestDto.getIsPublic());
 
-        return new InterviewResponseDto(interview, generatePresignedUrl(interview.getVideoKey()), generatePresignedUrl(interview.getThumbnailKey()));
+        String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
+        String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
 
+        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine);
     }
+
 }

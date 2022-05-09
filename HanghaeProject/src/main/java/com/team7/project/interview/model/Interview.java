@@ -50,11 +50,9 @@ public class Interview extends Timestamped {
     private Question question;
 
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Fetch(FetchMode.JOIN)
     List<Scrap> scraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Fetch(FetchMode.JOIN)
     List<Comment> comments = new ArrayList<>();
 
 
@@ -68,17 +66,17 @@ public class Interview extends Timestamped {
         this.badge = "NONE";
     }
 
-//    must be refactored with user
+    // complete interview
     public Interview complete(String memo, Boolean isPublic, User user, Question question){
         this.memo = memo;
         this.isPublic = isPublic;
-//        this.user = user;
+        this.user = user;
         this.question = question;
         this.isDone = true;
         return this;
     }
 
-    //    must be refactored
+    //  update interview (only memo, isPublic)
     public Interview update(String memo, Boolean isPublic){
         this.memo = memo;
         this.isPublic = isPublic;

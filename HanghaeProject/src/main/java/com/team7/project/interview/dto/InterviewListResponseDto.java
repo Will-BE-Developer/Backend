@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public class InterviewListResponseDto {
 
-    private List<InterviewResponseDto.Data> interviews;
+    private List<InterviewInfoResponseDto.Data> interviews;
 
     private PaginationResponseDto pagination;
 
