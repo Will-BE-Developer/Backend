@@ -44,7 +44,7 @@ public class UserProfileService {
         String accessToken = jwtTokenProvider.createAccessToken(email);
 
         return TokenResponseDto.builder()
-                .Authorization(accessToken)
+                .Authorization("BEARER " + accessToken)
                 .build();
     }
     @Transactional
@@ -56,10 +56,10 @@ public class UserProfileService {
     public User deleteUser(User user){
         log.info("DELETE_USER >> delete_user_(service) >> {}에 대해 deleted 접근 중... 현재 isDeleted : {}",
                 user.getNickname(),user.getIsDeleted());
-        user.setIsDeleted(true);
         User deleteThis = userRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new RestException(HttpStatus.NOT_FOUND,"회원이 존재하지 않습니다."));
-        deleteThis.setIsDeleted(true);
+        userRepository.delete(deleteThis);
+//        deleteThis.setIsDeleted(true);
         return deleteThis;
     }
 

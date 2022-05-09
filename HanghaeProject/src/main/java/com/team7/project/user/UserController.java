@@ -175,7 +175,7 @@ public class UserController {
                 .build(), HttpStatus.OK);
     }
 
-    @PostMapping("/users/me")
+    @DeleteMapping("/users/me")
     public ResponseEntity<Success> deleteUser(@AuthenticationPrincipal User user){
         log.info("DELETE_USER >> {} 의 유저정보 삭제를 요청합니다. ", user.getNickname());
         User deleting = userProfileService.deleteUser(user);

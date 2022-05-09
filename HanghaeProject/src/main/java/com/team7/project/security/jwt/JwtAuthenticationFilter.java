@@ -19,10 +19,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        // 헤더에서 JWT 를 받아옵니다.
+        // 헤더에서 JWT 를 받아온후 BEARER 추출
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
         // 토큰이 발급되어 있는 경우 유효한 토큰인지 확인합니다.
         if (accessToken != null) {
+            accessToken = accessToken.replace("BEARER ","");
             if (jwtTokenProvider.validateToken(accessToken)) {
                 //토큰을 SecurityContextHoder 의 Authentication에 저장
                 Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
