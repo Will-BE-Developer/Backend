@@ -2,20 +2,25 @@ package com.team7.project.comments.model;
 
 
 import com.team7.project._timestamped.model.Timestamped;
+import com.team7.project.comments.dto.CommentRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.user.model.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
 
-@Getter // get 함수를 일괄적으로 만들어줍니다.
-@NoArgsConstructor // 기본 생성자를 만들어줍니다.
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
+@ToString(exclude = {"interview","user"})
 public class Comment extends Timestamped {
-    // ID가 자동으로 생성 및 증가합니다.
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,5 +41,23 @@ public class Comment extends Timestamped {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "interview_id")
     private Interview interview;
+
+    //public Comment(CommentRequestDto requestDto, User user, Interview interview){
+    //public Comment(CommentRequestDto requestDto, Long userId, Long interviewId){
+    public Comment(CommentRequestDto requestDto, User user, Long interviewId){
+        this.contents = requestDto.getContents();
+        this.rootId = requestDto.getRootId();
+        this.rootName = requestDto.getRootName();
+        //this.user = new User();
+        //this.user.setId(userId);
+        this.user = user;
+        //this.interview = interview;
+        this.interview = new Interview();
+        this.interview.setId(interviewId);
+    }
+
+    public void update(CommentRequestDto requestDto){
+        this.contents = requestDto.getContents();
+    }
 
 }
