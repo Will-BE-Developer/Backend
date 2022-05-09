@@ -11,7 +11,6 @@ import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.question.model.Question;
 import com.team7.project.question.repostitory.QuestionRepository;
-import com.team7.project.user.model.Role;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
