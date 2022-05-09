@@ -115,14 +115,31 @@ public class UserController {
             return new ResponseEntity<Success>(new Success(true, "사용 가능한 이메일 입니다."), HttpStatus.OK);
         }
         //유저네임이 등록되어있는경우 사용불가능 하다.
-        return new ResponseEntity<Success>(new Success(false, "동일한 이메일 주소가 존재합니다."), HttpStatus.OK);
+        return new ResponseEntity<Success>(new Success(false, "동일한 이메일 주소가 존재합니다."), HttpStatus.CONFLICT);
     }
 
     @PostMapping("/signout")
-    public ResponseEntity<Success> logout(HttpServletRequest request) {
+    public ResponseEntity<UserInfoResponseDto> logout(HttpServletRequest request ,@AuthenticationPrincipal User user) {
+        String nickname = user.getNickname();
+        String gitHubLink = user.getGithubLink();
+        String introduce = user.getIntroduce();
+        Long id = user.getId();
+        String profileImg = user.getProfileImageUrl();
+        String token = user.getToken();
+
         //로그아웃시에 Conttext holder에 있는 사용자 정보 컨텐츠 값을 지줘준다.
         userProfileService.logout(request);
-        return new ResponseEntity<>(new Success(true, "로그아웃 성공"), HttpStatus.OK);
+
+        return new ResponseEntity<UserInfoResponseDto>(UserInfoResponseDto.builder()
+                .user(UserInfoResponseDto.UserBody.builder()
+                        .nickname(nickname)
+                        .githubLink(gitHubLink)
+                        .introduce(introduce)
+                        .id(id)
+                        .profileImageUrl(profileImg)
+                        .build())
+                .token(token)
+                .build(), HttpStatus.OK);
     }
 
 
@@ -167,8 +184,12 @@ public class UserController {
     }
 
     @GetMapping("/user/kakao/callback")
-    public ResponseEntity<UserInfoResponseDto> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
+    public ResponseEntity<UserInfoResponseDto> kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
        User user =  kakaoUserService.kakaoLogin(code);
+
+        //로그인이 오류없이 처리 되었다면 Autorization 토큰을 헤더에 실어 보내준다.
+        TokenResponseDto token = userProfileService.giveToken(user.getEmail());
+        response.setHeader("Authorization", token.getAuthorization());
 
         return new ResponseEntity<>(UserInfoResponseDto.builder()
                 .user(UserInfoResponseDto.UserBody.builder()
