@@ -4,6 +4,7 @@ import com.team7.project._timestamped.model.Timestamped;
 import com.team7.project.comments.model.Comment;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.scrap.model.Scrap;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Fetch;
@@ -52,8 +53,9 @@ public class User extends Timestamped implements UserDetails {
     @Column(nullable = true)
     private String token;
 
+
     @Column(nullable = false)
-    private String isDeleted;
+    private Boolean isDeleted;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
@@ -66,6 +68,59 @@ public class User extends Timestamped implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
     List<Comment> comments = new ArrayList<>();
+    //------------------------------------------------
+    //Scrap 과 Comment 구현 전
+//    public void addScrap(Scrap scrap) {
+//        this.scraps.add(scrap);
+//        scrap.setUser(this);
+//    }
+//
+//    public void addComment(Comment comment) {
+//        this.comments.add(commnet);
+//        comment.setUser(this);
+//    }
+    //-------------------------------------------
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @Builder
+    public User(String nickname, String password, String email, boolean isValid, String profileImageUrl,String githubLink,
+                String introduce, String token,String provider, boolean isDeleted, Role role){
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+        this.profileImageUrl=profileImageUrl;
+        this.githubLink = githubLink;
+        this.introduce = introduce;
+        this.provider = provider;
+        this.isValid = isValid;
+        this.isDeleted = isDeleted;
+        this.token = token;
+        this.role=role;
+    }
+
+    public User update(String nickname, String password,String githubLink,String introduce,String profileImageUrl,String token){
+        this.nickname = nickname;
+        this.password = password;
+        this.githubLink = githubLink;
+        this.introduce = introduce;
+        this.profileImageUrl = profileImageUrl;
+        this.token = token;
+
+        return this;
+    }
+    public void setIsDeleted(boolean deleted){
+        this.isDeleted = deleted;
+    }
+    public User isEmailvalidUser(boolean isValid){
+        this.isValid = true;
+        return this;
+    }
+    public String getRoleKey(){
+        return this.role.getKey();
+    }
 
 
     @Override
