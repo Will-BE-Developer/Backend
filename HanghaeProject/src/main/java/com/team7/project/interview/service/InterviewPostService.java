@@ -42,7 +42,6 @@ public class InterviewPostService {
     public String generatePresignedPost(String objectKey) {
         Date expireTime = new Date();
         expireTime.setTime(expireTime.getTime() + ONE_HOUR);
-        System.out.println("expireTime.getTime() = " + expireTime.getTime());
 
         // Generate the pre-signed URL.
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
@@ -66,14 +65,16 @@ public class InterviewPostService {
 
     @Transactional
     public InterviewInfoResponseDto completeInterview(User user, Long interviewId , InterviewPostRequestDto requestDto) {
-
-        //      need Refactoring(exception handling)
+        
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(RuntimeException::new);
-        //      need Refactoring(exception handling)
+                .orElseThrow(
+                        () -> new RestException(HttpStatus.BAD_REQUEST,"해당 인터뷰가 존재하지 않습니다.")
+                );
+
         Question question = questionRepository.findById(requestDto.getQuestionId())
-                .orElseThrow(RuntimeException::new);
-        //      need Refactoring(exception handling)
+                .orElseThrow(
+                        () -> new RestException(HttpStatus.BAD_REQUEST,"해당 질문이 존재하지 않습니다.")
+                );
 
         if(interview.getUser().getId() != user.getId()){
             throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 게시글을 업로드 할 수 없습니다.");
