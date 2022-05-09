@@ -3,7 +3,6 @@ package com.team7.project.comments.model;
 
 import com.team7.project._timestamped.model.Timestamped;
 import com.team7.project.interview.model.Interview;
-import com.team7.project.question.model.Question;
 import com.team7.project.user.model.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

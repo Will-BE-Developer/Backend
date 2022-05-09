@@ -19,7 +19,7 @@ public class CategoryController {
     @GetMapping("/api/categories")
     public ResponseEntity<CategoryResponseDto> getAllCategories() {
         List<CategoryEnum> categoryEnumList = categoryService.getCategoryNames();
-
-        return new ResponseEntity<>(new CategoryResponseDto(categoryEnumList), HttpStatus.OK);
+        CategoryResponseDto body = new CategoryResponseDto(categoryEnumList);
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 }

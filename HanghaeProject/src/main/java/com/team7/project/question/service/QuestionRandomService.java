@@ -57,9 +57,11 @@ public class QuestionRandomService {
 
 //    need refactoring, just test
     public void init(){
-        for(int i = 1; i < 13; ++i){
+        List<CategoryEnum> categoryEnums = Arrays.asList(CategoryEnum.values());
+        for(CategoryEnum categoryEnum: categoryEnums){
+            String categoryName = categoryEnum.name();
             for (int j = 1; j< 10; ++j){
-                saveQuestion(new QuestionRequestDto("DummyQuestion"+ i +"-"+ j , "test", "DUMMY"+i));
+                saveQuestion(new QuestionRequestDto(categoryName +"-"+ j , "reference test", categoryName));
             }
         }
     }

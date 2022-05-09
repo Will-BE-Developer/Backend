@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,30 +24,33 @@ public class InterviewController {
 
 
     @GetMapping("/api/interviews")
-    public InterviewListResponse readInterviews(@RequestParam(value = "per", defaultValue = "8") int per, @RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "sort", defaultValue = "new") String sort) {
+    public ResponseEntity<InterviewListResponse> readInterviews(@RequestParam(value = "per", defaultValue = "8") int per, @RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "sort", defaultValue = "new") String sort) {
 //      assume user id is 1
         // note that pageable start with 0
         Pageable pageable = PageRequest.of(page - 1, per, Sort.by("createdAt").descending());
-        return interviewGeneralService.readAllInterviews(pageable);
+        InterviewListResponse body = interviewGeneralService.readAllInterviews(pageable);
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     @GetMapping("/api/interviews/{interviewId}")
-    public InterviewResponse readOneInterview(@PathVariable Long interviewId) {
+    public ResponseEntity<InterviewResponse> readOneInterview(@PathVariable Long interviewId) {
 //       assume user id is 1
-
-        return interviewGeneralService.readOneInterview(interviewId);
+        InterviewResponse body = interviewGeneralService.readOneInterview(interviewId);
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     @GetMapping("/api/interviews/draft")
-    public InterviewDraftResponse createInterviewDraft() {
+    public ResponseEntity<InterviewDraftResponse> createInterviewDraft() {
 //       assume user id is 1
         Interview interview = interviewUploadService.createInterviewDraft(1L);
 
         String videoUrl = interviewUploadService.generatePresignedPost(interview.getVideoKey());
         String thumbnailUrl = interviewUploadService.generatePresignedPost(interview.getThumbnailKey());
 
-        return new InterviewDraftResponse(new InterviewDraftResponse.InterviewDraftBody(interview.getId()),
+        InterviewDraftResponse body = new InterviewDraftResponse(new InterviewDraftResponse.InterviewDraftBody(interview.getId()),
                 new InterviewDraftResponse.UrlBody(videoUrl, thumbnailUrl));
+
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     @PostMapping("/api/interviews/{interviewId}")
