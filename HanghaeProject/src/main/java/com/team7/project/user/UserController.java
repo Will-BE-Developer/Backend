@@ -132,6 +132,7 @@ public class UserController {
         userProfileService.logout(request);
 
         if(provider =="kakao"){
+            log.info("CONTORLLER >> LOGOUT >> 카카오 로그아웃시작 ");
             kakaoUserService.kakaoLogout(token);
         }
 

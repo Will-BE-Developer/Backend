@@ -188,7 +188,8 @@ import java.util.UUID;
                 URL url = new URL(reqURL);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
-                conn.setRequestProperty("Authorization","Bearer"+ accessToken);
+                log.info("KAKAOUSERSERVICE >> KAKALO LOGOUT  >> accessToken : {}", accessToken );
+                conn.setRequestProperty("Authorization","Bearer "+ accessToken);
 
                 int responseCode = conn.getResponseCode();
                 log.info("responseCode : " + responseCode);
@@ -196,9 +197,9 @@ import java.util.UUID;
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
                 String result = "";
-                String line ="";
+                String line = "";
 
-                while((line = br.readLine()) != null){
+                while((line = br.readLine()) != null) {
                     result += line;
                 }
                 log.info("result is {}",result);
