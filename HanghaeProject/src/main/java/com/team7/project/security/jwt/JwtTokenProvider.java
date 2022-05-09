@@ -35,7 +35,7 @@ public class JwtTokenProvider {
     private static final long HOUR = 60 * MINUTE;
     private static final long DAY = 24 * HOUR;
 
-    private final long ACCESS_TOKEN_VALID_TIME = HOUR ;   // 1 시간
+    private final long ACCESS_TOKEN_VALID_TIME = DAY ;   // 1 시간
 
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
@@ -83,8 +83,9 @@ public class JwtTokenProvider {
         //request가 들어오는지 확인하는 sysout
         System.out.println("Authorization ::: "+request.getHeader("Authorization"));
         //Header에 토큰이 존재 하면 가져오고 아니면 null 반환
-        if (request.getHeader("Authorization") != null)
+        if (request.getHeader("Authorization") != null) {
             return request.getHeader("Authorization");
+        }
         return null;
     }
 
