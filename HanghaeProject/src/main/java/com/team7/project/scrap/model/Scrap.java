@@ -1,6 +1,6 @@
 package com.team7.project.scrap.model;
 
-import com.team7.project._timestamped.model.Timestamped;
+import com.team7.project._global.timestamped.model.Timestamped;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.user.model.User;
 import lombok.Getter;

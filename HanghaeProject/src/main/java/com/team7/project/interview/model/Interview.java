@@ -1,11 +1,10 @@
 package com.team7.project.interview.model;
 
-import com.team7.project._timestamped.model.Timestamped;
+import com.team7.project._global.timestamped.model.Timestamped;
 import com.team7.project.comments.model.Comment;
 import com.team7.project.question.model.Question;
 import com.team7.project.scrap.model.Scrap;
 import com.team7.project.user.model.User;
-import com.team7.project.weeklyInterview.model.WeeklyInterview;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,11 +29,14 @@ public class Interview extends Timestamped {
     @Column(nullable = false, unique = true)
     private String thumbnailKey;
 
-    @Column(nullable = true)
+    @Column(nullable = true, length = 1000)
     private String memo;
 
     @Column(nullable = false)
-    private String isPublic;
+    private Boolean isPublic;
+
+    @Column(nullable = false)
+    private Boolean isDone;
 
     @Column(nullable = false)
     private String badge;
@@ -54,6 +56,36 @@ public class Interview extends Timestamped {
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
     List<Comment> comments = new ArrayList<>();
+
+
+//    making draft
+    public Interview(String videoKey, String thumbnailKey){
+        this.videoKey = videoKey;
+        this.thumbnailKey = thumbnailKey;
+        this.memo = "";
+        this.isPublic = false;
+        this.isDone = false;
+        this.badge = "NONE";
+    }
+
+//    must be refactored with user
+    public Interview complete(String memo, Boolean isPublic, User user, Question question){
+        this.memo = memo;
+        this.isPublic = isPublic;
+//        this.user = user;
+        this.question = question;
+        this.isDone = true;
+        return this;
+    }
+
+    //    must be refactored
+    public Interview update(String memo, Boolean isPublic){
+        this.memo = memo;
+        this.isPublic = isPublic;
+        return this;
+    }
+
+
 
 
 //   private WeeklyInterview weeklyInterview;

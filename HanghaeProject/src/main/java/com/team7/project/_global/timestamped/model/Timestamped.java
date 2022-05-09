@@ -1,4 +1,4 @@
-package com.team7.project._timestamped.model;
+package com.team7.project._global.timestamped.model;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;

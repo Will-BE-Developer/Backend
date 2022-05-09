@@ -1,16 +1,16 @@
 package com.team7.project.user.model;
 
-import com.team7.project._timestamped.model.Timestamped;
+import com.team7.project._global.timestamped.model.Timestamped;
 import com.team7.project.comments.model.Comment;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.scrap.model.Scrap;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.security.core.GrantedAuthority;
+//import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.ArrayList;
