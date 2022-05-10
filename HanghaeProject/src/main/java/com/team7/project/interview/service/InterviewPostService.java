@@ -56,11 +56,18 @@ public class InterviewPostService {
 
 
     @Transactional
-    public Interview createInterviewDraft(Long userId) {
+    public Interview createInterviewDraft(User user) {
+        Long userId = user.getId();
         String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
         String objectKey = userId + "-"+ suffix;
 
-        return interviewRepository.save(new Interview("videos/" + objectKey, "thumbnails/" + objectKey));
+        Interview interview = interviewRepository.save(new Interview("videos/" + objectKey, "thumbnails/" + objectKey, user));
+        User userSet = userRepository.findById(userId).orElseThrow(
+                () -> new RestException(HttpStatus.BAD_REQUEST,"해당 유저가 존재하지 않습니다.")
+        );
+        userSet.getInterviews().add(interview);
+
+        return interview;
     }
 
     @Transactional
@@ -80,9 +87,7 @@ public class InterviewPostService {
             throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 게시글을 업로드 할 수 없습니다.");
         }
 
-        interview.complete(requestDto.getNote(), requestDto.getIsPublic(), user, question);
-
-        user.getInterviews().add(interview);
+        interview.complete(requestDto.getNote(), requestDto.getIsPublic(), question);
 
         return new InterviewInfoResponseDto(interview, interviewGeneralService.generatePresignedUrl(interview.getVideoKey()), interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()),true);
     }

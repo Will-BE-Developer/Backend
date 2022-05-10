@@ -66,7 +66,7 @@ public class InterviewController {
 
         log.info("UID " + loginUserId + " INIT POST INTERVIEW");
 
-        Interview interview = interviewPostService.createInterviewDraft(loginUserId);
+        Interview interview = interviewPostService.createInterviewDraft(user);
 
         String videoUrl = interviewPostService.generatePresignedPost(interview.getVideoKey());
         String thumbnailUrl = interviewPostService.generatePresignedPost(interview.getThumbnailKey());

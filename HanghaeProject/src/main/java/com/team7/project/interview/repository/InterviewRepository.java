@@ -13,4 +13,5 @@ import java.util.List;
 @Repository
 public interface InterviewRepository extends JpaRepository<Interview, Long> {
     Page<Interview> findAllByIsDone(Boolean isDone, Pageable pageable);
+    Page<Interview> findAllByIsDoneAndUser_Id(Boolean isDone, Long userId, Pageable pageable);
 }
