@@ -36,6 +36,9 @@ public class UserProfileService {
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new RestException(HttpStatus.BAD_REQUEST, "잘못된 비밀번호입니다.");
         }
+        if(user.getIsValid() == false){
+            throw new RestException(HttpStatus.BAD_REQUEST, "이메일 인증 후에 이용해주세요.");
+        }
 
         return user;
     }
