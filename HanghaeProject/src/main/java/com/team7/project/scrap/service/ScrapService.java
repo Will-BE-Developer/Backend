@@ -62,7 +62,7 @@ public class ScrapService {
                         () -> new RestException(HttpStatus.BAD_REQUEST, "해당 스크랩 정보가 존재하지 않습니다.")
                 );
 
-        scrapRepository.delete(scrap);
+        scrapRepository.deleteById(scrap.getId());
 
         return new ScrapInfoResponseDto(new ScrapInfoResponseDto.Data(interviewId, false, 999L));
     }
