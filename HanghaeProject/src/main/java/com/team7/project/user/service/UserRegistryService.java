@@ -1,6 +1,7 @@
 package com.team7.project.user.service;
 
 import com.team7.project.advice.RestException;
+import com.team7.project.mail.Service.MailService;
 import com.team7.project.security.jwt.JwtTokenProvider;
 import com.team7.project.user.dto.RegisterRequestDto;
 import com.team7.project.user.model.Role;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,6 +35,8 @@ public class UserRegistryService {
             log.info("SIGN_UP() >> registerUser >> Nickname 생성 {}", randomGenName.toString());
             requestDto.setNickname(randomGenName.toString());
         }
+        UUID uuid = UUID.randomUUID();
+        log.info("GENERATE UUID for EMAIL VaLIDATION TOKEN : {} ",uuid.toString());
         log.info("SIGN_UP() >> registerUser >> UserRepository 에 유저 정보 생성후 저장중...");
             User user = userRepository.save(User.builder()
                     .email(requestDto.getEmail())
@@ -40,10 +44,10 @@ public class UserRegistryService {
                     .nickname(requestDto.getNickname())
                     .role(Role.GUEST)
                     .provider("email")
+                    .token(uuid.toString())
                     .isDeleted(false)
-                    .isValid(true)
+                    .isValid(false)
                     .build());
-
         log.info("SIGN_UP() >> registerUser() >>  return user ");
             return user;
     }
