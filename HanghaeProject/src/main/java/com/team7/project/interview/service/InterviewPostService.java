@@ -56,40 +56,42 @@ public class InterviewPostService {
 
 
     @Transactional
-    public Interview createInterviewDraft(User user) {
-        Long userId = user.getId();
+    public Interview createInterviewDraft(Long loginUserId) {
+
+        User user = userRepository.findById(loginUserId).orElseThrow(
+                () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
+        );
+
         String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
-        String objectKey = userId + "-"+ suffix;
+        String objectKey = loginUserId + "-" + suffix;
 
         Interview interview = interviewRepository.save(new Interview("videos/" + objectKey, "thumbnails/" + objectKey, user));
-        User userSet = userRepository.findById(userId).orElseThrow(
-                () -> new RestException(HttpStatus.BAD_REQUEST,"해당 유저가 존재하지 않습니다.")
-        );
-        userSet.getInterviews().add(interview);
+
+        user.getInterviews().add(interview);
 
         return interview;
     }
 
     @Transactional
-    public InterviewInfoResponseDto completeInterview(User user, Long interviewId , InterviewPostRequestDto requestDto) {
-        
+    public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) {
+
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST,"해당 인터뷰가 존재하지 않습니다.")
+                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
                 );
 
         Question question = questionRepository.findById(requestDto.getQuestionId())
                 .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST,"해당 질문이 존재하지 않습니다.")
+                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 질문이 존재하지 않습니다.")
                 );
 
-        if(interview.getUser().getId() != user.getId()){
+        if (interview.getUser().getId() != loginUserId) {
             throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 게시글을 업로드 할 수 없습니다.");
         }
 
         interview.complete(requestDto.getNote(), requestDto.getIsPublic(), question);
 
-        return new InterviewInfoResponseDto(interview, interviewGeneralService.generatePresignedUrl(interview.getVideoKey()), interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()),true);
+        return new InterviewInfoResponseDto(interview, interviewGeneralService.generatePresignedUrl(interview.getVideoKey()), interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()), true, false, 0L);
     }
 
 }

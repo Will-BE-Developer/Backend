@@ -42,7 +42,7 @@ public class InterviewInfoResponseDto {
         private String updatedAt;
     }
 
-    public InterviewInfoResponseDto(Interview interview, String videoUrl, String imageUrl, Boolean isMine){
+    public InterviewInfoResponseDto(Interview interview, String videoUrl, String imageUrl, Boolean isMine, Boolean scrapsMe, Long scrapsCount){
         Question question = interview.getQuestion();
         Long questionId = question.getId();
         String questionCategory = question.getCategory().name();
@@ -72,8 +72,8 @@ public class InterviewInfoResponseDto {
                 .user(userBody)
                 .badge(interview.getBadge())
                 .note(interview.getMemo())
-                .scrapsMe(false)
-                .scrapsCount(0L)
+                .scrapsMe(scrapsMe)
+                .scrapsCount(scrapsCount)
                 .likesCount(0L)
                 .isPublic(interview.getIsPublic())
                 .isMine(isMine)

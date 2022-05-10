@@ -10,7 +10,9 @@ import com.team7.project.interview.dto.InterviewListResponseDto;
 import com.team7.project.interview.dto.InterviewUpdateRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
+import com.team7.project.scrap.model.Scrap;
 import com.team7.project.user.model.User;
+import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -20,16 +22,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class InterviewMyPageService {
     private final InterviewRepository interviewRepository;
+    private final UserRepository userRepository;
 
     private static final long ONE_HOUR = 1000 * 60 * 60; // 1시간
     private final AmazonS3Client amazonS3Client;
@@ -55,17 +55,30 @@ public class InterviewMyPageService {
 
     public InterviewListResponseDto readAllMyInterviews(Pageable pageable, Long loginUserId){
 
+        User user = userRepository.findById(loginUserId)
+                .orElseThrow(
+                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
+                );
+
         Page<Interview> interviews = interviewRepository.findAllByIsDoneAndUser_Id(true, loginUserId, pageable);
+
         List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
+        Set<Long> userScrapsId = new HashSet<>();
+        for(Scrap scrap: user.getScraps()){
+            userScrapsId.add(scrap.getInterview().getId());
+        }
 
         for(Interview interview: interviews.getContent()){
 
             Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
 
+            Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
+            Long scrapsCount = (long) interview.getScraps().size();
+
             String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
             String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
 
-            InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine);
+            InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine, scrapsMe, scrapsCount);
 
             responses.add(response.getInterview());
 

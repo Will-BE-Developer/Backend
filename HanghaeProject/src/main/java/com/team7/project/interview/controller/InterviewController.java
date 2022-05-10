@@ -40,7 +40,7 @@ public class InterviewController {
         // note that pageable start with 0
         Pageable pageable = PageRequest.of(page - 1, per, Sort.by("createdAt").descending());
 
-        InterviewListResponseDto body = interviewGeneralService.readAllInterviews(pageable, loginUserId);
+        InterviewListResponseDto body = interviewGeneralService.readAllInterviews(loginUserId, pageable);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
@@ -66,7 +66,7 @@ public class InterviewController {
 
         log.info("UID " + loginUserId + " INIT POST INTERVIEW");
 
-        Interview interview = interviewPostService.createInterviewDraft(user);
+        Interview interview = interviewPostService.createInterviewDraft(loginUserId);
 
         String videoUrl = interviewPostService.generatePresignedPost(interview.getVideoKey());
         String thumbnailUrl = interviewPostService.generatePresignedPost(interview.getThumbnailKey());
@@ -88,7 +88,7 @@ public class InterviewController {
 
         log.info("UID " + loginUserId + " COMPLETE POST INTERVIEW " + interviewId);
 
-        InterviewInfoResponseDto body = interviewPostService.completeInterview(user, interviewId, requestDto);
+        InterviewInfoResponseDto body = interviewPostService.completeInterview(loginUserId, interviewId, requestDto);
 
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
@@ -104,7 +104,7 @@ public class InterviewController {
 
         log.info("UID " + loginUserId + " UPDATE INTERVIEW " + interviewId);
 
-        InterviewInfoResponseDto body = interviewGeneralService.updateInterview(interviewId, requestDto, user);
+        InterviewInfoResponseDto body = interviewGeneralService.updateInterview(loginUserId, interviewId, requestDto);
 
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
@@ -119,7 +119,7 @@ public class InterviewController {
 
         log.info("UID " + loginUserId + " DELETE INTERVIEW " + interviewId);
 
-        InterviewInfoResponseDto body = interviewGeneralService.deleteInterview(interviewId, user);
+        InterviewInfoResponseDto body = interviewGeneralService.deleteInterview(loginUserId, interviewId);
 
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
