@@ -174,7 +174,7 @@ public class InterviewGeneralService {
                         () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
                 );
 
-        Boolean isMine = Objects.equals(user.getId(), interviewId);
+        Boolean isMine = Objects.equals(user.getId(), interview.getUser().getId());
 
         Set<Long> userScrapsId = new HashSet<>();
         for (Scrap scrap : user.getScraps()) {
@@ -184,14 +184,14 @@ public class InterviewGeneralService {
         Long scrapsCount = (long) interview.getScraps().size();
 
         if (isMine == false) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 인터뷰를 수정 할 수 않습니다.");
+            throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 인터뷰를 수정 할 수 없습니다.");
         }
 
         String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
         String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
         InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine, scrapsMe, scrapsCount);
 
-        interviewRepository.deleteById(interviewId);
+        interviewRepository.delete(interview);
 
         return response;
     }
