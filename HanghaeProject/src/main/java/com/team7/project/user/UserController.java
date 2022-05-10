@@ -126,9 +126,15 @@ public class UserController {
         Long id = user.getId();
         String profileImg = user.getProfileImageUrl();
         String token = user.getToken();
+        String provider = user.getProvider();
 
         //로그아웃시에 Conttext holder에 있는 사용자 정보 컨텐츠 값을 지줘준다.
         userProfileService.logout(request);
+
+        if(provider =="kakao"){
+            log.info("CONTORLLER >> LOGOUT >> 카카오 로그아웃시작 ");
+            kakaoUserService.kakaoLogout(token);
+        }
 
         return new ResponseEntity<UserInfoResponseDto>(UserInfoResponseDto.builder()
                 .user(UserInfoResponseDto.UserBody.builder()
