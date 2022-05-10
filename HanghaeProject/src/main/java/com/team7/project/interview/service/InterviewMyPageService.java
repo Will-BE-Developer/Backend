@@ -91,4 +91,43 @@ public class InterviewMyPageService {
         return new InterviewListResponseDto(responses, pagination);
     }
 
+    public InterviewListResponseDto readAllMyScraps(Pageable pageable, Long loginUserId){
+
+        User user = userRepository.findById(loginUserId)
+                .orElseThrow(
+                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
+                );
+
+        Page<Interview> interviews = interviewRepository.findAllByIsDoneAndScraps_User_Id(true, loginUserId, pageable);
+
+        List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
+        Set<Long> userScrapsId = new HashSet<>();
+        for(Scrap scrap: user.getScraps()){
+            userScrapsId.add(scrap.getInterview().getId());
+        }
+
+        for(Interview interview: interviews.getContent()){
+
+            Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
+
+            Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
+            Long scrapsCount = (long) interview.getScraps().size();
+
+            String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
+            String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
+
+            InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine, scrapsMe, scrapsCount);
+
+            responses.add(response.getInterview());
+
+        }
+
+        PaginationResponseDto pagination = new PaginationResponseDto((long) pageable.getPageSize(),
+                interviews.getTotalElements(),
+                (long) pageable.getPageNumber() + 1);
+
+        return new InterviewListResponseDto(responses, pagination);
+    }
+
+
 }

@@ -191,7 +191,7 @@ public class InterviewGeneralService {
         String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
         InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine, scrapsMe, scrapsCount);
 
-        interviewRepository.delete(interview);
+        interviewRepository.deleteById(interviewId);
 
         return response;
     }

@@ -26,7 +26,7 @@ public class UserMyPageController {
 
 
     @GetMapping("/api/users/me/interviews")
-    public ResponseEntity<InterviewListResponseDto> readInterviews(@RequestParam(value = "per", defaultValue = "8") int per,
+    public ResponseEntity<InterviewListResponseDto> readMyInterviews(@RequestParam(value = "per", defaultValue = "8") int per,
                                                                    @RequestParam(value = "page", defaultValue = "1") int page,
                                                                    @RequestParam(value = "sort", defaultValue = "new") String sort,
                                                                    @AuthenticationPrincipal User user) {
@@ -45,6 +45,29 @@ public class UserMyPageController {
         Pageable pageable = PageRequest.of(page - 1, per, Sort.by("createdAt").descending());
 
         InterviewListResponseDto body = interviewMyPageService.readAllMyInterviews(pageable, loginUserId);
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/users/me/scraps")
+    public ResponseEntity<InterviewListResponseDto> readScrapInterviews(@RequestParam(value = "per", defaultValue = "8") int per,
+                                                                   @RequestParam(value = "page", defaultValue = "1") int page,
+                                                                   @RequestParam(value = "sort", defaultValue = "new") String sort,
+                                                                   @AuthenticationPrincipal User user) {
+        if (per < 1) {
+            throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
+        }
+
+        if (user == null) {
+            throw new RestException(HttpStatus.UNAUTHORIZED, "로그인을 해야합니다.");
+        }
+        Long loginUserId = user.getId();
+
+        log.info("UID " + loginUserId + " READ ALL MY INTERVIEWS");
+
+        // note that pageable start with 0
+        Pageable pageable = PageRequest.of(page - 1, per, Sort.by("createdAt").descending());
+
+        InterviewListResponseDto body = interviewMyPageService.readAllMyScraps(pageable, loginUserId);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
