@@ -38,7 +38,7 @@ public class UserRegistryService {
         UUID uuid = UUID.randomUUID();
         log.info("GENERATE UUID for EMAIL VaLIDATION TOKEN : {} ",uuid.toString());
         log.info("SIGN_UP() >> registerUser >> UserRepository 에 유저 정보 생성후 저장중...");
-            User user = userRepository.save(User.builder()
+            User user = userRepository.saveAndFlush(User.builder()
                     .email(requestDto.getEmail())
                     .password(passwordEncoder.encode(requestDto.getPassword()))
                     .nickname(requestDto.getNickname())
