@@ -256,14 +256,14 @@ public class UserController {
   
     //마이페이지 - 사용자 프로필 정보 수정
     @ResponseBody
-    @PutMapping(value = "/api/users/me", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity editUserInfo(@RequestPart UserRequestDto requestDto,
-                                       @RequestPart(value="profileImage", required = false)  MultipartFile profileImage,
-                                       @AuthenticationPrincipal User user) throws IOException {
-        if (profileImage == null){
-            System.out.println("profileImage is null");
-        }
+    @PutMapping(value = "/api/users/me", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity editUserInfo2 (@RequestPart(value="nickname", required = false) String nickname,
+                                         @RequestPart(value="githubLink", required = false) String githubLink,
+                                         @RequestPart(value="introduce", required = false) String introduce,
+                                         @RequestPart(value="profileImage", required = false) MultipartFile profileImage,
+                                         @AuthenticationPrincipal User user) throws IOException {
 
+        UserRequestDto requestDto = new UserRequestDto(nickname, githubLink, profileImage, introduce);
         requestDto.setProfileImage(profileImage);
 
         User savedUser = userMypageService.save(requestDto, user);
