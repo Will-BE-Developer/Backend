@@ -56,6 +56,34 @@ public class InterviewGeneralService {
         return url.toString();
     }
 
+    public String generateProfileImageUrl(String image) {
+        return (image.contains("http://") | image.contains("https://")) ? image : generatePresignedUrl(image);
+    }
+
+    public Set<Long> createUserScrapIds(User user) {
+        Set<Long> userScrapsId = new HashSet<>();
+        if (user != null) {
+            for (Scrap scrap : user.getScraps()) {
+                userScrapsId.add(scrap.getInterview().getId());
+            }
+        }
+        return userScrapsId;
+    }
+
+    public InterviewInfoResponseDto createInterviewResponse(Long loginUserId, Set<Long> userScrapsId, Interview interview) {
+        Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
+
+        Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
+        Long scrapsCount = (long) interview.getScraps().size();
+
+        String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
+        String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
+        String profilePresignedUrl = generateProfileImageUrl(interview.getUser().getProfileImageUrl());
+
+        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl,profilePresignedUrl, isMine, scrapsMe, scrapsCount);
+    }
+
+
     public InterviewListResponseDto readAllInterviews(Long loginUserId, String sort, String filter, Pageable pageable) {
 
         User user = loginUserId == null ?
@@ -65,8 +93,9 @@ public class InterviewGeneralService {
                                 () -> new RestException(HttpStatus.NOT_FOUND, "해당 유저가 존재하지 않습니다.")
                         );
 
-        Page<Interview> interviews;
         List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
+
+        Page<Interview> interviews;
         if (sort.equals("scrap")) {
             interviews = filter.equals("default") ?
                     interviewRepository.findAllOrderByScrapsCountDesc(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize())) :
@@ -79,25 +108,11 @@ public class InterviewGeneralService {
                     interviewRepository.findAllByIsDoneAndIsPublicAndQuestion_Category(true, true, CategoryEnum.valueOf(filter), pageable);
         }
 
-        Set<Long> userScrapsId = new HashSet<>();
-        if (user != null) {
-            for (Scrap scrap : user.getScraps()) {
-                userScrapsId.add(scrap.getInterview().getId());
-            }
-        }
-
+        Set<Long> userScrapsId = createUserScrapIds(user);
 
         for (Interview interview : interviews.getContent()) {
 
-            Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
-
-            Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
-            Long scrapsCount = (long) interview.getScraps().size();
-
-            String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
-            String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
-
-            InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine, scrapsMe, scrapsCount);
+            InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
 
             responses.add(response.getInterview());
 
@@ -124,21 +139,9 @@ public class InterviewGeneralService {
                         () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
                 );
 
-        Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
+        Set<Long> userScrapsId = createUserScrapIds(user);
 
-        Set<Long> userScrapsId = new HashSet<>();
-        if (user != null) {
-            for (Scrap scrap : user.getScraps()) {
-                userScrapsId.add(scrap.getInterview().getId());
-            }
-        }
-        Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
-        Long scrapsCount = (long) interview.getScraps().size();
-
-        String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
-        String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
-
-        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine, scrapsMe, scrapsCount);
+        return createInterviewResponse(loginUserId, userScrapsId, interview);
     }
 
     @Transactional
@@ -155,25 +158,16 @@ public class InterviewGeneralService {
                 );
 
         Boolean isMine = Objects.equals(loginUserId, interview.getUser().getId());
-
         if (isMine == false) {
             throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 인터뷰를 수정 할 수 않습니다.");
         }
 
-        Set<Long> userScrapsId = new HashSet<>();
-        for (Scrap scrap : user.getScraps()) {
-            userScrapsId.add(scrap.getInterview().getId());
-        }
-        Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
-        Long scrapsCount = (long) interview.getScraps().size();
-
-
         interview.update(requestDto.getNote(), requestDto.getIsPublic());
+        interviewRepository.saveAndFlush(interview);
 
-        String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
-        String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
+        Set<Long> userScrapsId = createUserScrapIds(user);
 
-        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine, scrapsMe, scrapsCount);
+        return createInterviewResponse(loginUserId, userScrapsId, interview);
     }
 
     @Transactional
@@ -190,26 +184,17 @@ public class InterviewGeneralService {
                 );
 
         Boolean isMine = Objects.equals(user.getId(), interview.getUser().getId());
-
-        Set<Long> userScrapsId = new HashSet<>();
-        for (Scrap scrap : user.getScraps()) {
-            userScrapsId.add(scrap.getInterview().getId());
-        }
-        Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
-        Long scrapsCount = (long) interview.getScraps().size();
-
         if (isMine == false) {
             throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 인터뷰를 수정 할 수 없습니다.");
         }
 
-        String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
-        String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
-        InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine, scrapsMe, scrapsCount);
+        Set<Long> userScrapsId = createUserScrapIds(user);
+
+        InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
 
         interviewRepository.deleteById(interviewId);
 
         return response;
     }
-
 
 }
