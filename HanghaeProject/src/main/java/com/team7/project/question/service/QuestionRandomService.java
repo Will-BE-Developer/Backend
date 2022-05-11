@@ -22,6 +22,7 @@ import java.util.List;
 public class QuestionRandomService {
     private final QuestionRepository questionRepository;
 
+    @Transactional
     public Question getRandomQuestion(CategoryEnum categoryEnum){
         List<Question> questions = questionRepository.findAllByCategory(categoryEnum);
 //        need Refactoring
@@ -55,6 +56,7 @@ public class QuestionRandomService {
     }
 
 //    need refactoring, just test
+    @Transactional
     public void init(){
         List<CategoryEnum> categoryEnums = Arrays.asList(CategoryEnum.values());
         for(CategoryEnum categoryEnum: categoryEnums){
