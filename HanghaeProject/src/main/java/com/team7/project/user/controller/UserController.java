@@ -36,7 +36,6 @@ public class UserController {
     private final UserRegistryService userRegistryService;
     private final UserProfileService userProfileService;
     private final KakaoUserService kakaoUserService;
-    private final UserMypageService userMypageService;
     private final MailService mailService;
 
     @PostMapping("/signin")
@@ -253,43 +252,5 @@ public class UserController {
                 .token(user.getToken())
                 .build(), HttpStatus.OK);
     }
-  
-    //마이페이지 - 사용자 프로필 정보 수정
-    @ResponseBody
-    @PutMapping(value = "/api/users/me", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity editUserInfo2 (@RequestPart(value="nickname", required = false) String nickname,
-                                         @RequestPart(value="githubLink", required = false) String githubLink,
-                                         @RequestPart(value="introduce", required = false) String introduce,
-                                         @RequestPart(value="profileImage", required = false) MultipartFile profileImage,
-                                         @AuthenticationPrincipal User user) throws IOException {
-
-        UserRequestDto requestDto = new UserRequestDto(nickname, githubLink, profileImage, introduce);
-        requestDto.setProfileImage(profileImage);
-
-        User savedUser = userMypageService.save(requestDto, user);
-
-        UserReponseDto userReponseDto = new UserReponseDto(savedUser);
-
-        return new ResponseEntity(userReponseDto, HttpStatus.OK);
-    }
-
-    @ResponseBody
-    @PutMapping(value = "/api/users/me2", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity editUserInfo2 (@RequestParam(required = false) String nickname,
-                                       @RequestParam(required = false) String githubLink,
-                                       @RequestParam(required = false) String introduce,
-                                       @RequestParam(required = false) MultipartFile profileImage,
-                                       @AuthenticationPrincipal User user) throws IOException {
-
-        UserRequestDto requestDto = new UserRequestDto(nickname, githubLink, profileImage, introduce);
-        requestDto.setProfileImage(profileImage);
-
-        User savedUser = userMypageService.save(requestDto, user);
-
-        UserReponseDto userReponseDto = new UserReponseDto(savedUser);
-
-        return new ResponseEntity(userReponseDto, HttpStatus.OK);
-    }
-
 }
 
