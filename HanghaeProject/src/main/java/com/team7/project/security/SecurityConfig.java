@@ -65,12 +65,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/signin/**").permitAll()
                 .antMatchers("/h2-console").permitAll()
                 .antMatchers("/user/**").permitAll()
+                .antMatchers(HttpMethod.GET,"/api/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/users/me").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout()
                 .logoutSuccessUrl("/");
-
     }
 
     @Bean

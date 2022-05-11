@@ -3,6 +3,7 @@ package com.team7.project.user;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.team7.project.advice.RestException;
 import com.team7.project.advice.Success;
+import com.team7.project.mail.Service.MailService;
 import com.team7.project.security.jwt.TokenResponseDto;
 import com.team7.project.user.dto.*;
 import com.team7.project.user.model.User;
@@ -36,9 +37,12 @@ public class UserController {
     private final UserProfileService userProfileService;
     private final KakaoUserService kakaoUserService;
     private final UserMypageService userMypageService;
+    private final MailService mailService;
 
     @PostMapping("/signin")
-    public ResponseEntity<UserInfoResponseDto> Signin(@RequestBody LoginRequestDto requestDto, @AuthenticationPrincipal User users, HttpServletResponse response, Errors errors) {
+    public ResponseEntity<UserInfoResponseDto> Signin(@RequestBody LoginRequestDto requestDto,
+                                                      @AuthenticationPrincipal User users,
+                                                      HttpServletResponse response, Errors errors) {
         //이미 로그인되어 있다면 사용자는 로그인 할 수 없다.
         if(users !=null){
             throw new RestException(HttpStatus.BAD_REQUEST, "이미 로그인된 사용자 입니다.");
@@ -99,6 +103,7 @@ public class UserController {
             //모든 조건이 충족될경우에 회원가입을 진행한다.
             User register = userRegistryService.registerUser(requestDto);
             log.info("SIGN_UP() >> 회원가입 완료!");
+            mailService.sendEmail(register.getEmail(),register.getToken());
             return new ResponseEntity<UserInfoResponseDto>(UserInfoResponseDto.builder()
                     .user(UserInfoResponseDto.UserBody.builder()
                                     .nickname(register.getNickname())
@@ -129,9 +134,15 @@ public class UserController {
         Long id = user.getId();
         String profileImg = user.getProfileImageUrl();
         String token = user.getToken();
+        String provider = user.getProvider();
 
         //로그아웃시에 Conttext holder에 있는 사용자 정보 컨텐츠 값을 지줘준다.
         userProfileService.logout(request);
+
+        if(provider =="kakao"){
+            log.info("CONTORLLER >> LOGOUT >> 카카오 로그아웃시작 ");
+            kakaoUserService.kakaoLogout(token);
+        }
 
         return new ResponseEntity<UserInfoResponseDto>(UserInfoResponseDto.builder()
                 .user(UserInfoResponseDto.UserBody.builder()
@@ -206,6 +217,39 @@ public class UserController {
                 .build(), HttpStatus.OK);
     }
 
+    @GetMapping("/signin/validation")
+    public ResponseEntity<UserInfoResponseDto> emailValidationandLogin(@RequestParam String token,
+                                                                       @RequestParam String email,
+                                                                       HttpServletRequest request,
+                                                                       @AuthenticationPrincipal User users,
+                                                                       HttpServletResponse response){
+        //logout 되어있지 않다면 일단 로그아웃 시킨다.
+        if(users !=null){
+            log.info("USER CONTROLLER >> logging out currnet user");
+            userProfileService.logout(request);
+        }
+        //isvalid 값을 바꿔준다.
+
+        User user = userProfileService.validateUser(email,token);
+        log.info("USER CONTROLLER >>change validation : from {} : ", user.getIsValid());
+        //성공했으면 로그인 시켜준다.
+
+        log.info("USER CONTROLLER >> 로그인 시켜주는 중 >>  토큰 발급 중 ... ");
+        TokenResponseDto accessToken = userProfileService.giveToken(email);
+        response.setHeader("Authorization", accessToken.getAuthorization());
+
+        return new ResponseEntity<>(UserInfoResponseDto.builder()
+                .user(UserInfoResponseDto.UserBody.builder()
+                        .nickname(user.getNickname())
+                        .githubLink(user.getGithubLink())
+                        .introduce(user.getIntroduce())
+                        .id(user.getId())
+                        .profileImageUrl(user.getProfileImageUrl())
+                        .build())
+                .token(user.getToken())
+                .build(), HttpStatus.OK);
+    }
+  
     //마이페이지 - 사용자 프로필 정보 수정
     @ResponseBody
     @PutMapping(value = "/api/users/me", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})

@@ -1,18 +1,21 @@
 package com.team7.project.question.service;
 
+import com.team7.project.advice.RestException;
 import com.team7.project.category.model.CategoryEnum;
 //import com.team7.project.category.repository.CategoryRepository;
 import com.team7.project.question.dto.QuestionRequestDto;
 import com.team7.project.question.model.Question;
 import com.team7.project.question.repostitory.QuestionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
 
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -36,23 +39,19 @@ public class QuestionRandomService {
 
         //compare with String value
         if(categoryEnums.contains(CategoryEnum.valueOf(questionRequestDto.getCategory()))){
-            //do something
+
             String contents = questionRequestDto.getContents();
             String reference = questionRequestDto.getReference();
             CategoryEnum category = CategoryEnum.valueOf(questionRequestDto.getCategory());
+
             return questionRepository.save(new Question(contents, reference, category));
         }
         else
         {
-            // need exception refactoring
-            throw new IllegalArgumentException();
+            log.error(questionRequestDto.getCategory() + "라는 잘못된 카테고리를 입력했습니다.");
+            throw new RestException(HttpStatus.BAD_REQUEST, "잘못된 카테고리를 입력했습니다.");
         }
-//        Category category = categoryRepository.findByCategoryName(questionRequestDto.getCategory()).orElseThrow(
-////                need exception refactoring
-//                RuntimeException::new
-//        );
 
-//        category.addQuestion(question);
     }
 
 //    need refactoring, just test

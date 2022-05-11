@@ -25,6 +25,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.UUID;
 
 //https://kauth.kakao.com/oauth/authorize?client_id=본인의 REST API키&redirect_uri=http://localhost:8080/user/kakao/callback&response_type=code
@@ -50,7 +55,7 @@ import java.util.UUID;
             KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
 
             log.info("Contorller : KAKAO_LOGIN >> 3. 카카오 사용자 정보로 필요시 회원가입");
-            User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
+            User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo, accessToken);
 
             log.info("Contorller : KAKAO_LOGIN >> 4.강제 로그인 처리");
             forceLogin(kakaoUser);
@@ -68,7 +73,7 @@ import java.util.UUID;
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("grant_type", "authorization_code");
             body.add("client_id", "95272555e8189d2f079be8adc9c37e4f");
-            body.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
+            body.add("redirect_uri", "http://localhost:3000/user/kakao/callback");
             body.add("client_secret","oAfSkjWSsZb7DoeYcffn4XDYf8eMmgIr");
             body.add("code", code);
 
@@ -112,18 +117,30 @@ import java.util.UUID;
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(responseBody);
             Long id = jsonNode.get("id").asLong();
-            String nickname = jsonNode.get("properties")
-                    .get("nickname").asText();
+            String provider = "kakao";
+            String nickname;
+            String imageUrl;
+
             String email = jsonNode.get("kakao_account")
                     .get("email").asText();
-            String imageUrl=jsonNode.get("properties").get("profile_image").asText();
-            String provider = "kakao";
 
+            try {
+                nickname = jsonNode.get("properties")
+                        .get("nickname").asText();
+            }catch(NullPointerException e){
+                long number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
+                nickname = "윌비@" + number;
+            }
+            try {
+                imageUrl = jsonNode.get("properties").get("profile_image").asText();
+            }catch (NullPointerException e){
+                imageUrl = null;
+            }
 
             return new KakaoUserInfoDto(id, nickname, email,provider,imageUrl);
         }
 
-        private User registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
+        private User registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo, String accessToken) {
             log.info("Contorller : REGISTER_KAKAO_USER_IF_NEEDED >> 서버에 가입된 사용자가 있는지 조회중입니다...");
             String provider = kakaoUserInfo.getProvider();
             String email = kakaoUserInfo.getEmail();
@@ -151,6 +168,7 @@ import java.util.UUID;
                         .profileImageUrl(kakaoUserInfo.getImageUrl())
                         .isDeleted(false)
                         .isValid(true)
+                        .token(accessToken)
                         .build();
                 userRepository.save(kakaoUser);
             }
@@ -162,6 +180,34 @@ import java.util.UUID;
             log.info("Contorller : FORCE_LOGIN >> 스프링 시큐리티에 유저를 등록시키는 중입니다...");
             Authentication authentication = new UsernamePasswordAuthenticationToken(kakaoUser, null, kakaoUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        }
+        public void kakaoLogout(String accessToken){
+            String reqURL = "https://kapi.kakao.com/v1/user/logout";
+            try{
+                URL url = new URL(reqURL);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                log.info("KAKAOUSERSERVICE >> KAKALO LOGOUT  >> accessToken : {}", accessToken );
+                conn.setRequestProperty("Authorization","Bearer "+ accessToken);
+
+                int responseCode = conn.getResponseCode();
+                log.info("responseCode : " + responseCode);
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                String result = "";
+                String line = "";
+
+                while((line = br.readLine()) != null) {
+                    result += line;
+                }
+                log.info("result is {}",result);
+
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+
         }
     }
 

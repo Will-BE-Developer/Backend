@@ -8,6 +8,7 @@ public enum CategoryEnum {
     Database,
     Network,
     DataStructure,
+    Algorithm,
     Spring,
     React,
     Java,

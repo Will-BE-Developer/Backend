@@ -36,9 +36,13 @@ public class UserProfileService {
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new RestException(HttpStatus.BAD_REQUEST, "잘못된 비밀번호입니다.");
         }
+        if(user.getIsValid() == false){
+            throw new RestException(HttpStatus.BAD_REQUEST, "이메일 인증 후에 이용해주세요.");
+        }
 
         return user;
     }
+
     @Transactional
     public TokenResponseDto giveToken(String email){
         String accessToken = jwtTokenProvider.createAccessToken(email);
@@ -61,6 +65,20 @@ public class UserProfileService {
         userRepository.delete(deleteThis);
 //        deleteThis.setIsDeleted(true);
         return deleteThis;
+    }
+    @Transactional
+    public User validateUser(String email, String token){
+        User validatingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RestException(HttpStatus.NOT_FOUND,"회원이 존재하지 않습니다."));
+        log.info("CONTORLLER >> SERVICE >> VALIDATE_USER : {} ", validatingUser.getNickname());
+        if(validatingUser.getToken().equals(token)) {
+            validatingUser.isEmailvalidUser(true);
+            log.info("CONTORLLER >> SERVICE >> VALIDATE_USER change is valid to : {} ", validatingUser.getIsValid());
+        }else{
+            throw new RestException(HttpStatus.BAD_REQUEST,"유효한 토큰이 아닙니다");
+        }
+
+        return validatingUser;
     }
 
 }

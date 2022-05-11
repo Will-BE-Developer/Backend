@@ -50,35 +50,33 @@ public class Interview extends Timestamped {
     private Question question;
 
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Fetch(FetchMode.JOIN)
     List<Scrap> scraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Fetch(FetchMode.JOIN)
     List<Comment> comments = new ArrayList<>();
 
 
 //    making draft
-    public Interview(String videoKey, String thumbnailKey){
+    public Interview(String videoKey, String thumbnailKey, User user){
         this.videoKey = videoKey;
         this.thumbnailKey = thumbnailKey;
+        this.user = user;
         this.memo = "";
         this.isPublic = false;
         this.isDone = false;
         this.badge = "NONE";
     }
 
-//    must be refactored with user
-    public Interview complete(String memo, Boolean isPublic, User user, Question question){
+    // complete interview
+    public Interview complete(String memo, Boolean isPublic, Question question){
         this.memo = memo;
         this.isPublic = isPublic;
-//        this.user = user;
         this.question = question;
         this.isDone = true;
         return this;
     }
 
-    //    must be refactored
+    //  update interview (only memo, isPublic)
     public Interview update(String memo, Boolean isPublic){
         this.memo = memo;
         this.isPublic = isPublic;

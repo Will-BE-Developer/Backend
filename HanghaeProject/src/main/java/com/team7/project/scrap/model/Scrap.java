@@ -26,4 +26,9 @@ public class Scrap extends Timestamped {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "interview_id")
     private Interview interview;
+
+    public Scrap(User user, Interview interview){
+        this.user = user;
+        this.interview = interview;
+    }
 }

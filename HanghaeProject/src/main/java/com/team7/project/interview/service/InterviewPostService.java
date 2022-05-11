@@ -4,15 +4,18 @@ package com.team7.project.interview.service;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.team7.project.interview.dto.InterviewResponseDto;
+import com.team7.project.advice.RestException;
+import com.team7.project.interview.dto.InterviewInfoResponseDto;
 import com.team7.project.interview.dto.InterviewPostRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.question.model.Question;
 import com.team7.project.question.repostitory.QuestionRepository;
 import com.team7.project.user.model.User;
+import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,7 @@ public class InterviewPostService {
     private final InterviewGeneralService interviewGeneralService;
     private final InterviewRepository interviewRepository;
     private final QuestionRepository questionRepository;
+    private final UserRepository userRepository;
 
     private static final long ONE_HOUR = 1000 * 60 * 60; // 1시간
     private final AmazonS3Client amazonS3Client;
@@ -38,7 +42,6 @@ public class InterviewPostService {
     public String generatePresignedPost(String objectKey) {
         Date expireTime = new Date();
         expireTime.setTime(expireTime.getTime() + ONE_HOUR);
-        System.out.println("expireTime.getTime() = " + expireTime.getTime());
 
         // Generate the pre-signed URL.
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
@@ -53,31 +56,42 @@ public class InterviewPostService {
 
 
     @Transactional
-    public Interview createInterviewDraft(Long userId) {
-        String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
-        String objectKey = userId + "-"+ suffix;
+    public Interview createInterviewDraft(Long loginUserId) {
 
-        return interviewRepository.save(new Interview("videos/" + objectKey, "thumbnails/" + objectKey));
+        User user = userRepository.findById(loginUserId).orElseThrow(
+                () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
+        );
+
+        String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
+        String objectKey = loginUserId + "-" + suffix;
+
+        Interview interview = interviewRepository.save(new Interview("videos/" + objectKey, "thumbnails/" + objectKey, user));
+
+        user.getInterviews().add(interview);
+
+        return interview;
     }
 
     @Transactional
-    public InterviewResponseDto completeInterview(Long userId, Long interviewId , InterviewPostRequestDto requestDto) {
+    public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) {
 
-//      need Refactoring
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(RuntimeException::new);
-        //      need Refactoring
+                .orElseThrow(
+                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
+                );
+
         Question question = questionRepository.findById(requestDto.getQuestionId())
-                .orElseThrow(RuntimeException::new);
-        //      need Refactoring
-        User user = new User();
+                .orElseThrow(
+                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 질문이 존재하지 않습니다.")
+                );
 
-        interview.complete(requestDto.getNote(),requestDto.getIsPublic(), user, question);
+        if (interview.getUser().getId() != loginUserId) {
+            throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 게시글을 업로드 할 수 없습니다.");
+        }
 
-//        need Refactoring****
-//        user.getInterviews().add(interview);
+        interview.complete(requestDto.getNote(), requestDto.getIsPublic(), question);
 
-        return new InterviewResponseDto(interview, interviewGeneralService.generatePresignedUrl(interview.getVideoKey()), interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()));
+        return new InterviewInfoResponseDto(interview, interviewGeneralService.generatePresignedUrl(interview.getVideoKey()), interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()), true, false, 0L);
     }
 
 }
