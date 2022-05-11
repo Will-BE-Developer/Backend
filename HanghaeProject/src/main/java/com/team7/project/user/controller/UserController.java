@@ -5,26 +5,28 @@ import com.team7.project.advice.RestException;
 import com.team7.project.advice.Success;
 import com.team7.project.mail.Service.MailService;
 import com.team7.project.security.jwt.TokenResponseDto;
-import com.team7.project.user.dto.LoginRequestDto;
-import com.team7.project.user.dto.RegisterRequestDto;
-import com.team7.project.user.dto.UserInfoResponseDto;
+import com.team7.project.user.dto.*;
 import com.team7.project.user.model.User;
 import com.team7.project.user.service.KakaoUserService;
+import com.team7.project.user.service.UserMypageService;
 import com.team7.project.user.service.UserProfileService;
 import com.team7.project.user.service.UserRegistryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,6 +36,7 @@ public class UserController {
     private final UserRegistryService userRegistryService;
     private final UserProfileService userProfileService;
     private final KakaoUserService kakaoUserService;
+    private final UserMypageService userMypageService;
     private final MailService mailService;
 
     @PostMapping("/signin")
@@ -250,8 +253,22 @@ public class UserController {
                 .token(user.getToken())
                 .build(), HttpStatus.OK);
     }
+  
+    //마이페이지 - 사용자 프로필 정보 수정
+    @ResponseBody
+    @PutMapping(value = "/api/users/me", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity editUserInfo(@RequestPart UserRequestDto requestDto,
+                                       @RequestPart MultipartFile profileImage,
+                                       @AuthenticationPrincipal User user) throws IOException {
 
+        requestDto.setProfileImage(profileImage);
 
+        User savedUser = userMypageService.save(requestDto, user);
+
+        UserReponseDto userReponseDto = new UserReponseDto(savedUser);
+
+        return new ResponseEntity(userReponseDto, HttpStatus.OK);
+    }
 
 }
 

@@ -81,9 +81,10 @@ public class JwtTokenProvider {
     public String resolveAccessToken(HttpServletRequest request) {
 
         //request가 들어오는지 확인하는 sysout
-        System.out.println("Authorization ::: "+request.getHeader("Authorization"));
+//        System.out.println("Authorization ::: "+request.getHeader("Authorization"));
         //Header에 토큰이 존재 하면 가져오고 아니면 null 반환
-        if (request.getHeader("Authorization") != null) {
+        if (request.getHeader("Authorization") != null){
+            System.out.println("Authorization ::: "+request.getHeader("Authorization"));
             return request.getHeader("Authorization");
         }
         return null;

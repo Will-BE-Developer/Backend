@@ -57,9 +57,10 @@ public class Interview extends Timestamped {
 
 
 //    making draft
-    public Interview(String videoKey, String thumbnailKey){
+    public Interview(String videoKey, String thumbnailKey, User user){
         this.videoKey = videoKey;
         this.thumbnailKey = thumbnailKey;
+        this.user = user;
         this.memo = "";
         this.isPublic = false;
         this.isDone = false;
@@ -67,10 +68,9 @@ public class Interview extends Timestamped {
     }
 
     // complete interview
-    public Interview complete(String memo, Boolean isPublic, User user, Question question){
+    public Interview complete(String memo, Boolean isPublic, Question question){
         this.memo = memo;
         this.isPublic = isPublic;
-        this.user = user;
         this.question = question;
         this.isDone = true;
         return this;
