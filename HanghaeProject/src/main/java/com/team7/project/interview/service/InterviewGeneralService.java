@@ -57,6 +57,9 @@ public class InterviewGeneralService {
     }
 
     public String generateProfileImageUrl(String image) {
+        if(image == null){
+            return null;
+        }
         return (image.contains("http://") | image.contains("https://")) ? image : generatePresignedUrl(image);
     }
 
