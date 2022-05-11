@@ -1,4 +1,4 @@
-package com.team7.project.user;
+package com.team7.project.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.team7.project.advice.RestException;
@@ -166,16 +166,16 @@ public class UserController {
         }
         log.info("GET_USER_INFO >> {}의 유저 정보를 반환 합니다 ",user.getNickname());
         //로그인 된 사용자의 이름과 닉네임을 반환한다.
-        UserInfoResponseDto userInfoResponseDto=(UserInfoResponseDto.builder()
-                .user(UserInfoResponseDto.UserBody.builder()
-                        .nickname(user.getNickname())
-                        .githubLink(user.getGithubLink())
-                        .introduce(user.getIntroduce())
-                        .id(user.getId())
-                        .profileImageUrl(user.getProfileImageUrl())
-                        .build())
-                .token(user.getToken())
-                .build());
+//        UserInfoResponseDto userInfoResponseDto=(UserInfoResponseDto.builder()
+//                .user(UserInfoResponseDto.UserBody.builder()
+//                        .nickname(user.getNickname())
+//                        .githubLink(user.getGithubLink())
+//                        .introduce(user.getIntroduce())
+//                        .id(user.getId())
+//                        .profileImageUrl(user.getProfileImageUrl())
+//                        .build())
+//                .token(user.getToken())
+//                .build());
 
         return new ResponseEntity<UserInfoResponseDto>(UserInfoResponseDto.builder()
                 .user(UserInfoResponseDto.UserBody.builder()
@@ -198,8 +198,12 @@ public class UserController {
     }
 
     @GetMapping("/user/kakao/callback")
-    public ResponseEntity<UserInfoResponseDto> kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
-       User user =  kakaoUserService.kakaoLogin(code);
+    public ResponseEntity<UserInfoResponseDto> kakaoLogin(@AuthenticationPrincipal User users, @RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+        //로그인 되는게 확인 될 경우에 에러를 반환한다.
+        if(users != null){
+            throw new RestException(HttpStatus.BAD_REQUEST, "로그아웃 후에 회원가입을 진행 해 주세요.");
+        }
+        User user =  kakaoUserService.kakaoLogin(code);
 
         //로그인이 오류없이 처리 되었다면 Autorization 토큰을 헤더에 실어 보내준다.
         TokenResponseDto token = userProfileService.giveToken(user.getEmail());
@@ -225,7 +229,7 @@ public class UserController {
                                                                        HttpServletResponse response){
         //logout 되어있지 않다면 일단 로그아웃 시킨다.
         if(users !=null){
-            log.info("USER CONTROLLER >> logging out currnet user");
+            log.info("USER CONTROLLER >> logging out current user");
             userProfileService.logout(request);
         }
         //isvalid 값을 바꿔준다.
