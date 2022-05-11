@@ -6,11 +6,7 @@ import com.team7.project.user.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-
 import java.time.LocalDateTime;
-
-
 
 @Getter
 @NoArgsConstructor
@@ -29,6 +25,7 @@ public class CommentResponseDto {
         private ResponseUser user;
         private String contents;
         private Boolean isMine;
+        private Long parentId;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
 
@@ -44,6 +41,7 @@ public class CommentResponseDto {
             this.contents = comment.getContents();
             this.createdAt = comment.getCreatedAt();
             this.modifiedAt = comment.getModifiedAt();
+            this.parentId = comment.getRootId();
             this.isMine = isMine;
         }
     }

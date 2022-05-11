@@ -6,6 +6,7 @@ import com.team7.project.user.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,21 +15,26 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class CommentListDto {
-    private List<ResponseComment> comment = new ArrayList<>();
+    private List<ResponseComment> comments = new ArrayList<>();
+
     //private Page pagination;
 
-//    public CommentListDto(Comment comment, Boolean isMine){
-//        this.comment.add(new ResponseComment(comment, isMine));
-//    }
     public void addComment(Comment comment, Boolean isMine){
-        this.comment.add(new ResponseComment(comment, isMine));
+        this.comments.add(new ResponseComment(comment, isMine));
     }
     public void addNestedComment(int index, Comment comment, Boolean isMine){
 
-        //this.comment.get(index).addNestedComment(comment, isMine);
-        //this.comment.get(index).addNestedComment(new ResponseComment(comment, isMine));
-        this.comment.get(index).addNestedCommentWithoutNest(new NestedComment(comment, isMine));
+        this.comments.get(index).addNestedCommentWithoutNest(new NestedComment(comment, isMine));
     }
+
+    private Pagination pagination;
+
+    public void addPagination(int per, int totalCounts, int totalPages,
+                              int currentPage, int nextPage, Boolean isLastPage) {
+        this.pagination = new Pagination(per, totalCounts, totalPages,
+                              currentPage, nextPage, isLastPage);
+    }
+
     @Getter
     public class ResponseComment{
         private Long id;
@@ -37,12 +43,12 @@ public class CommentListDto {
         private ResponseUser user;
         private String contents;
         private Boolean isMine;
+        private Long parentId;
         private Long nestedCommentsCount = 0L;
-        //private List<ResponseComment> nestedComments;
-        //private List<ResponseComment> nestedComments = new ArrayList<>();
         private List<NestedComment> nestedComments = new ArrayList<>();
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+        private Pagination pagination;
 
         public ResponseComment(Comment comment, Boolean isMine) {
             this.id = comment.getId();
@@ -56,26 +62,16 @@ public class CommentListDto {
             this.contents = comment.getContents();
             this.createdAt = comment.getCreatedAt();
             this.modifiedAt = comment.getModifiedAt();
+            this.parentId = null;
             this.isMine = isMine;
         }
 
-//        public void addNestedComment(ResponseComment comment, boolean isMine){
-//            this.nestedComments.add(comment);
-//            if (nestedComments != null && !nestedComments.isEmpty()){
-//                int lastIndex = nestedComments.size() - 1;
-//                this.nestedComments.get(lastIndex).isMine = isMine;
-//            }
-//        }
-
-        public void addNestedComment(ResponseComment responseComment) {
-            //this.nestedComments.add(responseComment);
-            this.nestedCommentsCount += 1;
-        }
         public void addNestedCommentWithoutNest(NestedComment nestedComment){
             this.nestedComments.add(nestedComment);
             this.nestedCommentsCount += 1;
         }
     }
+
     @Getter
     @AllArgsConstructor
     public class ResponseUser{
@@ -93,6 +89,7 @@ public class CommentListDto {
         private ResponseUser user;
         private String contents;
         private Boolean isMine;
+        private Long parentId;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
 
@@ -108,8 +105,20 @@ public class CommentListDto {
             this.contents = comment.getContents();
             this.createdAt = comment.getCreatedAt();
             this.modifiedAt = comment.getModifiedAt();
+            this.parentId = comment.getRootId();
             this.isMine = isMine;
         }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public class Pagination{
+        private int per;
+        private int totalCounts;
+        private int totalPages;
+        private int currentPage;
+        private int nextPage;
+        private Boolean isLastPage;
     }
 
 }

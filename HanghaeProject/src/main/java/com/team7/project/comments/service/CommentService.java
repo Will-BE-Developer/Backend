@@ -8,6 +8,7 @@ import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +71,7 @@ public class CommentService {
         if (comment.getRootName().equals(requestDto.getRootName())){
             //기존 rootId와 일치하는지
             if (comment.getRootId().equals(requestDto.getRootId())){
+                //수정 실시
                 comment.update(requestDto);
             }else{
                 throw new RestException(HttpStatus.BAD_REQUEST, "rootId가 일치하지 않습니다.");
@@ -82,7 +84,11 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment deleteComment(Long commentId) {
+    public Comment deleteComment(Long commentId, User user) {
+        userRepository.findById(user.getId()).orElseThrow(
+                () -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다.")
+        );
+
         //삭제 전 response를 위해 조회
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다.")
@@ -92,15 +98,18 @@ public class CommentService {
         return comment;
     }
 
-    public List<Comment> getListOfCommentOfInterview(Long interviewId) { //getCommentList
-        //List<Comment> commentList = commentRepository.findAllByInterviewId(interviewId);
-        List<Comment> commentList = commentRepository.findAllByInterviewIdAndRootName(interviewId, "interview");
+    //public List<Comment> getListOfCommentOfInterview(Long interviewId) {
+    //public List<Comment> getListOfCommentOfInterview(Long interviewId, Pageable pageable) {
+    public List<Comment> getListOfCommentOfInterview(Long interviewId, int per, int page) {
+        //List<Comment> commentList = commentRepository.findAllByInterviewIdAndRootName(interviewId, "interview");
+        List<Comment> commentList = commentRepository.findAllByInterviewIdAndRootName(interviewId, "interview", per, (page-1)*per);
 
         return commentList;
     }
     public List<Comment> getListOfCommentOfComment(Long interviewId) {
-        List<Comment> commentList = commentRepository.findAllByInterviewIdAndRootName(interviewId, "comment");
+        List<Comment> commentList = commentRepository.findAllByInterviewIdAndRootNameNest(interviewId, "comment");
 
         return commentList;
     }
+
 }
