@@ -49,31 +49,48 @@ public class UserMypageService {
                 () -> new IllegalArgumentException("없는 사용자입니다.")
         );
 
-        isImageFile(requestDto.getProfileImage());
-
-
-        //파일첨부 안했으면 원래이미지, 원래 이미지가 없다면 기본이미지 저장
-        if(requestDto.getProfileImage().isEmpty()){
-            //기존에도 프로필 이미지가 없으면
-            if(user.getProfileImageUrl().isEmpty()){
-                profileImageUrl = basicProfile;
+        //이미지 안넣었으면 그냥 회원정보만 저장
+        if (requestDto.getProfileImage() == null){
+            System.out.println("requestDto.getGithubLink():"+requestDto.getGithubLink());
+            //닉네임 공백이면
+            if (requestDto.getNickname().trim().length() > 0){ //랜덤으로 수정?
+                user.updateInfo(requestDto.getNickname(),
+                        requestDto.getGithubLink(),
+                        requestDto.getIntroduce(),
+                        user.getProfileImageUrl());
+            }else{
+                user.updateInfo(user.getNickname(),
+                        requestDto.getGithubLink(),
+                        requestDto.getIntroduce(),
+                        user.getProfileImageUrl());
             }
-        }else{
-            //파일첨부 했으면, 이미지 로컬 및 S3에 저장하기
-            saveFile(requestDto.getProfileImage(), user.getId());
-        }
+        }else {
+            //기존 코드
+            isImageFile(requestDto.getProfileImage());
 
-        // 프론트에서 공백시 기존값 넘겨주지만, 닉네임만 한번더 체크
-        if (requestDto.getNickname().trim().length() > 0){
-            user.updateInfo(requestDto.getNickname(),
-                    requestDto.getGithubLink(),
-                    requestDto.getIntroduce(),
-                    profileImageUrl);
-        }else{
-            user.updateInfo(user.getNickname(),
-                    requestDto.getGithubLink(),
-                    requestDto.getIntroduce(),
-                    profileImageUrl);
+            //파일첨부 안했으면 원래이미지, 원래 이미지가 없다면 기본이미지 저장
+            if(requestDto.getProfileImage().isEmpty()){
+                //기존에도 프로필 이미지가 없으면
+                if(user.getProfileImageUrl().isEmpty()){
+                    profileImageUrl = basicProfile;
+                }
+            }else{
+                //파일첨부 했으면, 이미지 로컬 및 S3에 저장하기
+                saveFile(requestDto.getProfileImage(), user.getId());
+            }
+
+            // 프론트에서 공백시 기존값 넘겨주지만, 닉네임만 한번더 체크
+            if (requestDto.getNickname().trim().length() > 0){
+                user.updateInfo(requestDto.getNickname(),
+                        requestDto.getGithubLink(),
+                        requestDto.getIntroduce(),
+                        profileImageUrl);
+            }else{
+                user.updateInfo(user.getNickname(),
+                        requestDto.getGithubLink(),
+                        requestDto.getIntroduce(),
+                        profileImageUrl);
+            }
         }
 
         return userRepository.save(user);
@@ -90,6 +107,7 @@ public class UserMypageService {
     }
 
     private void saveFile(MultipartFile multipartFile, Long userId) throws IOException {
+
         //임시 폴더 생성(지정된 폴더가 없을때만 폴더 생성으로 변경?)
         String dir = Files.createTempDirectory("tempDir").toFile().getAbsolutePath();//EC2 경로 테스트
 
