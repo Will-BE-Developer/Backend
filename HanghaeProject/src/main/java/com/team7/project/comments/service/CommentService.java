@@ -44,14 +44,15 @@ public class CommentService {
             Interview interview = interviewRepository.findById(requestDto.getRootId()).orElseThrow(
                     () -> new IllegalArgumentException("해당 인터뷰는 존재하지 않습니다.")
             );
-            comment = new Comment(requestDto, user, interview.getId());
+            System.out.println("댓글 작성한 인터뷰 ID: " + interview.getId());
+            comment = new Comment(requestDto, user, interview);
             commentRepository.save(comment);
         }else if(requestDto.getRootName().equals("comment")){
             Comment rootComment = commentRepository.findById(requestDto.getRootId()).orElseThrow(
                     () -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다.")
             );
             Interview interview = rootComment.getInterview();
-            comment = new Comment(requestDto, user, interview.getId());
+            comment = new Comment(requestDto, user, interview);
             commentRepository.save(comment);
         }
         return comment;
@@ -98,7 +99,6 @@ public class CommentService {
         return comment;
     }
 
-    //public List<Comment> getListOfCommentOfInterview(Long interviewId) {
     //public List<Comment> getListOfCommentOfInterview(Long interviewId, Pageable pageable) {
     public List<Comment> getListOfCommentOfInterview(Long interviewId, int per, int page) {
         //List<Comment> commentList = commentRepository.findAllByInterviewIdAndRootName(interviewId, "interview");
