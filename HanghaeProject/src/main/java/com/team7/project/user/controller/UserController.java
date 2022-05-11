@@ -273,5 +273,23 @@ public class UserController {
         return new ResponseEntity(userReponseDto, HttpStatus.OK);
     }
 
+    @ResponseBody
+    @PutMapping(value = "/api/users/me2", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity editUserInfo2 (@RequestParam(required = false) String nickname,
+                                       @RequestParam(required = false) String githubLink,
+                                       @RequestParam(required = false) String introduce,
+                                       @RequestParam(required = false) MultipartFile profileImage,
+                                       @AuthenticationPrincipal User user) throws IOException {
+
+        UserRequestDto requestDto = new UserRequestDto(nickname, githubLink, profileImage, introduce);
+        requestDto.setProfileImage(profileImage);
+
+        User savedUser = userMypageService.save(requestDto, user);
+
+        UserReponseDto userReponseDto = new UserReponseDto(savedUser);
+
+        return new ResponseEntity(userReponseDto, HttpStatus.OK);
+    }
+
 }
 

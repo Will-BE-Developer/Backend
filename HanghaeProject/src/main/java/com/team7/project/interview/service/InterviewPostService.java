@@ -91,7 +91,11 @@ public class InterviewPostService {
 
         interview.complete(requestDto.getNote(), requestDto.getIsPublic(), question);
 
-        return new InterviewInfoResponseDto(interview, interviewGeneralService.generatePresignedUrl(interview.getVideoKey()), interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()), true, false, 0L);
+        return new InterviewInfoResponseDto(interview,
+                interviewGeneralService.generatePresignedUrl(interview.getVideoKey()),
+                interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()),
+                interviewGeneralService.generateProfileImageUrl(interview.getUser().getProfileImageUrl()),
+                true, false, 0L);
     }
 
 }
