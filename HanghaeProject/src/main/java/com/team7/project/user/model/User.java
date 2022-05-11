@@ -122,6 +122,13 @@ public class User extends Timestamped implements UserDetails {
         return this.role.getKey();
     }
 
+    public void updateInfo(String nickname, String githubLink, String introduce, String profileImageUrl){
+        this.nickname = nickname;
+        this.githubLink = githubLink;
+        this.introduce = introduce;
+        this.profileImageUrl = profileImageUrl;
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

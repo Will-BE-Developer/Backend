@@ -30,6 +30,7 @@ public class CommentService {
         this.interviewRepository = interviewRepository;
     }
 
+    @Transactional  //메서드가 포함하고 있는 작업 중에 하나라도 실패할 경우 전체 작업을 취소
     public Comment saveComment(CommentRequestDto requestDto, User user) {
 
         userRepository.findById(user.getId()).orElseThrow(
