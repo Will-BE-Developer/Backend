@@ -258,8 +258,11 @@ public class UserController {
     @ResponseBody
     @PutMapping(value = "/api/users/me", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity editUserInfo(@RequestPart UserRequestDto requestDto,
-                                       @RequestPart MultipartFile profileImage,
+                                       @RequestPart(value="profileImage", required = false)  MultipartFile profileImage,
                                        @AuthenticationPrincipal User user) throws IOException {
+        if (profileImage == null){
+            System.out.println("profileImage is null");
+        }
 
         requestDto.setProfileImage(profileImage);
 
