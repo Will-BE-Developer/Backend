@@ -23,7 +23,7 @@ public class MailService implements EmailUtils{
         try{
         MimeMessage message = sender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-        String body="<a href='http://localhost:8080/signin/validation?token="+
+        String body="<a href='http://localhost:3000/signin/validation?token="+
                 token+"&email="+toEmail+"'>Click</a>";
             helper.setTo(toEmail);
             helper.setSubject("WILL_BE : 이메일 인증을 완료해 주세요:)");
