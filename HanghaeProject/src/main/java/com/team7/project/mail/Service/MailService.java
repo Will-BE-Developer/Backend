@@ -1,6 +1,7 @@
 package com.team7.project.mail.Service;
 
 import com.team7.project.advice.RestException;
+import com.team7.project.mail.template.MailTemplate;
 import com.team7.project.mail.utils.EmailUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,14 +18,15 @@ public class MailService implements EmailUtils{
     @Autowired
     private JavaMailSender sender;
 
+    private MailTemplate mailTemplate = new MailTemplate();
+
     @Override
-    public RestException sendEmail(String toEmail, String token){
+    public RestException sendEmail(String toEmail, String token, String nickname){
         RestException result = new RestException(null,null);
         try{
         MimeMessage message = sender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-        String body="<h2>버튼을 눌러 인증을 완료해 주세요\uD83D\uDC96</h2><a href='http://localhost:3000/signin/validation?token="+
-                token+"&email="+toEmail+"'>Click</a>";
+        String body=mailTemplate.getTemplate(token,toEmail,nickname);
             helper.setTo(toEmail);
             helper.setSubject("WILL_BE : 이메일 인증을 완료해 주세요\uD83D\uDE18");
             helper.setText(body,true);

@@ -1,10 +1,9 @@
-package com.team7.project.user.service;
+package com.team7.project.user.service.registerService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team7.project.user.dto.KakaoUserInfoDto;
-import com.team7.project.user.dto.UserInfoResponseDto;
 import com.team7.project.user.model.Role;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
@@ -14,11 +13,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -54,6 +51,7 @@ import java.util.UUID;
             log.info("Contorller : KAKAO_LOGIN >> 2. 액세스 토큰으로 카카오 사용자 정보 가져오기");
             KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
 
+
             log.info("Contorller : KAKAO_LOGIN >> 3. 카카오 사용자 정보로 필요시 회원가입");
             User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo, accessToken);
 
@@ -61,7 +59,6 @@ import java.util.UUID;
             forceLogin(kakaoUser);
             return kakaoUser;
         }
-
         private String getAccessToken(String code) throws JsonProcessingException {
             log.info("Contorller : GET_ACCESS_TOKEN>> 카카오 로그인 엑세스 토큰 발급 중입니다...");
             log.info("Contorller : GET_ACCESS_TOKEN>> 인가코드 : {}",code);
@@ -145,8 +142,11 @@ import java.util.UUID;
             String provider = kakaoUserInfo.getProvider();
             String email = kakaoUserInfo.getEmail();
 
+            //가입된 카카오 사용자가 있는지 조회한다.
             User kakaoUser = userRepository.findByEmailAndProvider(email,provider)
                     .orElse(null);
+
+            //가입된 카카오 사용자가 없다면, 가입을 진행한다
             if (kakaoUser == null) {
                 log.info("Contorller : REGISTER_KAKAO_USER_IF_NEEDED >> 카카오 가입자가 없으므로 회원가입을 진행합니다.");
                 // username: kakao nickname
@@ -172,6 +172,9 @@ import java.util.UUID;
                         .build();
                 userRepository.save(kakaoUser);
             }
+            //가입된 카카오 사용자가 있다면, 업데이트를 진행한다.
+            kakaoUser.updateInfo(kakaoUserInfo.getNickname(), kakaoUserInfo.getImageUrl());
+
             return kakaoUser;
         }
 

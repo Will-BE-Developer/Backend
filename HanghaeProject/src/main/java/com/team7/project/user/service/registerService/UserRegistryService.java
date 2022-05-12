@@ -1,15 +1,12 @@
-package com.team7.project.user.service;
+package com.team7.project.user.service.registerService;
 
-import com.team7.project.advice.RestException;
-import com.team7.project.mail.Service.MailService;
 import com.team7.project.security.jwt.JwtTokenProvider;
-import com.team7.project.user.dto.RegisterRequestDto;
+import com.team7.project.user.dto.request.RegisterRequestDto;
 import com.team7.project.user.model.Role;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

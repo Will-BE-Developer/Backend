@@ -128,7 +128,10 @@ public class User extends Timestamped implements UserDetails {
         this.introduce = introduce;
         this.profileImageUrl = profileImageUrl;
     }
-
+    public void updateInfo(String nickname, String profileImageUrl){
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
