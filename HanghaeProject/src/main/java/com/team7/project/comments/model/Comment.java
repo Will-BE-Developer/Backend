@@ -38,22 +38,17 @@ public class Comment extends Timestamped {
     @JoinColumn(name = "user_id")
     private User user;
 
+    //@ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "interview_id")
+    @JoinColumn(name = "interview_id", updatable = false)
     private Interview interview;
 
-    //public Comment(CommentRequestDto requestDto, User user, Interview interview){
-    //public Comment(CommentRequestDto requestDto, Long userId, Long interviewId){
-    public Comment(CommentRequestDto requestDto, User user, Long interviewId){
+    public Comment(CommentRequestDto requestDto, User user, Interview interview){
         this.contents = requestDto.getContents();
         this.rootId = requestDto.getRootId();
         this.rootName = requestDto.getRootName();
-        //this.user = new User();
-        //this.user.setId(userId);
         this.user = user;
-        //this.interview = interview;
-        this.interview = new Interview();
-//        this.interview.setId(interviewId);
+        this.interview = interview;
     }
 
     public void update(CommentRequestDto requestDto){
