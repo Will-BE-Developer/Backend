@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -25,9 +27,10 @@ public class InterviewController {
 
 
     @GetMapping("/api/interviews")
-    public ResponseEntity<InterviewListResponseDto> readInterviews(@RequestParam(value = "per", defaultValue = "8") int per,
+    public ResponseEntity<InterviewListResponseDto> readInterviews(@RequestParam(value = "per", defaultValue = "6") int per,
                                                                    @RequestParam(value = "page", defaultValue = "1") int page,
                                                                    @RequestParam(value = "sort", defaultValue = "new") String sort,
+                                                                   @RequestParam(value = "filter", defaultValue = "default") String filter,
                                                                    @AuthenticationPrincipal User user) {
         if (per < 1) {
             throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
@@ -35,12 +38,15 @@ public class InterviewController {
 
         Long loginUserId = user == null ? null : user.getId();
 
-        log.info("UID " + loginUserId + " READ ALL INTERVIEWS");
+        log.info("UID " + loginUserId + " READ ALL INTERVIEWS WITH PER " + per + " PAGE " + page + " SORT " + sort + " FILTER " + filter);
 
         // note that pageable start with 0
-        Pageable pageable = PageRequest.of(page - 1, per, Sort.by("createdAt").descending());
+        Pageable pageable = sort.equals("old") ?
+                PageRequest.of(page - 1, per, Sort.by("createdAt").ascending()) :
+                PageRequest.of(page - 1, per, Sort.by("createdAt").descending());
 
-        InterviewListResponseDto body = interviewGeneralService.readAllInterviews(loginUserId, pageable);
+
+        InterviewListResponseDto body = interviewGeneralService.readAllInterviews(loginUserId, sort, filter, pageable);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 

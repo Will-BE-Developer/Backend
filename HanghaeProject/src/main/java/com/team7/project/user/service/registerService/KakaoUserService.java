@@ -3,10 +3,12 @@ package com.team7.project.user.service.registerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team7.project.interview.service.InterviewGeneralService;
 import com.team7.project.user.dto.KakaoUserInfoDto;
 import com.team7.project.user.model.Role;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -34,15 +36,17 @@ import java.util.UUID;
 
     @Service
     @Slf4j
+    @RequiredArgsConstructor
     public class KakaoUserService {
         private final PasswordEncoder passwordEncoder;
         private final UserRepository userRepository;
+        private final InterviewGeneralService interviewGeneralService;
 
-        @Autowired
-        public KakaoUserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-            this.userRepository = userRepository;
-            this.passwordEncoder = passwordEncoder;
-        }
+//        @Autowired
+//        public KakaoUserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+//            this.userRepository = userRepository;
+//            this.passwordEncoder = passwordEncoder;
+//        }
 
         public User kakaoLogin(String code) throws JsonProcessingException {
             log.info("Contorller : KAKAO_LOGIN >> 1. 인가코드로 액세스 토큰 요청");
@@ -70,7 +74,7 @@ import java.util.UUID;
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("grant_type", "authorization_code");
             body.add("client_id", "95272555e8189d2f079be8adc9c37e4f");
-            body.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
+            body.add("redirect_uri", "http://localhost:3000/user/kakao/callback");
             body.add("client_secret","oAfSkjWSsZb7DoeYcffn4XDYf8eMmgIr");
             body.add("code", code);
 

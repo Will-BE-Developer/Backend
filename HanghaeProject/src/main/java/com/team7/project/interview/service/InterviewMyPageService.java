@@ -28,6 +28,7 @@ import java.util.*;
 @Service
 @Transactional(readOnly = true)
 public class InterviewMyPageService {
+    private final InterviewGeneralService interviewGeneralService;
     private final InterviewRepository interviewRepository;
     private final UserRepository userRepository;
 
@@ -63,22 +64,12 @@ public class InterviewMyPageService {
         Page<Interview> interviews = interviewRepository.findAllByIsDoneAndUser_Id(true, loginUserId, pageable);
 
         List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
-        Set<Long> userScrapsId = new HashSet<>();
-        for(Scrap scrap: user.getScraps()){
-            userScrapsId.add(scrap.getInterview().getId());
-        }
+
+        Set<Long> userScrapsId = interviewGeneralService.createUserScrapIds(user);
 
         for(Interview interview: interviews.getContent()){
 
-            Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
-
-            Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
-            Long scrapsCount = (long) interview.getScraps().size();
-
-            String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
-            String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
-
-            InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine, scrapsMe, scrapsCount);
+            InterviewInfoResponseDto response = interviewGeneralService.createInterviewResponse(loginUserId, userScrapsId, interview);
 
             responses.add(response.getInterview());
 
@@ -101,22 +92,12 @@ public class InterviewMyPageService {
         Page<Interview> interviews = interviewRepository.findAllByIsDoneAndScraps_User_Id(true, loginUserId, pageable);
 
         List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
-        Set<Long> userScrapsId = new HashSet<>();
-        for(Scrap scrap: user.getScraps()){
-            userScrapsId.add(scrap.getInterview().getId());
-        }
+
+        Set<Long> userScrapsId = interviewGeneralService.createUserScrapIds(user);
 
         for(Interview interview: interviews.getContent()){
 
-            Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
-
-            Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
-            Long scrapsCount = (long) interview.getScraps().size();
-
-            String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
-            String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
-
-            InterviewInfoResponseDto response = new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, isMine, scrapsMe, scrapsCount);
+            InterviewInfoResponseDto response = interviewGeneralService.createInterviewResponse(loginUserId, userScrapsId, interview);
 
             responses.add(response.getInterview());
 

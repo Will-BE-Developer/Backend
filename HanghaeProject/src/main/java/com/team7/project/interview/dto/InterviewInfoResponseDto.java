@@ -42,7 +42,7 @@ public class InterviewInfoResponseDto {
         private String updatedAt;
     }
 
-    public InterviewInfoResponseDto(Interview interview, String videoUrl, String imageUrl, Boolean isMine, Boolean scrapsMe, Long scrapsCount){
+    public InterviewInfoResponseDto(Interview interview, String videoUrl, String imageUrl, String profileUrl, Boolean isMine, Boolean scrapsMe, Long scrapsCount){
         Question question = interview.getQuestion();
         Long questionId = question.getId();
         String questionCategory = question.getCategory().name();
@@ -53,14 +53,13 @@ public class InterviewInfoResponseDto {
         Long userId = user.getId();
         String userNickname = user.getNickname();
         String userGithubLink = user.getGithubLink();
-        String userProfileImageUrl = user.getProfileImageUrl();
         String userIntroduce = user.getIntroduce();
 
         UserInfoResponseDto.UserBody userBody = UserInfoResponseDto.UserBody.builder()
                 .id(userId)
                 .nickname(userNickname)
                 .githubLink(userGithubLink)
-                .profileImageUrl(userProfileImageUrl)
+                .profileImageUrl(profileUrl)
                 .introduce(userIntroduce)
                 .build();
 
