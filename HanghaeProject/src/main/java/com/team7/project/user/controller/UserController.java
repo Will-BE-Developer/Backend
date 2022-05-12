@@ -3,6 +3,7 @@ package com.team7.project.user.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.team7.project.advice.RestException;
 import com.team7.project.advice.Success;
+import com.team7.project.interview.service.InterviewGeneralService;
 import com.team7.project.mail.Service.MailService;
 import com.team7.project.security.jwt.TokenResponseDto;
 import com.team7.project.user.dto.*;
@@ -35,6 +36,7 @@ public class UserController {
 
     private final UserRegistryService userRegistryService;
     private final UserProfileService userProfileService;
+    private final InterviewGeneralService interviewGeneralService;
     private final KakaoUserService kakaoUserService;
     private final MailService mailService;
 
@@ -69,7 +71,7 @@ public class UserController {
                         .githubLink(loginUser.getGithubLink())
                         .introduce(loginUser.getIntroduce())
                         .id(loginUser.getId())
-                        .profileImageUrl(loginUser.getProfileImageUrl())
+                        .profileImageUrl(interviewGeneralService.generateProfileImageUrl(loginUser.getProfileImageUrl()))
                         .build())
                 .token(loginUser.getToken())
                 .build(), HttpStatus.OK);
@@ -109,7 +111,7 @@ public class UserController {
                                     .githubLink(register.getGithubLink())
                                     .introduce(register.getIntroduce())
                                     .id(register.getId())
-                                    .profileImageUrl(register.getProfileImageUrl())
+                                    .profileImageUrl(interviewGeneralService.generateProfileImageUrl(register.getProfileImageUrl()))
                                     .build())
                     .token(register.getToken())
                     .build(), HttpStatus.OK);
@@ -182,7 +184,7 @@ public class UserController {
                         .githubLink(user.getGithubLink())
                         .introduce(user.getIntroduce())
                         .id(user.getId())
-                        .profileImageUrl(user.getProfileImageUrl())
+                        .profileImageUrl(interviewGeneralService.generateProfileImageUrl(user.getProfileImageUrl()))
                         .build())
                 .token(user.getToken())
                 .build(), HttpStatus.OK);
@@ -214,7 +216,7 @@ public class UserController {
                         .githubLink(user.getGithubLink())
                         .introduce(user.getIntroduce())
                         .id(user.getId())
-                        .profileImageUrl(user.getProfileImageUrl())
+                        .profileImageUrl(interviewGeneralService.generateProfileImageUrl(user.getProfileImageUrl()))
                         .build())
                 .token(user.getToken())
                 .build(), HttpStatus.OK);
@@ -247,7 +249,7 @@ public class UserController {
                         .githubLink(user.getGithubLink())
                         .introduce(user.getIntroduce())
                         .id(user.getId())
-                        .profileImageUrl(user.getProfileImageUrl())
+                        .profileImageUrl(interviewGeneralService.generateProfileImageUrl(user.getProfileImageUrl()))
                         .build())
                 .token(user.getToken())
                 .build(), HttpStatus.OK);
