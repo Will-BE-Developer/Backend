@@ -159,7 +159,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/users/me")
+    @GetMapping("api/users/me")
     public ResponseEntity<UserInfoResponseDto> getUserInfo(@AuthenticationPrincipal User user){
         //유저가 로그인 되어있지 않는 경우에는 유저정보를 반환하지 않는다
         log.info("GET_USER_INFO >> 유저 정보를 조회하는 중입니다.");
@@ -181,7 +181,7 @@ public class UserController {
                 .build(), HttpStatus.OK);
     }
 
-    @DeleteMapping("/users/me")
+    @DeleteMapping("api/users/me")
     public ResponseEntity<Success> deleteUser(@AuthenticationPrincipal User user){
         log.info("DELETE_USER >> {} 의 유저정보 삭제를 요청합니다. ", user.getNickname());
         User deleting = userProfileService.deleteUser(user);
