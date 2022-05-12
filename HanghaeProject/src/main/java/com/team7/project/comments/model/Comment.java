@@ -38,7 +38,8 @@ public class Comment extends Timestamped {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
+    //@ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "interview_id", updatable = false)
     private Interview interview;
 

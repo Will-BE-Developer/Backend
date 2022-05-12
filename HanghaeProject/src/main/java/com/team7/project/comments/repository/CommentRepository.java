@@ -21,5 +21,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query(value = "SELECT * FROM comment WHERE interview_id = :interviewId  and root_name = :rootName", nativeQuery = true)
     List<Comment> findAllByInterviewIdAndRootNameNest(@Param("interviewId") Long interviewId, @Param("rootName") String rootName);
+
+    //Long countByInterview_Id(Long interviewId); //대댓글 포함
+    Long countByInterview_IdAndRootName(Long interviewId, String rootName);
 }
 
