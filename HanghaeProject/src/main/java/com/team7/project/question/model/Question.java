@@ -43,7 +43,7 @@ public class Question extends Timestamped {
         this.category = category;
     }
 
-
-
-
+    public void setShow(Boolean show) {
+        isShow = show;
+    }
 }
