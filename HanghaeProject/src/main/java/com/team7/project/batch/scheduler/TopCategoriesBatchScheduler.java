@@ -23,8 +23,9 @@ public class TopCategoriesBatchScheduler {
     private final JobLauncher jobLauncher;
     private final TopCategoriesBatchConfig topCategoriesBatchConfig;
     //매일 저녁 6시에 실행
-//    @Scheduled(cron = "0 0 18 * * *")
-    @Scheduled(cron = "0/10 * * * * *")
+    @Scheduled(cron = "0 0 18 * * *")
+    //매 10초마다 실행 --테스트용
+    //    @Scheduled(cron = "0/10 * * * * *")
     public void runJob() {
         Map<String, JobParameter> configMap = new HashMap<>();
         configMap.put("time", new JobParameter((System.currentTimeMillis())));

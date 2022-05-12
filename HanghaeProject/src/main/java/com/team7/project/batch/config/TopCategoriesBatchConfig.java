@@ -48,12 +48,15 @@ public class TopCategoriesBatchConfig {
         return stepBuilderFactory.get("stepTopCategories")
                 .tasklet((contribution, chunkContext)->{
                     System.out.println("QUERY TESTING ::::");
-                    List<CategoryEnum> topSix = interviewRepository.findCategoriesOrderedByCategoryCount(PageRequest.of(0,6));
 
+                    //인터뷰를 조회해서 가장 인기가 많은 여섯개의 카테고리를 가져온다
+                    List<CategoryEnum> topSix = interviewRepository.findCategoriesOrderedByCategoryCount(PageRequest.of(0,6));
                     log.info("category Eunm : {}",topSix);
 
+                    //기존에 있는 카테고리를 지운다.
                     batchTopCategoriesRepository.deleteAll();
 
+                    //카테고리를 등록한다.
                     for(CategoryEnum category : topSix){
                         log.info("topSix Eunm : {}",category.name());
                         BATCH_TopCategories batch_topCategories = new BATCH_TopCategories(category);
@@ -62,9 +65,6 @@ public class TopCategoriesBatchConfig {
                      return RepeatStatus.FINISHED;
 
                 })
-//
                 .build();
     }
-
-
 }
