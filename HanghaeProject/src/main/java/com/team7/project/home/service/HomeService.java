@@ -13,6 +13,7 @@ import com.team7.project.comments.repository.CommentRepository;
 import com.team7.project.interview.dto.InterviewInfoResponseDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
+import com.team7.project.interview.service.InterviewGeneralService;
 import com.team7.project.question.dto.QuestionResponseDto;
 import com.team7.project.question.model.Question;
 import com.team7.project.question.repostitory.QuestionRepository;
@@ -38,6 +39,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Transactional
 public class HomeService {
+    private final InterviewGeneralService interviewGeneralService;
     private final BATCH_WeeklyInterviewRepository batch_weeklyInterviewRepository;
     private final QuestionRepository questionRepository;
     private final BATCH_TodayQuestionRepository batch_todayQuestionRepository;
@@ -106,7 +108,7 @@ public class HomeService {
                             .githubLink(interview.getUser().getGithubLink())
                             .id(interview.getUser().getId())
                             .nickname(interview.getUser().getNickname())
-                            .profileImageUrl(interview.getUser().getProfileImageUrl())
+                            .profileImageUrl(interviewGeneralService.generateProfileImageUrl(interview.getUser().getProfileImageUrl()))
                             .introduce(interview.getUser().getIntroduce())
                             .build())
                     .badge(interview.getBadge())
@@ -147,7 +149,7 @@ public class HomeService {
                             .githubLink(interview.getInterview().getUser().getGithubLink())
                             .id(interview.getInterview().getUser().getId())
                             .nickname(interview.getInterview().getUser().getNickname())
-                            .profileImageUrl(interview.getInterview().getUser().getProfileImageUrl())
+                            .profileImageUrl(interviewGeneralService.generateProfileImageUrl(interview.getUser().getProfileImageUrl()))
                             .introduce(interview.getInterview().getUser().getIntroduce())
                             .build())
                     .badge(interview.getBadge())
