@@ -37,6 +37,10 @@ public class WeeklyInterview extends Timestamped {
     @Column(name = "scrap_count")
     private Long scrapCount;  //1개씩 step하면서 순위??
 
+    @Column(nullable = false)
+    private String badge;
+
+
     //public WeeklyInterview(Interview interview, Long scrapCount){
     public WeeklyInterview(Interview interview){
         this.user = interview.getUser();
@@ -45,4 +49,12 @@ public class WeeklyInterview extends Timestamped {
         //this.scrapCount = scrapCount;
     }
 
+    public WeeklyInterview(WeeklyInterview weeklyInterviewTop3, String badge) {
+        this.user = weeklyInterviewTop3.getUser();
+        this.question = weeklyInterviewTop3.getQuestion();
+        this.interview = weeklyInterviewTop3.getInterview();
+        this.scrapCount = weeklyInterviewTop3.getScrapCount();
+        this.badge = badge;
+        //super();
+    }
 }
