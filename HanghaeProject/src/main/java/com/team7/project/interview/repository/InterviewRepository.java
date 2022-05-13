@@ -3,15 +3,16 @@ package com.team7.project.interview.repository;
 import com.team7.project.category.model.CategoryEnum;
 import com.team7.project.interview.model.Interview;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Tuple;
 import java.util.List;
-
 
 @Repository
 public interface InterviewRepository extends JpaRepository<Interview, Long> {
@@ -29,6 +30,20 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
 
     Page<Interview> findAllByIsDoneAndScraps_User_Id(Boolean isDone, Long userId, Pageable pageable);
 
+    //주간 면접왕
+    @Query(value = "SELECT i.id as interview_id, i.user_id, i.question_id, s.scrap_count FROM interview i " +
+                        "inner JOIN ( " +
+                            "SELECT interview_id, count(interview_id) as scrap_count FROM scrap " +
+                            "WHERE created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 WEEK ) AND NOW() " +
+                            "group by interview_id " +
+                            "order by count(interview_id) DESC LIMIT 3 " +
+                        ") s " +
+                        "ON i.id IN (s.interview_id)", nativeQuery = true)
+    //List<Interview> findWeeklyInterview();
+    Page<Interview> findWeeklyInterview(Pageable pageable);
+    //List<Interview> findWeeklyInterview(Pageable pageable);
+
     @Query("SELECT q.category FROM Interview i LEFT JOIN i.question q WHERE i.question.id = q.id GROUP BY q.category ORDER BY COUNT(q.category ) DESC ")
     List<CategoryEnum> findCategoriesOrderedByCategoryCount(Pageable pageable);
+
 }
