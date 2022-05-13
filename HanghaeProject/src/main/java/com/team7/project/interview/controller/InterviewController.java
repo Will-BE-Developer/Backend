@@ -1,6 +1,7 @@
 package com.team7.project.interview.controller;
 
 import com.team7.project.advice.RestException;
+import com.team7.project.category.model.CategoryEnum;
 import com.team7.project.interview.dto.*;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.service.InterviewGeneralService;
@@ -16,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,13 +35,23 @@ public class InterviewController {
                                                                    @RequestParam(value = "sort", defaultValue = "new") String sort,
                                                                    @RequestParam(value = "filter", defaultValue = "default") String filter,
                                                                    @AuthenticationPrincipal User user) {
-        if (per < 1) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
-        }
 
         Long loginUserId = user == null ? null : user.getId();
-
         log.info("UID " + loginUserId + " READ ALL INTERVIEWS WITH PER " + per + " PAGE " + page + " SORT " + sort + " FILTER " + filter);
+
+        List<CategoryEnum> categoryEnums = Arrays.asList(CategoryEnum.values());
+
+        if (per < 1) {
+            log.error(per + "(per)는 0보다 커야 합니다.");
+            throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
+        }
+        if(filter.equals("default") != false){
+            boolean isValidFilter = categoryEnums.contains(CategoryEnum.valueOf(filter));
+            if(isValidFilter){
+                log.error(filter + "라는 잘못된 카테고리를 입력했습니다.");
+                throw new RestException(HttpStatus.NOT_FOUND, "잘못된 카테고리를 입력했습니다.");
+            }
+        }
 
         // note that pageable start with 0
         Pageable pageable = sort.equals("old") ?
