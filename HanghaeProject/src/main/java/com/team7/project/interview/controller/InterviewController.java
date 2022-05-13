@@ -45,13 +45,14 @@ public class InterviewController {
             log.error(per + "(per)는 0보다 커야 합니다.");
             throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
         }
-        if(filter.equals("default") != false){
-            boolean isValidFilter = categoryEnums.contains(CategoryEnum.valueOf(filter));
-            if(isValidFilter){
-                log.error(filter + "라는 잘못된 카테고리를 입력했습니다.");
-                throw new RestException(HttpStatus.NOT_FOUND, "잘못된 카테고리를 입력했습니다.");
-            }
-        }
+
+//        if(filter.equals("default") != false){
+//            boolean isValidFilter = categoryEnums.contains(CategoryEnum.valueOf(filter));
+//            if(isValidFilter){
+//                log.error(filter + "라는 잘못된 카테고리를 입력했습니다.");
+//                throw new RestException(HttpStatus.NOT_FOUND, "잘못된 카테고리를 입력했습니다.");
+//            }
+//        }
 
         // note that pageable start with 0
         Pageable pageable = sort.equals("old") ?
