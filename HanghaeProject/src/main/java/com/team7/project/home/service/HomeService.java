@@ -12,6 +12,7 @@ import com.team7.project.comments.dto.CommentResponseDto;
 import com.team7.project.comments.model.Comment;
 import com.team7.project.comments.repository.CommentRepository;
 import com.team7.project.interview.dto.InterviewInfoResponseDto;
+import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.question.dto.QuestionResponseDto;
 import com.team7.project.question.model.Question;
@@ -43,6 +44,7 @@ public class HomeService {
     private final BATCH_TodayQuestionRepository batch_todayQuestionRepository;
     private final BATCH_TopCategoriesRepository batch_topCategoriesRepository;
     private final CommentRepository commentRepository;
+    private final InterviewRepository interviewRepository;
 
     public List<BATCH_TopCategories> getTopCatetories() {
         List<BATCH_TopCategories> topCategories = batch_topCategoriesRepository.findAll();
@@ -82,7 +84,46 @@ public class HomeService {
         }
         return commentResponseDtos;
     }
+    public List<InterviewInfoResponseDto.Data> getLatestInterview(User user){
+        List<Interview> latstInterview = interviewRepository.findAllByIsDoneAndIsPublicOrderByCreatedAtDesc(true, true, PageRequest.of(0,3));
+        List<InterviewInfoResponseDto.Data> latestInterviewDto = new ArrayList<>();
+        Boolean ismine = false;
+        Boolean scrapMe = false;
 
+        for (Interview interview : latstInterview) {
+
+            if (user != null) {
+                ismine = interview.getUser().getEmail() == user.getEmail();
+                Set<Long> userScapId = createUserScrapIds(user);
+                scrapMe = userScapId.contains(interview.getId());
+            }
+
+            InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
+                    .id(interview.getId())
+                    .video(interview.getVideoKey())
+                    .thumbnail(interview.getThumbnailKey())
+                    .question(new QuestionResponseDto.data(interview.getQuestion().getId(), interview.getQuestion().getCategory().name(), interview.getQuestion().getContents(), interview.getQuestion().getReference()))
+                    .user(UserInfoResponseDto.UserBody.builder()
+                            .githubLink(interview.getUser().getGithubLink())
+                            .id(interview.getUser().getId())
+                            .nickname(interview.getUser().getNickname())
+                            .profileImageUrl(interview.getUser().getProfileImageUrl())
+                            .introduce(interview.getUser().getIntroduce())
+                            .build())
+                    .badge(interview.getBadge())
+                    .note(interview.getMemo())
+                    .scrapsMe(scrapMe)
+                    .scrapsCount((long)(interview.getScraps().size()))
+                    .likesCount(0L)
+                    .isPublic(interview.getIsPublic())
+                    .isMine(ismine)
+                    .createdAt(interview.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                    .updatedAt(interview.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                    .build();
+            latestInterviewDto.add(n);
+        }
+        return latestInterviewDto;
+    }
     public List<InterviewInfoResponseDto.Data> getWeeklyInterview(User user) {
 
         List<BATCH_WeeklyInterview> getInterviews = batch_weeklyInterviewRepository.findAll();

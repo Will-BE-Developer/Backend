@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class HomeResponseDto {
 
-    private List<CommentResponseDto.ResponseComment> latestCommnets;
+    private List<InterviewInfoResponseDto.Data> latestInterviews;
     private List<InterviewInfoResponseDto.Data> weeklyInterviews;
     private List<QuestionResponseDto> TodaysQuestions ;
     private List<BATCH_TopCategories> topCategories;
