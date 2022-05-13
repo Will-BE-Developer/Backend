@@ -2,7 +2,6 @@ package com.team7.project.scrap.service;
 
 
 import com.team7.project.advice.ErrorMessage;
-import com.team7.project.advice.RestException;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.scrap.dto.ScrapInfoResponseDto;
@@ -11,12 +10,9 @@ import com.team7.project.scrap.repository.ScrapRepository;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -56,7 +52,7 @@ public class ScrapService {
     public ScrapInfoResponseDto removeScrap(User user, Long interviewId) {
 
         Scrap scrap = scrapRepository.findByUser_IdAndInterview_Id(user.getId(), interviewId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
+                .orElseThrow(ErrorMessage.CONFLICT_SCRAP_DELETE::throwError);
 
         scrapRepository.deleteById(scrap.getId());
 
