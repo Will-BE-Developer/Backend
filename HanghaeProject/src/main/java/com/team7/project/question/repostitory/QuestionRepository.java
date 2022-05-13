@@ -11,4 +11,5 @@ import java.util.List;
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findAllByCategory(CategoryEnum categoryEnum);
     List<Question> findAllByCategoryAndIsShow(CategoryEnum categoryEnum, boolean isShow);
+
 }

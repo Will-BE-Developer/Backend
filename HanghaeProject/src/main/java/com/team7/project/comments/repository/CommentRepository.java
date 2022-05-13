@@ -24,5 +24,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     //Long countByInterview_Id(Long interviewId); //대댓글 포함
     Long countByInterview_IdAndRootName(Long interviewId, String rootName);
+
+    List<Comment> findAllByRootNameOrderByCreatedAtDesc(String rootname, Pageable pageable);
 }
 
