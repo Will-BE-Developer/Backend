@@ -27,7 +27,7 @@ public class WeeklyInterviewScheduler {
     private JobLauncher jobLauncher;
 
     //주간 면접왕
-    //@Scheduled(cron = "0 0 0 ? * MON")  //Mon 00:00:00
+    //@Scheduled(cron = "0 0 0 ? * MON")  //Mon 00:00:00 매주 -> 매일(삭제된글 있으면 재선정)
     @Scheduled(cron = "0 0/30 * * * *")   //30분
     public void runWeeklyInterviewJob() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         JobParameters jobParameters = new JobParameters(

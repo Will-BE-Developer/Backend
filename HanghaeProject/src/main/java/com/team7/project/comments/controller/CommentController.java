@@ -31,6 +31,17 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    @GetMapping("/api/comments/{interviewId}")
+    public ResponseEntity makeCommentList(@PathVariable Long interviewId,
+                                          @AuthenticationPrincipal User user,
+                                          @RequestParam(value = "per", defaultValue = "10") int per,
+                                          @RequestParam(value = "page", defaultValue = "1") int page){
+
+        CommentListDto commentListDto = commentService.makeCommentList(interviewId, user, per, page);
+
+        return new ResponseEntity(commentListDto, HttpStatus.OK);
+    }
+
     @PostMapping("/api/comments")
     public ResponseEntity saveComment(@RequestBody CommentRequestDto requestDto,
                                       @AuthenticationPrincipal User user) {
@@ -40,7 +51,7 @@ public class CommentController {
         //CommentResponseDto responseDto = new CommentResponseDto(comment, true);
 
         // 댓글 리스트 response
-        int page = commentService.getCurrentCommentPage(comment);
+        int page = commentService.getCurrentCommentPage(comment, "save");
         Long interviewId = comment.getInterview().getId();
         int per = 10;
         CommentListDto commentListDto = commentService.makeCommentList(interviewId, user, per, page);
@@ -54,10 +65,9 @@ public class CommentController {
                                       @AuthenticationPrincipal User user) {
 
         Comment editedComment = commentService.editComment(commentId, requestDto, user);
-        //CommentResponseDto responseDto = new CommentResponseDto(editedComment, true);
 
         // 댓글 리스트 response
-        int page = commentService.getCurrentCommentPage(editedComment);
+        int page = commentService.getCurrentCommentPage(editedComment, "edit");
         Long interviewId = editedComment.getInterview().getId();
         int per = 10;
         CommentListDto commentListDto = commentService.makeCommentList(interviewId, user, per, page);
@@ -70,25 +80,14 @@ public class CommentController {
                                         @AuthenticationPrincipal User user) {
 
         Comment comment = commentService.deleteComment(commentId, user);
-        //CommentResponseDto responseDto = new CommentResponseDto(comment, true);
 
         // 댓글 리스트 response
-        int page = commentService.getCurrentCommentPage(comment);
+        int page = commentService.getCurrentCommentPage(comment, "delete");
         Long interviewId = comment.getInterview().getId();
         int per = 10;
         CommentListDto commentListDto = commentService.makeCommentList(interviewId, user, per, page);
 
         return new ResponseEntity(commentListDto, HttpStatus.OK);
     }
-
-    @GetMapping("/api/comments/{interviewId}")
-    public ResponseEntity makeCommentList(@PathVariable Long interviewId,
-                                          @AuthenticationPrincipal User user,
-                                          @RequestParam(value = "per", defaultValue = "10") int per,
-                                          @RequestParam(value = "page", defaultValue = "1") int page){
-
-        CommentListDto commentListDto = commentService.makeCommentList(interviewId, user, per, page);
-
-        return new ResponseEntity(commentListDto, HttpStatus.OK);
-    }
 }
+

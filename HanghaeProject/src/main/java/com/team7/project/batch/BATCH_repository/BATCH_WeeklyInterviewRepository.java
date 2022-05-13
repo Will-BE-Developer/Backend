@@ -18,7 +18,8 @@ public interface BATCH_WeeklyInterviewRepository extends JpaRepository<BATCH_Wee
             "group by interview_id " +
             "order by count(interview_id) DESC LIMIT 3 " +
             ") s " +
-            "ON i.id IN (s.interview_id)", nativeQuery = true)
+            "ON i.id IN (s.interview_id) " +
+            "WHERE i.is_public = 1 order by scrap_count DESC, created_at DESC ", nativeQuery = true)
 
         //List<Interview> findWeeklyInterview();
         //Page<Interview> findWeeklyInterview(Pageable pageable);
