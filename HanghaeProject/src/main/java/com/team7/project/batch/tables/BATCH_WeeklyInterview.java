@@ -20,6 +20,7 @@ public class BATCH_WeeklyInterview extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
     private Long id;
 
     @ManyToOne(fetch = LAZY)
