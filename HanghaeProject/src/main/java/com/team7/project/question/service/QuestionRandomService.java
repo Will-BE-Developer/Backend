@@ -1,5 +1,6 @@
 package com.team7.project.question.service;
 
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.advice.RestException;
 import com.team7.project.category.model.CategoryEnum;
 //import com.team7.project.category.repository.CategoryRepository;
@@ -49,8 +50,7 @@ public class QuestionRandomService {
         }
         else
         {
-            log.error(questionRequestDto.getCategory() + "라는 잘못된 카테고리를 입력했습니다.");
-            throw new RestException(HttpStatus.BAD_REQUEST, "잘못된 카테고리를 입력했습니다.");
+            throw ErrorMessage.INVALID_PAGINATION_CATEGORY.throwError();
         }
 
     }

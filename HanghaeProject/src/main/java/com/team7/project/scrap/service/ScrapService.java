@@ -1,6 +1,7 @@
 package com.team7.project.scrap.service;
 
 
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.advice.RestException;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
@@ -30,20 +31,17 @@ public class ScrapService {
     public ScrapInfoResponseDto addScrap(User user, Long interviewId) {
 
         User loginUser = userRepository.findById(user.getId())
-                .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
 
         for (Scrap scrap : loginUser.getScraps()) {
             if (Objects.equals(scrap.getInterview().getId(), interviewId)) {
-                throw new RestException(HttpStatus.CONFLICT, "이미 스크랩한 게시글 입니다.");
+                throw ErrorMessage.CONFLICT_SCRAP_POST.throwError();
             }
         }
 
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+
         Long scrapCount = interview.getScraps().stream().count();
 
         Scrap scrap = scrapRepository.save(new Scrap(loginUser, interview));
@@ -58,20 +56,17 @@ public class ScrapService {
     public ScrapInfoResponseDto removeScrap(User user, Long interviewId) {
 
         Scrap scrap = scrapRepository.findByUser_IdAndInterview_Id(user.getId(), interviewId)
-                .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 스크랩 정보가 존재하지 않습니다.")
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
 
         scrapRepository.deleteById(scrap.getId());
 
         return new ScrapInfoResponseDto(new ScrapInfoResponseDto.Data(interviewId, false, 999L));
     }
 
-    public Long getScrapCount(Long interviewId){
+    public Long getScrapCount(Long interviewId) {
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+
         return interview.getScraps().stream().count();
     }
 

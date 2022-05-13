@@ -1,5 +1,6 @@
 package com.team7.project.interview.controller;
 
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.advice.RestException;
 import com.team7.project.category.model.CategoryEnum;
 import com.team7.project.interview.dto.*;
@@ -9,6 +10,7 @@ import com.team7.project.interview.service.InterviewPostService;
 import com.team7.project.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,8 +35,8 @@ public class InterviewController {
     @GetMapping("/api/interviews")
     public ResponseEntity<InterviewListResponseDto> readInterviews(@RequestParam(value = "per", defaultValue = "6") int per,
                                                                    @RequestParam(value = "page", defaultValue = "1") int page,
-                                                                   @RequestParam(value = "sort", defaultValue = "new") String sort,
-                                                                   @RequestParam(value = "filter", defaultValue = "default") String filter,
+                                                                   @RequestParam(value = "sort", defaultValue = "최신순") String sort,
+                                                                   @RequestParam(value = "filter", defaultValue = "전체보기") String filter,
                                                                    @AuthenticationPrincipal User user) {
 
         Long loginUserId = user == null ? null : user.getId();
@@ -46,16 +49,16 @@ public class InterviewController {
             throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
         }
 
-//        if(filter.equals("default") != false){
-//            boolean isValidFilter = categoryEnums.contains(CategoryEnum.valueOf(filter));
-//            if(isValidFilter){
-//                log.error(filter + "라는 잘못된 카테고리를 입력했습니다.");
-//                throw new RestException(HttpStatus.NOT_FOUND, "잘못된 카테고리를 입력했습니다.");
-//            }
-//        }
+        if(filter.equals("전체보기") == false){
+            boolean isFilterValid = EnumUtils.isValidEnum(CategoryEnum.class, filter);
+            if(isFilterValid == false){
+                log.error(filter + " 라는 잘못된 카테고리를 입력했습니다.");
+                throw ErrorMessage.INVALID_PAGINATION_CATEGORY.throwError();
+            }
+        }
 
         // note that pageable start with 0
-        Pageable pageable = sort.equals("old") ?
+        Pageable pageable = sort.equals("오래된순") ?
                 PageRequest.of(page - 1, per, Sort.by("createdAt").ascending()) :
                 PageRequest.of(page - 1, per, Sort.by("createdAt").descending());
 
@@ -80,7 +83,7 @@ public class InterviewController {
     public ResponseEntity<InterviewDraftResponseDto> createInterviewDraft(@AuthenticationPrincipal User user) {
 
         if (user == null) {
-            throw new RestException(HttpStatus.UNAUTHORIZED, "로그인을 해야합니다.");
+            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
         }
         Long loginUserId = user.getId();
 
@@ -102,7 +105,7 @@ public class InterviewController {
                                                                       @RequestBody InterviewPostRequestDto requestDto,
                                                                       @AuthenticationPrincipal User user) {
         if (user == null) {
-            throw new RestException(HttpStatus.UNAUTHORIZED, "로그인을 해야합니다.");
+            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
         }
         Long loginUserId = user.getId();
 
@@ -118,7 +121,7 @@ public class InterviewController {
                                                                     @RequestBody InterviewUpdateRequestDto requestDto,
                                                                     @AuthenticationPrincipal User user) {
         if (user == null) {
-            throw new RestException(HttpStatus.UNAUTHORIZED, "로그인을 해야합니다.");
+            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
         }
         Long loginUserId = user.getId();
 
@@ -133,7 +136,7 @@ public class InterviewController {
     public ResponseEntity<InterviewInfoResponseDto> deleteInterview(@PathVariable Long interviewId,
                                                                     @AuthenticationPrincipal User user) {
         if (user == null) {
-            throw new RestException(HttpStatus.UNAUTHORIZED, "로그인을 해야합니다.");
+            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
         }
         Long loginUserId = user.getId();
 

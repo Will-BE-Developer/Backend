@@ -32,7 +32,7 @@ public class UserInfoResponseDto {
     @Builder
     public UserInfoResponseDto(UserBody user, String token, LocalDateTime tokenExpires){
         this.user = user ;
-        this.token =token;
+        this.token = token;
         this.tokenExpires = null;
     }
 

@@ -1,6 +1,7 @@
 package com.team7.project.scrap.controller;
 
 
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.advice.RestException;
 import com.team7.project.scrap.dto.ScrapInfoResponseDto;
 import com.team7.project.scrap.service.ScrapService;
@@ -23,7 +24,7 @@ public class ScrapController {
                                                                @AuthenticationPrincipal User user) {
 
         if (user == null) {
-            throw new RestException(HttpStatus.UNAUTHORIZED, "로그인을 해야합니다.");
+            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
         }
         Long loginUserId = user.getId();
 
@@ -38,7 +39,7 @@ public class ScrapController {
                                                                @AuthenticationPrincipal User user) {
 
         if (user == null) {
-            throw new RestException(HttpStatus.UNAUTHORIZED, "로그인을 해야합니다.");
+            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
         }
         Long loginUserId = user.getId();
 

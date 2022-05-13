@@ -10,7 +10,7 @@ public class MailTemplate {
     String htmlBodyBeforeName="    <body style=\"margin: 0; padding: 0; width:600px; font-family:Arial ;\">\n" +
             "        <div style=\"margin: 20px\">\n" +
             "        <header>\n" +
-            "            <a style=\"height: 30px;\" href =\"https://dev.d3rdkt99yi3hok.amplifyapp.com/\">\n" +
+            "            <a style=\"height: 30px;\" href =\"https://dev.d3rdkt99yi3hok.amplifyapp.com\">\n" +
             "                <img src=\"../../../resources/static/image/logo.png\">\n" +
             "            </a>\n" +
             "        </header>\n" +
