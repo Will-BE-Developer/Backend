@@ -1,6 +1,5 @@
 package com.team7.project.home.service;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.team7.project.advice.RestException;
 import com.team7.project.batch.BATCH_repository.BATCH_TodayQuestionRepository;
 import com.team7.project.batch.BATCH_repository.BATCH_TopCategoriesRepository;

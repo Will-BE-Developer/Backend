@@ -7,8 +7,11 @@ import com.team7.project.comments.model.Comment;
 import com.team7.project.comments.repository.CommentRepository;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
+import com.team7.project.interview.service.InterviewGeneralService;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,21 +23,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class CommentService {
 
+    private final InterviewGeneralService interviewGeneralService;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final InterviewRepository interviewRepository;
-
-    public CommentService(
-            CommentRepository commentRepository,
-            UserRepository userRepository,
-            InterviewRepository interviewRepository){
-        this.commentRepository = commentRepository;
-        this.userRepository = userRepository;
-        this.interviewRepository = interviewRepository;
-    }
 
     @Transactional  //메서드가 포함하고 있는 작업 중에 하나라도 실패할 경우 전체 작업을 취소
     public Comment saveComment(CommentRequestDto requestDto, User user) {
@@ -129,7 +126,8 @@ public class CommentService {
             if (user != null){
                 isMine = user.getId().equals(eachComment.getUser().getId());
             }
-            commentListDto.addComment(eachComment, isMine);
+            String profileUrl = interviewGeneralService.generateProfileImageUrl(eachComment.getUser().getProfileImageUrl());
+            commentListDto.addComment(eachComment, isMine, profileUrl);
         }
 
         //대댓글 조회 + 대댓글 수
@@ -153,7 +151,7 @@ public class CommentService {
                 if (eachCommentDto.getId().equals(RootId)){
                     int index = commentListDto.getComments().indexOf(eachCommentDto);
                     System.out.println("nested 넣을 댓글 목록의 index: " + index);
-                    commentListDto.addNestedComment(index, eachComment, isMine);
+                    commentListDto.addNestedComment(index, eachComment, isMine, commentListDto.getComments().get(index).getUser().getProfileImageUrl());
                 }
             }
         }
