@@ -1,5 +1,6 @@
 package com.team7.project.user.controller;
 
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.advice.RestException;
 import com.team7.project.interview.dto.*;
 import com.team7.project.interview.service.InterviewMyPageService;
@@ -54,16 +55,16 @@ public class UserMyPageController {
     }
 
     @GetMapping("/api/users/me/scraps")
-    public ResponseEntity<InterviewListResponseDto> readScrapInterviews(@RequestParam(value = "per", defaultValue = "8") int per,
+    public ResponseEntity<InterviewListResponseDto> readScrapInterviews(@RequestParam(value = "per", defaultValue = "6") int per,
                                                                    @RequestParam(value = "page", defaultValue = "1") int page,
                                                                    @RequestParam(value = "sort", defaultValue = "new") String sort,
                                                                    @AuthenticationPrincipal User user) {
         if (per < 1) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
+            throw ErrorMessage.INVALID_PAGINATION_SIZE.throwError();
         }
 
         if (user == null) {
-            throw new RestException(HttpStatus.UNAUTHORIZED, "로그인을 해야합니다.");
+            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
         }
         Long loginUserId = user.getId();
 

@@ -58,7 +58,7 @@ public class InterviewGeneralService {
     }
 
     public String generateProfileImageUrl(String image) {
-        if(image == null){
+        if (image == null) {
             return null;
         }
         return (image.contains("http://") | image.contains("https://")) ? image : generatePresignedUrl(image);
@@ -84,7 +84,7 @@ public class InterviewGeneralService {
         String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
         String profilePresignedUrl = generateProfileImageUrl(interview.getUser().getProfileImageUrl());
 
-        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl,profilePresignedUrl, isMine, scrapsMe, scrapsCount);
+        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, profilePresignedUrl, isMine, scrapsMe, scrapsCount);
     }
 
 
@@ -93,21 +93,19 @@ public class InterviewGeneralService {
         User user = loginUserId == null ?
                 null :
                 userRepository.findById(loginUserId)
-                        .orElseThrow(
-                                () -> new RestException(HttpStatus.NOT_FOUND, "해당 유저가 존재하지 않습니다.")
-                        );
+                        .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
 
         List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
 
         Page<Interview> interviews;
-        if (sort.equals("scrap")) {
-            interviews = filter.equals("default") ?
+        if (sort.equals("스크랩순")) {
+            interviews = filter.equals("전체보기") ?
                     interviewRepository.findAllOrderByScrapsCountDesc(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize())) :
                     interviewRepository.findAllByQuestion_CategoryOrderByScrapsCountDesc(CategoryEnum.valueOf(filter), pageable);
 
 
         } else {
-            interviews = filter.equals("default") ?
+            interviews = filter.equals("전체보기") ?
                     interviewRepository.findAllByIsDoneAndIsPublic(true, true, pageable) :
                     interviewRepository.findAllByIsDoneAndIsPublicAndQuestion_Category(true, true, CategoryEnum.valueOf(filter), pageable);
         }
@@ -134,18 +132,16 @@ public class InterviewGeneralService {
         User user = loginUserId == null ?
                 null :
                 userRepository.findById(loginUserId)
-                        .orElseThrow(
-                                () -> new RestException(HttpStatus.NOT_FOUND, "로그인 유저 정보가 존재하지 않습니다.")
-                        );
+                        .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
 
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(
-                        () -> new RestException(HttpStatus.NOT_FOUND, "해당 인터뷰가 존재하지 않습니다.")
+                        ErrorMessage.NOT_FOUND_INTERVIEW::throwError
                 );
 
 
-        if ( interview.getIsPublic() == false & interview.getUser().getId() != loginUserId) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 인터뷰를 조회 할 수 없습니다.");
+        if (interview.getIsPublic() == false & interview.getUser().getId() != loginUserId) {
+            throw ErrorMessage.INVALID_INTERVIEW_VIEW.throwError();
         }
 
         Set<Long> userScrapsId = createUserScrapIds(user);
@@ -157,18 +153,14 @@ public class InterviewGeneralService {
     public InterviewInfoResponseDto updateInterview(Long loginUserId, Long interviewId, InterviewUpdateRequestDto requestDto) {
 
         User user = userRepository.findById(loginUserId)
-                .orElseThrow(
-                        ErrorMessage.NOT_FOUND_USER::throwError
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
 
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(
-                        () -> ErrorMessage.NOT_FOUND_INTERVIEW.throwError()
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
 
         Boolean isMine = Objects.equals(loginUserId, interview.getUser().getId());
         if (isMine == false) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 인터뷰를 수정 할 수 않습니다.");
+            throw ErrorMessage.INVALID_INTERVIEW_UPDATE.throwError();
         }
 
         interview.update(requestDto.getNote(), requestDto.getIsPublic());
@@ -183,18 +175,14 @@ public class InterviewGeneralService {
     public InterviewInfoResponseDto deleteInterview(Long loginUserId, Long interviewId) {
 
         User user = userRepository.findById(loginUserId)
-                .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
 
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
 
         Boolean isMine = Objects.equals(user.getId(), interview.getUser().getId());
         if (isMine == false) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 인터뷰를 수정 할 수 없습니다.");
+            throw ErrorMessage.INVALID_INTERVIEW_DELETE.throwError();
         }
 
         Set<Long> userScrapsId = createUserScrapIds(user);
