@@ -1,20 +1,48 @@
 package com.team7.project.weeklyInterview.model;
 
 import com.team7.project._global.timestamped.model.Timestamped;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.team7.project.interview.model.Interview;
+import com.team7.project.question.model.Question;
+import com.team7.project.user.model.User;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
-@Getter // get 함수를 일괄적으로 만들어줍니다.
-@NoArgsConstructor // 기본 생성자를 만들어줍니다.
+import static javax.persistence.FetchType.LAZY;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 @Entity
 public class WeeklyInterview extends Timestamped {
-    // ID가 자동으로 생성 및 증가합니다.
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "question_id")
+    private Question question;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "interview_id")
+    private Interview interview;
+
+    @Column(name = "scrap_count")
+    private Long scrapCount;  //1개씩 step하면서 순위??
+
+    //public WeeklyInterview(Interview interview, Long scrapCount){
+    public WeeklyInterview(Interview interview){
+        this.user = interview.getUser();
+        this.question = interview.getQuestion();
+        this.interview = interview;
+        //this.scrapCount = scrapCount;
+    }
+
 }
