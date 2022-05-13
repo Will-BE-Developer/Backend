@@ -22,12 +22,13 @@ public class CommentListDto {
 
     int totalComments;
 
-    public void addComment(Comment comment, Boolean isMine){
-        this.comments.add(new ResponseComment(comment, isMine));
-    }
-    public void addNestedComment(int index, Comment comment, Boolean isMine){
+    public void addComment(Comment comment, Boolean isMine, String profileUrl){
+        this.comments.add(new ResponseComment(comment, isMine, profileUrl));
 
-        this.comments.get(index).addNestedCommentWithoutNest(new NestedComment(comment, isMine));
+    }
+    public void addNestedComment(int index, Comment comment, Boolean isMine, String profileUrl){
+
+        this.comments.get(index).addNestedCommentWithoutNest(new NestedComment(comment, isMine, profileUrl));
     }
 
     private Pagination pagination;
@@ -52,14 +53,14 @@ public class CommentListDto {
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
 
-        public ResponseComment(Comment comment, Boolean isMine) {
+        public ResponseComment(Comment comment, Boolean isMine, String profileUrl) {
             this.id = comment.getId();
             this.userOrigin = comment.getUser();
             this.user = new ResponseUser(
                     userOrigin.getId(),
                     userOrigin.getNickname(),
                     userOrigin.getGithubLink(),
-                    userOrigin.getProfileImageUrl(),
+                    profileUrl,
                     userOrigin.getIntroduce());
             this.contents = comment.getContents();
             this.createdAt = comment.getCreatedAt();
@@ -95,14 +96,14 @@ public class CommentListDto {
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
 
-        public NestedComment(Comment comment, Boolean isMine){
+        public NestedComment(Comment comment, Boolean isMine, String profileUrl){
             this.id = comment.getId();
             this.userOrigin = comment.getUser();
             this.user = new ResponseUser(
                     userOrigin.getId(),
                     userOrigin.getNickname(),
                     userOrigin.getGithubLink(),
-                    userOrigin.getProfileImageUrl(),
+                    profileUrl,
                     userOrigin.getIntroduce());
             this.contents = comment.getContents();
             this.createdAt = comment.getCreatedAt();

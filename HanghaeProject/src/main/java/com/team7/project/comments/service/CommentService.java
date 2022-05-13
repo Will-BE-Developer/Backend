@@ -7,10 +7,11 @@ import com.team7.project.comments.model.Comment;
 import com.team7.project.comments.repository.CommentRepository;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
+import com.team7.project.interview.service.InterviewGeneralService;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -59,7 +61,8 @@ public class CommentService {
             if (user != null){
                 isMine = user.getId().equals(eachComment.getUser().getId());
             }
-            commentListDto.addComment(eachComment, isMine);
+            String profileUrl = interviewGeneralService.generateProfileImageUrl(eachComment.getUser().getProfileImageUrl());
+            commentListDto.addComment(eachComment, isMine, profileUrl);
         }
 
         //대댓글 조회 + 대댓글 수
@@ -84,7 +87,7 @@ public class CommentService {
                 if (eachCommentDto.getId().equals(RootId)){
                     int index = commentListDto.getComments().indexOf(eachCommentDto);
                     System.out.println("대댓글을 포함시킬 부모댓글의 index: " + index);
-                    commentListDto.addNestedComment(index, eachComment, isMine);
+                    commentListDto.addNestedComment(index, eachComment, isMine, commentListDto.getComments().get(index).getUser().getProfileImageUrl());
                 }
             }
         }

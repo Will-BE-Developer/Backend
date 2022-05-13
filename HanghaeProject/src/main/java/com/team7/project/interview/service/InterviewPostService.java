@@ -4,6 +4,7 @@ package com.team7.project.interview.service;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.advice.RestException;
 import com.team7.project.interview.dto.InterviewInfoResponseDto;
 import com.team7.project.interview.dto.InterviewPostRequestDto;
@@ -59,7 +60,7 @@ public class InterviewPostService {
     public Interview createInterviewDraft(Long loginUserId) {
 
         User user = userRepository.findById(loginUserId).orElseThrow(
-                () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
+                ErrorMessage.NOT_FOUND_LOGIN_USER::throwError
         );
 
         String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
@@ -76,17 +77,14 @@ public class InterviewPostService {
     public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) {
 
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_DRAFT::throwError);
 
         Question question = questionRepository.findById(requestDto.getQuestionId())
-                .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 질문이 존재하지 않습니다.")
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_QUESTION::throwError);
+
 
         if (interview.getUser().getId() != loginUserId) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 게시글을 업로드 할 수 없습니다.");
+            throw ErrorMessage.INVALID_INTERVIEW_POST.throwError();
         }
 
         interview.complete(requestDto.getNote(), requestDto.getIsPublic(), question);

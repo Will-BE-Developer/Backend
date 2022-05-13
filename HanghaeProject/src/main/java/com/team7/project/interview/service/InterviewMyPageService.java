@@ -4,6 +4,7 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.team7.project._global.pagination.dto.PaginationResponseDto;
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.advice.RestException;
 import com.team7.project.interview.dto.InterviewInfoResponseDto;
 import com.team7.project.interview.dto.InterviewListResponseDto;
@@ -54,12 +55,10 @@ public class InterviewMyPageService {
         return url.toString();
     }
 
-    public InterviewListResponseDto readAllMyInterviews(Pageable pageable, Long loginUserId){
+    public InterviewListResponseDto readAllMyInterviews(Pageable pageable, Long loginUserId) {
 
         User user = userRepository.findById(loginUserId)
-                .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
-                );
+                .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
 
         Page<Interview> interviews = interviewRepository.findAllByIsDoneAndUser_Id(true, loginUserId, pageable);
 
@@ -67,7 +66,7 @@ public class InterviewMyPageService {
 
         Set<Long> userScrapsId = interviewGeneralService.createUserScrapIds(user);
 
-        for(Interview interview: interviews.getContent()){
+        for (Interview interview : interviews.getContent()) {
 
             InterviewInfoResponseDto response = interviewGeneralService.createInterviewResponse(loginUserId, userScrapsId, interview);
 
@@ -82,12 +81,10 @@ public class InterviewMyPageService {
         return new InterviewListResponseDto(responses, pagination);
     }
 
-    public InterviewListResponseDto readAllMyScraps(Pageable pageable, Long loginUserId){
+    public InterviewListResponseDto readAllMyScraps(Pageable pageable, Long loginUserId) {
 
         User user = userRepository.findById(loginUserId)
-                .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
-                );
+                .orElseThrow(ErrorMessage.UNAUTHORIZED_USER::throwError);
 
         Page<Interview> interviews = interviewRepository.findAllByIsDoneAndScraps_User_Id(true, loginUserId, pageable);
 
@@ -95,7 +92,7 @@ public class InterviewMyPageService {
 
         Set<Long> userScrapsId = interviewGeneralService.createUserScrapIds(user);
 
-        for(Interview interview: interviews.getContent()){
+        for (Interview interview : interviews.getContent()) {
 
             InterviewInfoResponseDto response = interviewGeneralService.createInterviewResponse(loginUserId, userScrapsId, interview);
 
