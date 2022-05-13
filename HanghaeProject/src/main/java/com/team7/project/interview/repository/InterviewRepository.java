@@ -19,7 +19,7 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     //인터뷰 전체보기
     Page<Interview> findAllByIsDoneAndIsPublic(Boolean isDone, Boolean isPublic, Pageable pageable);
     Page<Interview> findAllByIsDoneAndIsPublicAndQuestion_Category(Boolean isDone, Boolean isPublic, CategoryEnum categoryEnum, Pageable pageable);
-
+    List<Interview> findAllByIsDoneAndIsPublicOrderByCreatedAtDesc(Boolean isDone, Boolean isPublic, Pageable pageable);
     @Query(value = "select p from Interview p where p.isDone = true and p.isPublic = true Order By size(p.scraps) desc")
     Page<Interview> findAllOrderByScrapsCountDesc(Pageable pageable);
 
