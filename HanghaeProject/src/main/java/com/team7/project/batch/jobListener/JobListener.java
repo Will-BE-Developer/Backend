@@ -1,4 +1,4 @@
-package com.team7.project.batch.WeeklyInterview;
+package com.team7.project.batch.jobListener;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.BatchStatus;

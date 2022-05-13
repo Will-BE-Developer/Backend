@@ -1,9 +1,7 @@
 package com.team7.project.batch.scheduler;
 
-
-import com.team7.project.batch.config.WeeklyInterviewBatchConfig;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -11,29 +9,34 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Calendar;
+import java.util.Collections;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class WeeklyInterviewBatchScheduler {
+public class WeeklyInterviewScheduler {
 
-    private final JobLauncher jobLauncher;
-    private final WeeklyInterviewBatchConfig weeklyInterviewBatchConfig;
+    @Autowired
+    private Job weeklyInterviewJob;
 
-//    시간 마다 실행
-    @Scheduled(cron = "0 0 * * * *")
-    public void runJob() {
-        Map<String, JobParameter> configMap = new HashMap<>();
-        configMap.put("time", new JobParameter((System.currentTimeMillis())));
-        JobParameters jobParameters = new JobParameters(configMap);
+    @Autowired
+    private JobLauncher jobLauncher;
 
+    //주간 면접왕
+    //@Scheduled(cron = "0 0 0 ? * MON")  //Mon 00:00:00
+    @Scheduled(cron = "0 0/30 * * * *")   //30분
+    public void runWeeklyInterviewJob() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+        JobParameters jobParameters = new JobParameters(
+                Collections.singletonMap("requestTime", new JobParameter(System.currentTimeMillis()))
+        );
+        
         try {
-            jobLauncher.run(weeklyInterviewBatchConfig.jobWeeklyInterview(), jobParameters);
+            jobLauncher.run(weeklyInterviewJob, jobParameters);
+            log.info("weeklyInterviewJob 배치 실행됨: " + Calendar.getInstance().getTime());
         } catch (JobExecutionAlreadyRunningException |
                 JobInstanceAlreadyCompleteException |
                 JobParametersInvalidException |
@@ -41,5 +44,4 @@ public class WeeklyInterviewBatchScheduler {
             log.error(e.getMessage());
         }
     }
-
 }

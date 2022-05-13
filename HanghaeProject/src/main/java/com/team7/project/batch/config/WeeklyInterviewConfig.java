@@ -1,5 +1,6 @@
-package com.team7.project.batch.WeeklyInterview;
+package com.team7.project.batch.config;
 
+import com.team7.project.batch.jobListener.JobListener;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;

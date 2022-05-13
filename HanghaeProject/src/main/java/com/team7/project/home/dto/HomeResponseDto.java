@@ -14,7 +14,7 @@ import java.util.List;
 public class HomeResponseDto {
 
     private List<CommentResponseDto.ResponseComment> latestCommnets;
-//    private List<InterviewInfoResponseDto.Data> weeklyInterviews;
+    private List<InterviewInfoResponseDto.Data> weeklyInterviews;
     private List<QuestionResponseDto> TodaysQuestions ;
     private List<BATCH_TopCategories> topCategories;
 
