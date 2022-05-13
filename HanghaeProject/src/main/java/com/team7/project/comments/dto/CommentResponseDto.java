@@ -2,10 +2,13 @@ package com.team7.project.comments.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.team7.project.comments.model.Comment;
+import com.team7.project.user.dto.UserInfoResponseDto;
 import com.team7.project.user.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -18,11 +21,12 @@ public class CommentResponseDto {
     }
 
     @Getter
-    public class ResponseComment{
+    @Setter
+    public static class ResponseComment{
         private Long id;
         @JsonIgnore
         private User userOrigin;
-        private ResponseUser user;
+        private UserInfoResponseDto.UserBody user;
         private String contents;
         private Boolean isMine;
         private Long parentId;
@@ -32,12 +36,13 @@ public class CommentResponseDto {
         public ResponseComment(Comment comment, Boolean isMine) {
             this.id = comment.getId();
             this.userOrigin = comment.getUser();
-            this.user = new ResponseUser(
-                    userOrigin.getId(),
-                    userOrigin.getNickname(),
-                    userOrigin.getGithubLink(),
-                    userOrigin.getProfileImageUrl(),
-                    userOrigin.getIntroduce());
+            this.user = UserInfoResponseDto.UserBody.builder()
+                    .introduce(userOrigin.getIntroduce())
+                    .profileImageUrl(userOrigin.getProfileImageUrl())
+                    .nickname(userOrigin.getNickname())
+                    .githubLink(userOrigin.getGithubLink())
+                    .id(userOrigin.getId())
+                    .build();
             this.contents = comment.getContents();
             this.createdAt = comment.getCreatedAt();
             this.modifiedAt = comment.getModifiedAt();
