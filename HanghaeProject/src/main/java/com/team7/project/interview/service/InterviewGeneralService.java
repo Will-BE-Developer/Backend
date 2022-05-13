@@ -4,6 +4,7 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.team7.project._global.pagination.dto.PaginationResponseDto;
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.advice.RestException;
 import com.team7.project.category.model.CategoryEnum;
 import com.team7.project.interview.dto.InterviewListResponseDto;
@@ -134,13 +135,18 @@ public class InterviewGeneralService {
                 null :
                 userRepository.findById(loginUserId)
                         .orElseThrow(
-                                () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
+                                () -> new RestException(HttpStatus.NOT_FOUND, "로그인 유저 정보가 존재하지 않습니다.")
                         );
 
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
+                        () -> new RestException(HttpStatus.NOT_FOUND, "해당 인터뷰가 존재하지 않습니다.")
                 );
+
+
+        if ( interview.getIsPublic() == false & interview.getUser().getId() != loginUserId) {
+            throw new RestException(HttpStatus.BAD_REQUEST, "현재 사용자는 해당 인터뷰를 조회 할 수 없습니다.");
+        }
 
         Set<Long> userScrapsId = createUserScrapIds(user);
 
@@ -152,12 +158,12 @@ public class InterviewGeneralService {
 
         User user = userRepository.findById(loginUserId)
                 .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
+                        ErrorMessage.NOT_FOUND_USER::throwError
                 );
 
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(
-                        () -> new RestException(HttpStatus.BAD_REQUEST, "해당 인터뷰가 존재하지 않습니다.")
+                        () -> ErrorMessage.NOT_FOUND_INTERVIEW.throwError()
                 );
 
         Boolean isMine = Objects.equals(loginUserId, interview.getUser().getId());

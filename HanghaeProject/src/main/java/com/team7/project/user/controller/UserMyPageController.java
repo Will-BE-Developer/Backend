@@ -2,11 +2,9 @@ package com.team7.project.user.controller;
 
 import com.team7.project.advice.RestException;
 import com.team7.project.interview.dto.*;
-import com.team7.project.interview.model.Interview;
-import com.team7.project.interview.service.InterviewGeneralService;
 import com.team7.project.interview.service.InterviewMyPageService;
 import com.team7.project.interview.service.InterviewPostService;
-import com.team7.project.user.dto.UserReponseDto;
+import com.team7.project.user.dto.UserInfoResponseDto;
 import com.team7.project.user.dto.UserRequestDto;
 import com.team7.project.user.model.User;
 import com.team7.project.user.service.UserMypageService;
@@ -102,37 +100,11 @@ public class UserMyPageController {
         UserRequestDto requestDto = new UserRequestDto(nickname, githubLink, profileImage, introduce);
         requestDto.setProfileImage(profileImage);
 
-        UserReponseDto userReponseDto = userMypageService.save(requestDto, user);
+        UserInfoResponseDto userInfoResponseDto = userMypageService.save(requestDto, user);
 
-        return new ResponseEntity(userReponseDto, HttpStatus.OK);
+        return new ResponseEntity(userInfoResponseDto, HttpStatus.OK);
     }
 
-    @ResponseBody
-    @PutMapping(value = "/api/users/me2", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity editUserInfo (@RequestParam(required = false) String nickname,
-                                        @RequestParam(required = false) String githubLink,
-                                        @RequestParam(required = false) String introduce,
-                                        @RequestParam(required = false) MultipartFile profileImage,
-                                        @AuthenticationPrincipal User user) throws IOException {
 
-        if(nickname != null){
-            nickname = nickname.replaceAll("^\"|\"$", "");
-        }
-        if(githubLink != null){
-            githubLink = githubLink.replaceAll("^\"|\"$", "");
-        }
-        if(introduce != null){
-            introduce = introduce.replaceAll("^\"|\"$", "");
-        }
-
-        log.info("UID "+user.getId()+" CHANGE PROFILE");
-
-        UserRequestDto requestDto = new UserRequestDto(nickname, githubLink, profileImage, introduce);
-        requestDto.setProfileImage(profileImage);
-
-        UserReponseDto userReponseDto = userMypageService.save(requestDto, user);
-
-        return new ResponseEntity(userReponseDto, HttpStatus.OK);
-    }
 
 }

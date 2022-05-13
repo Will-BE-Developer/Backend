@@ -1,4 +1,4 @@
-package com.team7.project.user.dto;
+package com.team7.project.user.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

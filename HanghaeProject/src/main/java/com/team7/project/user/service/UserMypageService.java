@@ -8,13 +8,14 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.team7.project.interview.service.InterviewGeneralService;
 import com.team7.project.user.dto.UserInfoResponseDto;
-import com.team7.project.user.dto.UserReponseDto;
 import com.team7.project.user.dto.UserRequestDto;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,7 +48,7 @@ public class UserMypageService {
     private String basicProfile = "profileImg/100.jpeg"; //temp
 
     @Transactional
-    public UserReponseDto save(UserRequestDto requestDto, User user) throws IOException {
+    public UserInfoResponseDto save(UserRequestDto requestDto, User user) throws IOException {
         String profileImageUrl = "";
 
         userRepository.findById(user.getId()).orElseThrow(
@@ -99,13 +100,16 @@ public class UserMypageService {
         }
         userRepository.save(user);
 
-        return new UserReponseDto(UserInfoResponseDto.UserBody.builder()
+
+        return UserInfoResponseDto.builder()
+                .user(UserInfoResponseDto.UserBody.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())
                 .githubLink(user.getGithubLink())
                 .profileImageUrl(interviewGeneralService.generateProfileImageUrl(user.getProfileImageUrl()))
                 .introduce(user.getIntroduce())
-                .build());
+                .build())
+         .build();
     }
 
     //이미지 파일 여부 image/gif, image/png, image/jpeg, image/bmp, image/webp  //(jpg등 테스트예정)

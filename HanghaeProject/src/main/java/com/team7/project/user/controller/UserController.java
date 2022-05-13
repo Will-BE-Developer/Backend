@@ -3,15 +3,16 @@ package com.team7.project.user.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.team7.project.advice.RestException;
 import com.team7.project.advice.Success;
-import com.team7.project.interview.service.InterviewGeneralService;
 import com.team7.project.mail.Service.MailService;
 import com.team7.project.security.jwt.TokenResponseDto;
 import com.team7.project.user.dto.*;
+import com.team7.project.user.dto.request.LoginRequestDto;
+import com.team7.project.user.dto.request.RegisterRequestDto;
 import com.team7.project.user.model.User;
-import com.team7.project.user.service.KakaoUserService;
+import com.team7.project.user.service.registerService.KakaoUserService;
 import com.team7.project.user.service.UserMypageService;
-import com.team7.project.user.service.UserProfileService;
-import com.team7.project.user.service.UserRegistryService;
+import com.team7.project.user.service.registerService.UserProfileService;
+import com.team7.project.user.service.registerService.UserRegistryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,8 +37,8 @@ public class UserController {
 
     private final UserRegistryService userRegistryService;
     private final UserProfileService userProfileService;
-    private final InterviewGeneralService interviewGeneralService;
     private final KakaoUserService kakaoUserService;
+    private final UserMypageService userMypageService;
     private final MailService mailService;
 
     @PostMapping("/signin")
@@ -71,7 +72,7 @@ public class UserController {
                         .githubLink(loginUser.getGithubLink())
                         .introduce(loginUser.getIntroduce())
                         .id(loginUser.getId())
-                        .profileImageUrl(interviewGeneralService.generateProfileImageUrl(loginUser.getProfileImageUrl()))
+                        .profileImageUrl(loginUser.getProfileImageUrl())
                         .build())
                 .token(loginUser.getToken())
                 .build(), HttpStatus.OK);
@@ -104,14 +105,14 @@ public class UserController {
             //모든 조건이 충족될경우에 회원가입을 진행한다.
             User register = userRegistryService.registerUser(requestDto);
             log.info("SIGN_UP() >> 회원가입 완료!");
-            mailService.sendEmail(register.getEmail(),register.getToken());
+            mailService.sendEmail(register.getEmail(),register.getToken(),register.getNickname());
             return new ResponseEntity<UserInfoResponseDto>(UserInfoResponseDto.builder()
                     .user(UserInfoResponseDto.UserBody.builder()
                                     .nickname(register.getNickname())
                                     .githubLink(register.getGithubLink())
                                     .introduce(register.getIntroduce())
                                     .id(register.getId())
-                                    .profileImageUrl(interviewGeneralService.generateProfileImageUrl(register.getProfileImageUrl()))
+                                    .profileImageUrl(register.getProfileImageUrl())
                                     .build())
                     .token(register.getToken())
                     .build(), HttpStatus.OK);
@@ -158,7 +159,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/users/me")
+    @GetMapping("api/users/me")
     public ResponseEntity<UserInfoResponseDto> getUserInfo(@AuthenticationPrincipal User user){
         //유저가 로그인 되어있지 않는 경우에는 유저정보를 반환하지 않는다
         log.info("GET_USER_INFO >> 유저 정보를 조회하는 중입니다.");
@@ -167,16 +168,6 @@ public class UserController {
         }
         log.info("GET_USER_INFO >> {}의 유저 정보를 반환 합니다 ",user.getNickname());
         //로그인 된 사용자의 이름과 닉네임을 반환한다.
-//        UserInfoResponseDto userInfoResponseDto=(UserInfoResponseDto.builder()
-//                .user(UserInfoResponseDto.UserBody.builder()
-//                        .nickname(user.getNickname())
-//                        .githubLink(user.getGithubLink())
-//                        .introduce(user.getIntroduce())
-//                        .id(user.getId())
-//                        .profileImageUrl(user.getProfileImageUrl())
-//                        .build())
-//                .token(user.getToken())
-//                .build());
 
         return new ResponseEntity<UserInfoResponseDto>(UserInfoResponseDto.builder()
                 .user(UserInfoResponseDto.UserBody.builder()
@@ -184,13 +175,13 @@ public class UserController {
                         .githubLink(user.getGithubLink())
                         .introduce(user.getIntroduce())
                         .id(user.getId())
-                        .profileImageUrl(interviewGeneralService.generateProfileImageUrl(user.getProfileImageUrl()))
+                        .profileImageUrl(user.getProfileImageUrl())
                         .build())
                 .token(user.getToken())
                 .build(), HttpStatus.OK);
     }
 
-    @DeleteMapping("/users/me")
+    @DeleteMapping("api/users/me")
     public ResponseEntity<Success> deleteUser(@AuthenticationPrincipal User user){
         log.info("DELETE_USER >> {} 의 유저정보 삭제를 요청합니다. ", user.getNickname());
         User deleting = userProfileService.deleteUser(user);
@@ -216,7 +207,7 @@ public class UserController {
                         .githubLink(user.getGithubLink())
                         .introduce(user.getIntroduce())
                         .id(user.getId())
-                        .profileImageUrl(interviewGeneralService.generateProfileImageUrl(user.getProfileImageUrl()))
+                        .profileImageUrl(user.getProfileImageUrl())
                         .build())
                 .token(user.getToken())
                 .build(), HttpStatus.OK);
@@ -249,10 +240,12 @@ public class UserController {
                         .githubLink(user.getGithubLink())
                         .introduce(user.getIntroduce())
                         .id(user.getId())
-                        .profileImageUrl(interviewGeneralService.generateProfileImageUrl(user.getProfileImageUrl()))
+                        .profileImageUrl(user.getProfileImageUrl())
                         .build())
                 .token(user.getToken())
                 .build(), HttpStatus.OK);
     }
+  
+
 }
 

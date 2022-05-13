@@ -1,9 +1,9 @@
-package com.team7.project.user.service;
+package com.team7.project.user.service.registerService;
 
 import com.team7.project.advice.RestException;
 import com.team7.project.security.jwt.JwtTokenProvider;
 import com.team7.project.security.jwt.TokenResponseDto;
-import com.team7.project.user.dto.LoginRequestDto;
+import com.team7.project.user.dto.request.LoginRequestDto;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
