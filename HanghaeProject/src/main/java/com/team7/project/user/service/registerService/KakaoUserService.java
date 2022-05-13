@@ -74,7 +74,7 @@ import java.util.UUID;
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("grant_type", "authorization_code");
             body.add("client_id", "95272555e8189d2f079be8adc9c37e4f");
-            body.add("redirect_uri", "https://dev.d3rdkt99yi3hok.amplifyapp.com/user/kakao/callback");
+            body.add("redirect_uri", "https://willbedeveloper.com/user/kakao/callback");
             body.add("client_secret","oAfSkjWSsZb7DoeYcffn4XDYf8eMmgIr");
             body.add("code", code);
 
