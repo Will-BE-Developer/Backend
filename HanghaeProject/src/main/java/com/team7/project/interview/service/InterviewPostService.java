@@ -60,7 +60,7 @@ public class InterviewPostService {
     public Interview createInterviewDraft(Long loginUserId) {
 
         User user = userRepository.findById(loginUserId).orElseThrow(
-                () -> new RestException(HttpStatus.BAD_REQUEST, "해당 유저가 존재하지 않습니다.")
+                ErrorMessage.NOT_FOUND_LOGIN_USER::throwError
         );
 
         String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
