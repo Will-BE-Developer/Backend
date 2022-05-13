@@ -10,13 +10,11 @@ import com.team7.project.user.dto.request.LoginRequestDto;
 import com.team7.project.user.dto.request.RegisterRequestDto;
 import com.team7.project.user.model.User;
 import com.team7.project.user.service.registerService.KakaoUserService;
-import com.team7.project.user.service.UserMypageService;
 import com.team7.project.user.service.registerService.UserProfileService;
 import com.team7.project.user.service.registerService.UserRegistryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -38,7 +36,6 @@ public class UserController {
     private final UserRegistryService userRegistryService;
     private final UserProfileService userProfileService;
     private final KakaoUserService kakaoUserService;
-    private final UserMypageService userMypageService;
     private final MailService mailService;
 
     @PostMapping("/signin")
@@ -245,30 +242,5 @@ public class UserController {
                 .token(user.getToken())
                 .build(), HttpStatus.OK);
     }
-  
-    //마이페이지 - 사용자 프로필 정보 수정
-    @ResponseBody
-    @PutMapping(value = "/api/users/me", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity editUserInfo(@RequestPart UserRequestDto requestDto,
-                                       @RequestPart MultipartFile profileImage,
-                                       @AuthenticationPrincipal User user) throws IOException {
-
-        requestDto.setProfileImage(profileImage);
-
-        User savedUser = userMypageService.save(requestDto, user);
-
-        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.builder()
-                .user(UserInfoResponseDto.UserBody.builder()
-                        .nickname(savedUser.getNickname())
-                        .githubLink(savedUser.getGithubLink())
-                        .profileImageUrl(savedUser.getProfileImageUrl())
-                        .introduce(savedUser.getIntroduce())
-                        .id(savedUser.getId())
-                        .build())
-                .build();
-
-        return new ResponseEntity(userInfoResponseDto, HttpStatus.OK);
-    }
-
 }
 
