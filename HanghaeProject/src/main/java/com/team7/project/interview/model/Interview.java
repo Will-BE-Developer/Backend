@@ -83,7 +83,9 @@ public class Interview extends Timestamped {
         return this;
     }
 
-
+    public void updateBadge(String badge) {
+        this.badge = badge;
+    }
 
 
 //   private WeeklyInterview weeklyInterview;
