@@ -246,29 +246,6 @@ public class UserController {
                 .build(), HttpStatus.OK);
     }
   
-    //마이페이지 - 사용자 프로필 정보 수정
-    @ResponseBody
-    @PutMapping(value = "/api/users/me", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity editUserInfo(@RequestPart UserRequestDto requestDto,
-                                       @RequestPart MultipartFile profileImage,
-                                       @AuthenticationPrincipal User user) throws IOException {
-
-        requestDto.setProfileImage(profileImage);
-
-        User savedUser = userMypageService.save(requestDto, user);
-
-        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.builder()
-                .user(UserInfoResponseDto.UserBody.builder()
-                        .nickname(savedUser.getNickname())
-                        .githubLink(savedUser.getGithubLink())
-                        .profileImageUrl(savedUser.getProfileImageUrl())
-                        .introduce(savedUser.getIntroduce())
-                        .id(savedUser.getId())
-                        .build())
-                .build();
-
-        return new ResponseEntity(userInfoResponseDto, HttpStatus.OK);
-    }
 
 }
 
