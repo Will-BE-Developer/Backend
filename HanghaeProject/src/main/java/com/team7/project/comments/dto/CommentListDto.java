@@ -13,14 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class CommentListDto {
     private List<ResponseComment> comments = new ArrayList<>();
 
     //private Page pagination;
 
+    int totalComments;
+
     public void addComment(Comment comment, Boolean isMine, String profileUrl){
         this.comments.add(new ResponseComment(comment, isMine, profileUrl));
+
     }
     public void addNestedComment(int index, Comment comment, Boolean isMine, String profileUrl){
 
@@ -30,7 +34,7 @@ public class CommentListDto {
     private Pagination pagination;
 
     public void addPagination(int per, int totalCounts, int totalPages,
-                              int currentPage, int nextPage, Boolean isLastPage) {
+                              int currentPage, Integer nextPage, Boolean isLastPage) {
         this.pagination = new Pagination(per, totalCounts, totalPages,
                               currentPage, nextPage, isLastPage);
     }
@@ -48,7 +52,6 @@ public class CommentListDto {
         private List<NestedComment> nestedComments = new ArrayList<>();
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
-        private Pagination pagination;
 
         public ResponseComment(Comment comment, Boolean isMine, String profileUrl) {
             this.id = comment.getId();
@@ -117,7 +120,7 @@ public class CommentListDto {
         private int totalCounts;
         private int totalPages;
         private int currentPage;
-        private int nextPage;
+        private Integer nextPage;
         private Boolean isLastPage;
     }
 
