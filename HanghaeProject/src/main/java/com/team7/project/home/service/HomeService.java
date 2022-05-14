@@ -103,7 +103,7 @@ public class HomeService {
                 scrapMe = userScapId.contains(interview.getId());
             }
 
-            Long commentsCount = commentRepository.countByInterview_Id(interview.getId());
+            int commentsCount = commentRepository.countByInterview_Id(interview.getId());
 
             InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
                     .id(interview.getId())
@@ -121,7 +121,7 @@ public class HomeService {
                     .note(interview.getMemo())
                     .scrapsMe(scrapMe)
                     .scrapsCount((long) (interview.getScraps().size()))
-                    .commentsCount(commentsCount)
+                    .commentsCount((long) commentsCount)
                     .likesCount(0L)
                     .isPublic(interview.getIsPublic())
                     .isMine(ismine)
@@ -149,7 +149,7 @@ public class HomeService {
                 scrapMe = userScapId.contains(interview.getId());
             }
 
-            Long commentsCount = commentRepository.countByInterview_Id(interview.getInterview().getId());
+            int commentsCount = commentRepository.countByInterview_Id(interview.getInterview().getId());
 
             InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
                     .id(interview.getInterview().getId())
@@ -170,7 +170,7 @@ public class HomeService {
                     .note(interview.getInterview().getMemo())
                     .scrapsMe(scrapMe)
                     .scrapsCount(interview.getScrapCount())
-                    .commentsCount(commentsCount)
+                    .commentsCount((long) commentsCount)
                     .likesCount(0L)
                     .isPublic(interview.getInterview().getIsPublic())
                     .isMine(ismine)
