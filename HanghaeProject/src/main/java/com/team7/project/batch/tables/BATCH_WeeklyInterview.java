@@ -22,13 +22,13 @@ public class BATCH_WeeklyInterview extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "question_id")
-    private Question question;
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "user_id")
+//    private User user;
+//
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "question_id")
+//    private Question question;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "interview_id")
@@ -43,15 +43,15 @@ public class BATCH_WeeklyInterview extends Timestamped {
 
     //public WeeklyInterview(Interview interview, Long scrapCount){
     public BATCH_WeeklyInterview(Interview interview){
-        this.user = interview.getUser();
-        this.question = interview.getQuestion();
+//        this.user = interview.getUser();
+//        this.question = interview.getQuestion();
         this.interview = interview;
         //this.scrapCount = scrapCount;
     }
 
     public BATCH_WeeklyInterview(BATCH_WeeklyInterview weeklyInterviewTop3, String badge) {
-        this.user = weeklyInterviewTop3.getUser();
-        this.question = weeklyInterviewTop3.getQuestion();
+//        this.user = weeklyInterviewTop3.getUser();
+//        this.question = weeklyInterviewTop3.getQuestion();
         this.interview = weeklyInterviewTop3.getInterview();
         this.scrapCount = weeklyInterviewTop3.getScrapCount();
         this.badge = badge;

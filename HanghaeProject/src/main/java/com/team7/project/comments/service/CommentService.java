@@ -151,7 +151,7 @@ public class CommentService {
                 if (eachCommentDto.getId().equals(RootId)){
                     int index = commentListDto.getComments().indexOf(eachCommentDto);
                     System.out.println("nested 넣을 댓글 목록의 index: " + index);
-                    commentListDto.addNestedComment(index, eachComment, isMine, commentListDto.getComments().get(index).getUser().getProfileImageUrl());
+                    commentListDto.addNestedComment(index, eachComment, isMine, eachCommentDto.getUser().getProfileImageUrl());
                 }
             }
         }
