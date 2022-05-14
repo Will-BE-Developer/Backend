@@ -79,12 +79,13 @@ public class InterviewGeneralService {
 
         Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
         Long scrapsCount = (long) interview.getScraps().size();
+        Long commentsCount = (long) interview.getComments().size();
 
         String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
         String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
         String profilePresignedUrl = generateProfileImageUrl(interview.getUser().getProfileImageUrl());
 
-        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, profilePresignedUrl, isMine, scrapsMe, scrapsCount);
+        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, profilePresignedUrl, isMine, scrapsMe, scrapsCount, commentsCount);
     }
 
 
