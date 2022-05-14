@@ -11,7 +11,10 @@ import java.util.List;
 @Repository
 public interface BATCH_WeeklyInterviewRepository extends JpaRepository<BATCH_WeeklyInterview, Long> {
 
-    @Query(value = "SELECT * FROM interview i " +
+    /** reverse('null') as weekly_badge
+     *  Field 'weekly_badge' doesn't have a default value에러 때문에 가상의 컬럼 추가함
+     * */
+    @Query(value = "SELECT *, reverse('null') as weekly_badge FROM interview i " +
             "inner JOIN ( " +
             "SELECT interview_id, count(interview_id) as scrap_count FROM scrap " +
             "WHERE created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 WEEK ) AND NOW() " +
