@@ -4,14 +4,21 @@ package com.team7.project.mail.template;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+import java.util.UUID;
+
 @Getter
 @NoArgsConstructor
 public class MailTemplate {
+
+
+    String originalUrl ="https://firebasestorage.googleapis.com/v0/b/react-deep-99.appspot.com/o/images%2Fwillbe_logo[…]?alt=media&token=f8059164-f427-4eb3-8b11-1be22e9d8937";
+    String imgEncoded= Base64.getEncoder().encodeToString(originalUrl.getBytes());
     String htmlBodyBeforeName="    <body style=\"margin: 0; padding: 0; width:600px; font-family:Arial ;\">\n" +
             "        <div style=\"margin: 20px\">\n" +
             "        <header>\n" +
             "            <a style=\"height: 30px;\" href =\"https://willbedeveloper.com\">\n" +
-            "                <img src=\"../../../resources/static/image/logo.png\">\n" +
+            "               <img src=\"cid:logo\" alt=\"logo\"/>\n" +
             "            </a>\n" +
             "        </header>\n" +
             "        <section>\n" +

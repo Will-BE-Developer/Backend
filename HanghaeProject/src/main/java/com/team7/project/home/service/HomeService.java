@@ -20,6 +20,7 @@ import com.team7.project.question.repostitory.QuestionRepository;
 import com.team7.project.scrap.model.Scrap;
 import com.team7.project.user.dto.UserInfoResponseDto;
 import com.team7.project.user.model.User;
+import com.team7.project.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Transactional
 public class HomeService {
+    private final UserRepository userRepository;
     private final InterviewGeneralService interviewGeneralService;
     private final BATCH_WeeklyInterviewRepository batch_weeklyInterviewRepository;
     private final QuestionRepository questionRepository;
@@ -85,8 +87,9 @@ public class HomeService {
         }
         return commentResponseDtos;
     }
-    public List<InterviewInfoResponseDto.Data> getLatestInterview(User user){
-        List<Interview> latstInterview = interviewRepository.findAllByIsDoneAndIsPublicOrderByCreatedAtDesc(true, true, PageRequest.of(0,3));
+
+    public List<InterviewInfoResponseDto.Data> getLatestInterview(User user) {
+        List<Interview> latstInterview = interviewRepository.findAllByIsDoneAndIsPublicOrderByCreatedAtDesc(true, true, PageRequest.of(0, 3));
         List<InterviewInfoResponseDto.Data> latestInterviewDto = new ArrayList<>();
         Boolean ismine = false;
         Boolean scrapMe = false;
@@ -94,15 +97,18 @@ public class HomeService {
         for (Interview interview : latstInterview) {
 
             if (user != null) {
-                ismine = interview.getUser().getEmail() == user.getEmail();
-                Set<Long> userScapId = createUserScrapIds(user);
+                User loginUser = userRepository.getById(user.getId());
+                ismine = interview.getUser().getEmail() == loginUser.getEmail();
+                Set<Long> userScapId = createUserScrapIds(loginUser);
                 scrapMe = userScapId.contains(interview.getId());
             }
 
+            int commentsCount = commentRepository.countByInterview_Id(interview.getId());
+
             InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
                     .id(interview.getId())
-                    .video(interview.getVideoKey())
-                    .thumbnail(interview.getThumbnailKey())
+                    .video(interviewGeneralService.generateProfileImageUrl(interview.getVideoKey()))
+                    .thumbnail(interviewGeneralService.generateProfileImageUrl(interview.getThumbnailKey()))
                     .question(new QuestionResponseDto.data(interview.getQuestion().getId(), interview.getQuestion().getCategory().name(), interview.getQuestion().getContents(), interview.getQuestion().getReference()))
                     .user(UserInfoResponseDto.UserBody.builder()
                             .githubLink(interview.getUser().getGithubLink())
@@ -114,7 +120,8 @@ public class HomeService {
                     .badge(interview.getBadge())
                     .note(interview.getMemo())
                     .scrapsMe(scrapMe)
-                    .scrapsCount((long)(interview.getScraps().size()))
+                    .scrapsCount((long) (interview.getScraps().size()))
+                    .commentsCount((long) commentsCount)
                     .likesCount(0L)
                     .isPublic(interview.getIsPublic())
                     .isMine(ismine)
@@ -125,6 +132,7 @@ public class HomeService {
         }
         return latestInterviewDto;
     }
+
     public List<InterviewInfoResponseDto.Data> getWeeklyInterview(User user) {
 
         List<BATCH_WeeklyInterview> getInterviews = batch_weeklyInterviewRepository.findAll();
@@ -135,27 +143,34 @@ public class HomeService {
         for (BATCH_WeeklyInterview interview : getInterviews) {
 
             if (user != null) {
-                ismine = interview.getUser().getEmail() == user.getEmail();
-                Set<Long> userScapId = createUserScrapIds(user);
+                User loginUser = userRepository.getById(user.getId());
+                ismine = interview.getInterview().getUser().getEmail() == loginUser.getEmail();
+                Set<Long> userScapId = createUserScrapIds(loginUser);
                 scrapMe = userScapId.contains(interview.getId());
             }
 
+            int commentsCount = commentRepository.countByInterview_Id(interview.getInterview().getId());
+
             InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
                     .id(interview.getInterview().getId())
-                    .video(interview.getInterview().getVideoKey())
-                    .thumbnail(interview.getInterview().getThumbnailKey())
-                    .question(new QuestionResponseDto.data(interview.getQuestion().getId(), interview.getQuestion().getCategory().name(), interview.getQuestion().getContents(), interview.getQuestion().getReference()))
+                    .video(interviewGeneralService.generateProfileImageUrl(interview.getInterview().getVideoKey()))
+                    .thumbnail(interviewGeneralService.generateProfileImageUrl(interview.getInterview().getThumbnailKey()))
+                    .question(new QuestionResponseDto.data(interview.getInterview().getQuestion().getId(),
+                            interview.getInterview().getQuestion().getCategory().name(),
+                            interview.getInterview().getQuestion().getContents(),
+                            interview.getInterview().getQuestion().getReference()))
                     .user(UserInfoResponseDto.UserBody.builder()
                             .githubLink(interview.getInterview().getUser().getGithubLink())
                             .id(interview.getInterview().getUser().getId())
                             .nickname(interview.getInterview().getUser().getNickname())
-                            .profileImageUrl(interviewGeneralService.generateProfileImageUrl(interview.getUser().getProfileImageUrl()))
+                            .profileImageUrl(interviewGeneralService.generateProfileImageUrl(interview.getInterview().getUser().getProfileImageUrl()))
                             .introduce(interview.getInterview().getUser().getIntroduce())
                             .build())
                     .badge(interview.getBadge())
                     .note(interview.getInterview().getMemo())
                     .scrapsMe(scrapMe)
                     .scrapsCount(interview.getScrapCount())
+                    .commentsCount((long) commentsCount)
                     .likesCount(0L)
                     .isPublic(interview.getInterview().getIsPublic())
                     .isMine(ismine)
@@ -170,7 +185,8 @@ public class HomeService {
     public Set<Long> createUserScrapIds(User user) {
         Set<Long> userScrapsId = new HashSet<>();
         if (user != null) {
-            for (Scrap scrap : user.getScraps()) {
+            User loginUser = userRepository.getById(user.getId());
+            for (Scrap scrap : loginUser.getScraps()) {
                 userScrapsId.add(scrap.getInterview().getId());
             }
         }

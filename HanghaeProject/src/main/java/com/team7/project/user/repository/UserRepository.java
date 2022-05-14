@@ -1,5 +1,6 @@
 package com.team7.project.user.repository;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.team7.project.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String userEmail);
     Optional<User> findByEmailAndProvider(String email, String provider);
-
+    Optional<User> findByEmailAndIsValid(String email, Boolean isValid);
 
 }

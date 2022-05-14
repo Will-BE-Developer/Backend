@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -50,11 +51,16 @@ public class UserRegistryService {
     }
 
     public boolean isEmailExist(String email){
-        if(userRepository.findByEmail(email).isPresent()){
+        User user = userRepository.findByEmailAndIsValid(email,false).orElse(null);
+        if(user != null){
+            userRepository.delete(user);
             log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 가능 ");
+            return false;
+        }else if(userRepository.findByEmail(email).isPresent()){
+            log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 불가능 ");
             return true;
         }else {
-            log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 불가능 ");
+            log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 가능 ");
             return false;
         }
     }
