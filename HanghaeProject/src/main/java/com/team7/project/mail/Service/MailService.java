@@ -32,7 +32,7 @@ public class MailService implements EmailUtils{
     public RestException sendEmail(String toEmail, String token, String nickname){
         RestException result = new RestException(null,null);
         try{
-//
+
             File f1 = new File("");
              MimeMessage message = sender.createMimeMessage();
              MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");

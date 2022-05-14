@@ -166,7 +166,7 @@ public class HomeService {
                             .profileImageUrl(interviewGeneralService.generateProfileImageUrl(interview.getInterview().getUser().getProfileImageUrl()))
                             .introduce(interview.getInterview().getUser().getIntroduce())
                             .build())
-                    .badge(interview.getBadge())
+                    .badge(interview.getWeeklyBadge())
                     .note(interview.getInterview().getMemo())
                     .scrapsMe(scrapMe)
                     .scrapsCount(interview.getScrapCount())
@@ -174,6 +174,8 @@ public class HomeService {
                     .likesCount(0L)
                     .isPublic(interview.getInterview().getIsPublic())
                     .isMine(ismine)
+
+
                     .createdAt(interview.getInterview().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                     .updatedAt(interview.getInterview().getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                     .build();

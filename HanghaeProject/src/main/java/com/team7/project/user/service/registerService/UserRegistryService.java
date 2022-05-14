@@ -20,7 +20,6 @@ import java.util.UUID;
 public class UserRegistryService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public User registerUser(RegisterRequestDto requestDto) {

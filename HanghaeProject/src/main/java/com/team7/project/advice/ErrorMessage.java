@@ -24,6 +24,8 @@ public enum ErrorMessage {
     CONFLICT_SCRAP_POST(HttpStatus.CONFLICT,"이미 스크랩한 게시글 입니다."),
     CONFLICT_SCRAP_DELETE(HttpStatus.CONFLICT,"해당 스크랩 정보가 존재하지 않습니다."),
 
+    INVALID_USER_REQUEST(HttpStatus.BAD_REQUEST, "로그아웃 후에 회원가입을 진행 해 주세요."),
+    PASSWORD_AND_PASSWORDCHECK_MISSMATCHED(HttpStatus.BAD_REQUEST, "비밀번호와 비밀번호확인이 일치하지 않습니다.");
 
 
     ;
