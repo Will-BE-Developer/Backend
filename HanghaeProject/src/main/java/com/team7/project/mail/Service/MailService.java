@@ -23,6 +23,7 @@ import java.io.File;
 @Service
 public class MailService implements EmailUtils{
 
+    
     @Autowired
     private JavaMailSender sender;
 
