@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 // run param: --spring.batch.job.names=weeklyInterviewJob
@@ -72,6 +73,7 @@ public class WeeklyInterviewConfig {
 
     @StepScope
     @Bean
+    @Transactional
     public Tasklet weeklyInterviewTasklet() {
         return (contribution, chunkContext) -> {
             System.out.println("weeklyInterviewTasklet is started.");
@@ -101,8 +103,20 @@ public class WeeklyInterviewConfig {
                 //인터뷰 뱃지 골드,실버,브론즈 저장
                 String[] badge = {"Gold", "Silver", "Bronze"};
 
+                //현재날짜의 지난주
+                Date currentDate = new Date();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(currentDate);
+                String month = String.valueOf(calendar.get(Calendar.MONTH)+1);
+                String week = String.valueOf(calendar.get(Calendar.WEEK_OF_MONTH)-1);  //지난주
+                String weeklyBadge = month + "월 "+ week + "번째주 " + badge[ranking-1];
+                System.out.println("weeklyBadge: " + weeklyBadge);
+
                 log.info("weeklyInterviewTop{}: {}", ranking, weeklyInterviewTop3.getInterview().getId());
-                BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, badge[ranking-1]);
+
+                BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, badge[ranking-1], weeklyBadge);
+                weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
+                System.out.println("weeklyInterviewEach.getWeeklyBadge: "+ weeklyInterviewEach.getWeeklyBadge());
                 weeklyInterviewRepository.save(weeklyInterviewEach);
 
                 //인터뷰 뱃지 골드,실버,브론즈 저장
