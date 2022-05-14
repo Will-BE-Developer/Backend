@@ -34,6 +34,8 @@ public class InterviewInfoResponseDto {
         private Boolean scrapsMe;
         private Long scrapsCount;
         private Long likesCount;
+        private Long commentsCount;
+
         private Boolean isPublic;
 
         private Boolean isMine;
@@ -42,7 +44,7 @@ public class InterviewInfoResponseDto {
         private String updatedAt;
     }
 
-    public InterviewInfoResponseDto(Interview interview, String videoUrl, String imageUrl, String profileUrl, Boolean isMine, Boolean scrapsMe, Long scrapsCount){
+    public InterviewInfoResponseDto(Interview interview, String videoUrl, String imageUrl, String profileUrl, Boolean isMine, Boolean scrapsMe, Long scrapsCount, Long commentsCount){
         Question question = interview.getQuestion();
         Long questionId = question.getId();
         String questionCategory = question.getCategory().name();
@@ -73,6 +75,7 @@ public class InterviewInfoResponseDto {
                 .note(interview.getMemo())
                 .scrapsMe(scrapsMe)
                 .scrapsCount(scrapsCount)
+                .commentsCount(commentsCount)
                 .likesCount(0L)
                 .isPublic(interview.getIsPublic())
                 .isMine(isMine)

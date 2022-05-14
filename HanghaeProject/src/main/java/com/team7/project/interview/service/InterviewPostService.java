@@ -93,7 +93,7 @@ public class InterviewPostService {
                 interviewGeneralService.generatePresignedUrl(interview.getVideoKey()),
                 interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()),
                 interviewGeneralService.generateProfileImageUrl(interview.getUser().getProfileImageUrl()),
-                true, false, 0L);
+                true, false, 0L, 0L);
     }
 
 }
