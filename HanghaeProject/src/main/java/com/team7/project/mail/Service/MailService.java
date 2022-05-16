@@ -31,6 +31,7 @@ public class MailService implements EmailUtils{
 
     private final JavaMailSender sender;
 
+
     private MailTemplate mailTemplate = new MailTemplate();
 
     @Override
