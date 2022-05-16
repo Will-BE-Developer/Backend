@@ -2,6 +2,7 @@ package com.team7.project.interview.model;
 
 import com.team7.project._global.timestamped.model.Timestamped;
 import com.team7.project.comments.model.Comment;
+import com.team7.project.likes.model.Likes;
 import com.team7.project.question.model.Question;
 import com.team7.project.scrap.model.Scrap;
 import com.team7.project.user.model.User;
@@ -54,6 +55,10 @@ public class Interview extends Timestamped {
 
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Comment> comments = new ArrayList<>();
+
+    @OneToOne(cascade=CascadeType.ALL, mappedBy = "interview")
+    @JoinColumn
+    Likes likes;
 
 
     //    making draft

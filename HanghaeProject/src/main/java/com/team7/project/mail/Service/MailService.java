@@ -3,6 +3,7 @@ package com.team7.project.mail.Service;
 import com.team7.project.advice.RestException;
 import com.team7.project.mail.template.MailTemplate;
 import com.team7.project.mail.utils.EmailUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,11 +19,11 @@ import java.io.File;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MailService implements EmailUtils{
 
-    @Autowired
-    private JavaMailSender sender;
 
+    private final JavaMailSender sender;
     private MailTemplate mailTemplate = new MailTemplate();
 
     @Override

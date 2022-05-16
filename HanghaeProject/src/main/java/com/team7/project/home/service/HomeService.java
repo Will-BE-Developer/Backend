@@ -73,7 +73,7 @@ public class HomeService {
     }
 
     public List<CommentResponseDto.ResponseComment> getLatestComments(User user) {
-        List<Comment> comments = commentRepository.findAllByRootNameOrderByCreatedAtDesc("interview", PageRequest.of(0, 3));
+        List<Comment> comments = commentRepository.findAllByRootNameOrderByCreatedAtDesc("interview", PageRequest.of(0, 4));
         log.info("COMMENTS FOUND : {}", comments);
         List<CommentResponseDto.ResponseComment> commentResponseDtos = new ArrayList<>();
         Boolean ismine = false;

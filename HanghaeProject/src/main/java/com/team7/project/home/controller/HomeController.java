@@ -22,7 +22,7 @@ public class HomeController {
 
     private final HomeService homeService;
     @GetMapping("/api/home")
-    public ResponseEntity<HomeResponseDto> home(@AuthenticationPrincipal User users, HttpServletResponse response) {
+    public ResponseEntity<HomeResponseDto> home(@AuthenticationPrincipal User users) {
         return new ResponseEntity<HomeResponseDto>(new HomeResponseDto(homeService.getLatestInterview(users),homeService.getWeeklyInterview(users),
                 homeService.getTodayQuestion(),homeService.getTopCatetories()), HttpStatus.OK);
     }
