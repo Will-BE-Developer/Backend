@@ -22,10 +22,10 @@ import java.util.Map;
 public class TopCategoriesBatchScheduler {
     private final JobLauncher jobLauncher;
     private final TopCategoriesBatchConfig topCategoriesBatchConfig;
-    //매일 3시에 실행
+//    매일 3시에 실행
     @Scheduled(cron = "0 0 3 * * *")
-    //매 10초마다 실행 --테스트용
-    //    @Scheduled(cron = "0/10 * * * * *")
+//    매 10초마다 실행 --테스트용
+//        @Scheduled(cron = "0/10 * * * * *")
     public void runJob() {
         Map<String, JobParameter> configMap = new HashMap<>();
         configMap.put("time", new JobParameter((System.currentTimeMillis())));

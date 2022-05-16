@@ -16,9 +16,7 @@ public class MailTemplate {
             "        <header>\n" +
             "            <a style=\"height: 30px;\" href =\"https://willbedeveloper.com\">\n" +
             "               <img src=\"cid:logo\" alt=\"logo\"/>\n" +
-            "            </a>\n" +
-            "        </header>\n" +
-            "        <section>\n" +
+            "            </a></header>\n<section>\n" +
             "            <h1 style=\"font-weight: 700; font-size: 24px; line-height: 30px; margin:12px 0px;\">✨메일 인증 안내입니다✨</h1>\n" +
             "        <p style=\" margin: 2px ;color:#6D727C; font-weight: 400; font-size: 14px; line-height: 22px;\">\n" +
             "            안녕하세요. <span style=\"font-weight: 500; color:#50555E; \">";
