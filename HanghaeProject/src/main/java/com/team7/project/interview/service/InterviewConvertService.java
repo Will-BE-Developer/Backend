@@ -98,6 +98,7 @@ public class InterviewConvertService {
                 .setInput(webmFile.getPath())
                 .addOutput(mp4File.getPath())
                 .setVideoCodec("h264")
+                .setVideoFrameRate(24,1)
                 .done();
 
         log.info("EXEC FFMPEG " + builder.toString());
