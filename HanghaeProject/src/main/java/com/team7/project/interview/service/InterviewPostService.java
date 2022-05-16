@@ -15,16 +15,19 @@ import com.team7.project.question.repostitory.QuestionRepository;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -33,6 +36,7 @@ public class InterviewPostService {
     private final InterviewRepository interviewRepository;
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
+    private final InterviewConvertService interviewConvertService;
 
     private static final long ONE_HOUR = 1000 * 60 * 60; // 1시간
     private final AmazonS3Client amazonS3Client;
@@ -66,7 +70,7 @@ public class InterviewPostService {
         String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
         String objectKey = loginUserId + "-" + suffix;
 
-        Interview interview = interviewRepository.save(new Interview("videos/" + objectKey, "thumbnails/" + objectKey, user));
+        Interview interview = interviewRepository.save(new Interview("videos/" + objectKey+".webm", "thumbnails/" + objectKey +".png", user));
 
         user.getInterviews().add(interview);
 
@@ -74,7 +78,7 @@ public class InterviewPostService {
     }
 
     @Transactional
-    public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) {
+    public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) throws IOException {
 
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(ErrorMessage.NOT_FOUND_DRAFT::throwError);
@@ -87,7 +91,14 @@ public class InterviewPostService {
             throw ErrorMessage.INVALID_INTERVIEW_POST.throwError();
         }
 
-        interview.complete(requestDto.getNote(), requestDto.getIsPublic(), question);
+        String convertedObjectkey = interviewConvertService.webmToMp4(interview.getVideoKey());
+        log.info(interview.getVideoKey() + " To " + convertedObjectkey);
+
+        interview.complete(requestDto.getNote(),
+                requestDto.getIsPublic(),
+                question,
+                convertedObjectkey,
+                "re" + interview.getThumbnailKey());
 
         return new InterviewInfoResponseDto(interview,
                 interviewGeneralService.generatePresignedUrl(interview.getVideoKey()),

@@ -23,7 +23,7 @@ import java.io.File;
 @Service
 public class MailService implements EmailUtils{
 
-    
+
     @Autowired
     private JavaMailSender sender;
 
@@ -41,7 +41,10 @@ public class MailService implements EmailUtils{
             helper.setTo(toEmail);
             helper.setSubject("WILL_BE : 이메일 인증을 완료해 주세요\uD83D\uDE18");
             helper.setText(body,true);
-            helper.addInline("logo",new FileDataSource(f1.getAbsolutePath()+"/src/main/java/com/team7/project/mail/logos/logo.png"));
+
+            FileDataSource fileDataSource = new FileDataSource("./logo.png");
+
+            helper.addInline("logo",fileDataSource);
             sender.send(message);
             result.setMessage("메일 발송 성공");
             result.setHttpStatus(HttpStatus.OK);
