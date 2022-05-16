@@ -1,6 +1,6 @@
 package com.team7.project.batch.config;
 
-//import com.team7.project.batch.jobListener.JobListener;
+import com.team7.project.batch.jobListener.JobListener;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 
-import javax.batch.api.listener.JobListener;
+//import javax.batch.api.listener.JobListener;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -40,28 +40,10 @@ public class WeeklyInterviewConfig {
     public Job weeklyInterviewJob(Step MigrationStep) {
         return jobBuilderFactory.get("weeklyInterviewJob")
                 .incrementer(new RunIdIncrementer())
-//                .listener(new JobListener())
+                .listener(new JobListener())
                 .start(MigrationStep)
                 .build();
     }
-
-    //step 여러개
-//    @JobScope
-//    @Bean
-//    public Step MigrationStep(
-//            //ItemReader listItemReader //interviewReader
-//            ListItemReader listItemReader //interviewReader
-//            , ItemWriter weeklyInterviewWriter
-//            , ItemProcessor weeklyInterviewProcessor) {
-//
-//        return stepBuilderFactory.get("MigrationStep")
-//                .<Interview, WeeklyInterview>chunk(3)
-//                //.reader(interviewReader)
-//                .reader(listItemReader)
-//                .processor(weeklyInterviewProcessor)
-//                .writer(weeklyInterviewWriter)
-//                .build();
-//    }
 
     //step 한개
     @JobScope
@@ -89,7 +71,7 @@ public class WeeklyInterviewConfig {
 
             //이번주 면접왕 인터뷰 선정 + (추후 추가: 좋아요 숫자, 동점은 인터뷰 최신순)
             //List<Interview> weeklyInterview = interviewRepository.findWeeklyInterview(PageRequest.of(0,3));
-            List<BATCH_WeeklyInterview> weeklyInterview = weeklyInterviewRepository.findWeeklyInterview(PageRequest.of(0,3));
+            List<BATCH_WeeklyInterview> weeklyInterview = weeklyInterviewRepository.findWeeklyInterview(PageRequest.of(0,5));
             log.info("weeklyInterview top 3: {}", weeklyInterview);
 
             //기존 위클리 면접왕 삭제
@@ -102,7 +84,8 @@ public class WeeklyInterviewConfig {
                 ranking ++;
 
                 //인터뷰 뱃지 골드,실버,브론즈 저장
-                String[] badge = {"Gold", "Silver", "Bronze"};
+                //String[] badge = {"Gold", "Silver", "Bronze"};
+                String[] badge = {"1등", "2등", "3등", "4등", "5등"};
 
                 //현재날짜의 지난주
                 Date currentDate = new Date();
@@ -110,70 +93,25 @@ public class WeeklyInterviewConfig {
                 calendar.setTime(currentDate);
                 String month = String.valueOf(calendar.get(Calendar.MONTH)+1);
                 String week = String.valueOf(calendar.get(Calendar.WEEK_OF_MONTH)-1);  //지난주
-                String weeklyBadge = month + "월 "+ week + "번째주 " + badge[ranking-1];
+                //String weeklyBadge = month + "월 "+ week + "번째주 " + badge[ranking-1];
+                String weeklyBadge = month + "월 "+ week + "번째주 " + ranking + "등";
                 System.out.println("weeklyBadge: " + weeklyBadge);
 
                 log.info("weeklyInterviewTop{}: {}", ranking, weeklyInterviewTop3.getInterview().getId());
 
                 BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, badge[ranking-1], weeklyBadge);
                 weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
-                System.out.println("weeklyInterviewEach.getWeeklyBadge: "+ weeklyInterviewEach.getWeeklyBadge());
                 weeklyInterviewRepository.save(weeklyInterviewEach);
 
-                //인터뷰 뱃지 골드,실버,브론즈 저장
+                //인터뷰 뱃지 저장
                 Interview interview = weeklyInterviewTop3.getInterview();
-                interview.updateBadge(badge[ranking-1]);
+                //interview.updateBadge(badge[ranking-1]);
+                interview.updateBadge(weeklyBadge);
                 interviewRepository.save(interview);
-
             }
 
            return RepeatStatus.FINISHED;
         };
     }
-
-    //step 여러개
-
-//    @StepScope
-//    @Bean
-//    public RepositoryItemReader<Interview> interviewReader() {
-//        List<Interview> findWeeklyInterview = new ArrayList();
-//        return new RepositoryItemReaderBuilder<Interview>()
-//                .name("interviewReader")
-//                .repository(interviewRepository)
-//                .methodName("findWeeklyInterview")
-//                .pageSize(3)
-//                .arguments(PageRequest.of(0,3))   // 파라미터
-//                .sorts(Collections.singletonMap("scrap_count", Sort.Direction.DESC))
-//                .build();
-//    }
-
-
-//    @StepScope
-//    @Bean
-//    //public ItemReader<Interview> listItemReader() {
-//    public ListItemReader<Interview> listItemReader() {
-//        List<Interview> list = (List<Interview>) interviewRepository.findWeeklyInterview(PageRequest.of(0,3));
-//        return new ListItemReader<>(list);
-//    }
-
-//    @StepScope
-//    @Bean
-//    public ItemProcessor<Interview, WeeklyInterview> weeklyInterviewProcessor() {
-//        return new ItemProcessor<Interview, WeeklyInterview>() {
-//            @Override
-//            public WeeklyInterview process(Interview top3) throws Exception {
-//                return new WeeklyInterview(top3);
-//            }
-//        };
-//    }
-//
-//    @StepScope
-//    @Bean
-//    public RepositoryItemWriter<WeeklyInterview> weeklyInterviewWriter() {
-//        return new RepositoryItemWriterBuilder<WeeklyInterview>()
-//                .repository(weeklyInterviewRepository)
-//                .methodName("save")
-//                .build();
-//    }
 }
 

@@ -1,9 +1,8 @@
-package com.team7.project.user.service;
+package com.team7.project.user.service.mypageService;
 
 import com.amazonaws.auth.*;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.team7.project.interview.service.InterviewGeneralService;
@@ -15,11 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.transaction.Transactional;
@@ -86,7 +82,8 @@ public class UserMypageService {
                     profileImageUrl = basicProfile;
                 }
             } else {
-                //파일첨부 했으면, 이미지 로컬 및 S3에 저장하기
+                //파일첨부 했으면, 이미지 로컬 및 S3에 저장하기 ----------------------------- (크롭 시작)
+                //profileImageUrl = saveFile(requestDto.getProfileImage(), user.getId());
                 log.info(requestDto.getProfileImage().toString());
 
                 //image 파일 받기
@@ -121,7 +118,7 @@ public class UserMypageService {
                 //original name 이랑 name 에 뭐 들어갈지 잘 모르겟음
                 MultipartFile multipartFile = new ConvertToMultipartFile(imageByte, "CROP"+requestDto.getProfileImage().getName(), requestDto.getProfileImage().getOriginalFilename(), requestDto.getProfileImage().getContentType(), imageByte.length);
 
-                profileImageUrl = saveFile(multipartFile, user.getId());
+                profileImageUrl = saveFile(multipartFile, user.getId());  //-----------------------------------종료
             }
 
             // 프론트에서 공백시 기존값 넘겨주지만, 닉네임만 한번더 체크
@@ -151,14 +148,15 @@ public class UserMypageService {
          .build();
     }
 
-    public File convert(MultipartFile file) throws IOException {
+    public File convert(MultipartFile file) throws IOException {  //------------------------시작
         File convFile = new File(file.getOriginalFilename());
         convFile.createNewFile();
         FileOutputStream fos = new FileOutputStream(convFile);
         fos.write(file.getBytes());
         fos.close();
         return convFile;
-    }
+    }  //------------------------------------------------------------------------------------종료
+
     //이미지 파일 여부 image/gif, image/png, image/jpeg, image/bmp, image/webp  //(jpg등 테스트예정)
     private void isImageFile(MultipartFile profileImage) {
         Boolean isImage = profileImage.getContentType().split("/")[0].equals("image");

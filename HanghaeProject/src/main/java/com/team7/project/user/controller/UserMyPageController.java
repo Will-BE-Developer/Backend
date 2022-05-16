@@ -8,7 +8,7 @@ import com.team7.project.interview.service.InterviewPostService;
 import com.team7.project.user.dto.UserInfoResponseDto;
 import com.team7.project.user.dto.UserRequestDto;
 import com.team7.project.user.model.User;
-import com.team7.project.user.service.UserMypageService;
+import com.team7.project.user.service.mypageService.UserMypageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
