@@ -13,7 +13,7 @@ import static javax.persistence.FetchType.LAZY;
 @Getter
 @Setter
 @ToString
-@Entity
+@Entity(name="batch_weekly_interview")
 public class BATCH_WeeklyInterview extends Timestamped {
 
     @Id

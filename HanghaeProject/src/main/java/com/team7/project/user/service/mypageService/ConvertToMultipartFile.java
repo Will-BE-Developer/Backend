@@ -1,4 +1,4 @@
-package com.team7.project.user.service;
+package com.team7.project.user.service.mypageService;
 
 import org.springframework.web.multipart.MultipartFile;
 

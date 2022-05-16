@@ -5,6 +5,8 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.team7.project._global.pagination.dto.PaginationResponseDto;
 import com.team7.project.advice.ErrorMessage;
+import com.team7.project.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;
+import com.team7.project.batch.tables.BATCH_WeeklyInterview;
 import com.team7.project.category.model.CategoryEnum;
 import com.team7.project.interview.dto.InterviewInfoResponseDto;
 import com.team7.project.interview.dto.InterviewListResponseDto;
@@ -12,6 +14,7 @@ import com.team7.project.interview.dto.InterviewUpdateRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.scrap.model.Scrap;
+import com.team7.project.scrap.repository.ScrapRepository;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +30,13 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Service
-@Transactional(readOnly = true)
+//@Transactional(readOnly = true)
+@Transactional
 public class InterviewGeneralService {
     private final InterviewRepository interviewRepository;
     private final UserRepository userRepository;
+    private final BATCH_WeeklyInterviewRepository weeklyInterviewRepository;
+    private final ScrapRepository scrapRepository;
 
     private static final long ONE_HOUR = 1000 * 60 * 60; // 1시간
     private final AmazonS3Client amazonS3Client;
@@ -187,9 +193,43 @@ public class InterviewGeneralService {
 
         InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
 
-        interviewRepository.deleteById(interviewId);
+        //인터뷰 삭제전 면접왕 뱃지가 있으면, 밑에 등수 수정
+        if (interview.getBadge().equals("NONE") == false){
+            try{
+                String badge = interview.getBadge();
+                int ranking = Integer.parseInt(badge.substring(8, 9));
+
+                int[] totalRank = {1, 2, 3, 4, 5};
+                int[] lowerRankArray = Arrays.copyOfRange(totalRank, ranking, totalRank.length);
+                //하위 랭킹 for문, 뱃지 수정
+                for(int num: lowerRankArray){
+                    String lowerRank = badge.substring(0, 8) + num + "등";
+                    BATCH_WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerRank);
+
+                    String newRank = badge.substring(0, 8) + (num-1) + "등";
+                    System.out.println("기존 랭킹: " + lowerRank + ", 수정된 랭킹: " + newRank);
+
+                    //위클리 테이블 랭링 수정
+                    weekly.setWeeklyBadge(newRank);
+                    weekly.setBadge((num-1) + "등");
+                    weeklyInterviewRepository.save(weekly);
+
+                    //인터뷰 테이블 랭킹 수정
+                    Interview lowInterview = weekly.getInterview();
+                    lowInterview.updateBadge(newRank);
+                    interviewRepository.save(lowInterview);
+                }
+                //스크랩, 인터뷰 삭제(위클리도 삭제됨)
+                scrapRepository.deleteByInterviewId(interviewId);
+                interview.makeScrapNullForDelete();
+                interviewRepository.deleteById(interviewId);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
 
         return response;
     }
+
 
 }
