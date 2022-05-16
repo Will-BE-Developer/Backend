@@ -53,6 +53,9 @@ dependencies {
 
 	//apache common langs
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
+ 	//image crop
+	implementation group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
+	implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.17'
 }
 
 tasks.named('test') {

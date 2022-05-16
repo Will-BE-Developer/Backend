@@ -13,13 +13,17 @@ import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.transaction.Transactional;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
@@ -55,6 +59,7 @@ public class UserMypageService {
                 () -> new IllegalArgumentException("없는 사용자입니다.")
         );
 
+
         //이미지 안넣었으면 그냥 회원정보만 저장
         if (requestDto.getProfileImage() == null) {
             System.out.println("requestDto.getGithubLink():" + requestDto.getGithubLink());
@@ -82,7 +87,41 @@ public class UserMypageService {
                 }
             } else {
                 //파일첨부 했으면, 이미지 로컬 및 S3에 저장하기
-                profileImageUrl = saveFile(requestDto.getProfileImage(), user.getId());
+                log.info(requestDto.getProfileImage().toString());
+
+                //image 파일 받기
+                File getFile = convert(requestDto.getProfileImage());
+                BufferedImage originalImage = ImageIO.read(getFile);
+                log.info("before crop x : {} ", originalImage.getWidth());
+                log.info("before crop y : {} ", originalImage.getHeight());
+
+                int dw = 200, dh = 200;
+                int ow = originalImage.getWidth();
+                int oh = originalImage.getHeight();
+                int nw = ow ; int nh = ow;
+
+                if (nh>oh){
+                    nw = (oh *dw) /dh;
+                    nh = oh;
+                }
+                //이미지 크롭
+                BufferedImage cropImg = Scalr.crop(originalImage, (ow-nw)/2, (oh-nh)/2, nw, nh);
+                //이미지 리사이징
+                BufferedImage destImg = Scalr.resize(cropImg, dw, dh);
+
+                log.info("after crop & resizing x : {} ", destImg.getWidth());
+                log.info("after crop & resizing y : {} ", destImg.getHeight());
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                ImageIO.write(destImg,requestDto.getProfileImage().getContentType().split("/")[1], out);
+                log.info(requestDto.getProfileImage().getContentType().split("/")[1]);
+
+                byte[] imageByte = out.toByteArray();
+                out.close();
+                //original name 이랑 name 에 뭐 들어갈지 잘 모르겟음
+                MultipartFile multipartFile = new ConvertToMultipartFile(imageByte, "CROP"+requestDto.getProfileImage().getName(), requestDto.getProfileImage().getOriginalFilename(), requestDto.getProfileImage().getContentType(), imageByte.length);
+
+                profileImageUrl = saveFile(multipartFile, user.getId());
             }
 
             // 프론트에서 공백시 기존값 넘겨주지만, 닉네임만 한번더 체크
@@ -112,6 +151,14 @@ public class UserMypageService {
          .build();
     }
 
+    public File convert(MultipartFile file) throws IOException {
+        File convFile = new File(file.getOriginalFilename());
+        convFile.createNewFile();
+        FileOutputStream fos = new FileOutputStream(convFile);
+        fos.write(file.getBytes());
+        fos.close();
+        return convFile;
+    }
     //이미지 파일 여부 image/gif, image/png, image/jpeg, image/bmp, image/webp  //(jpg등 테스트예정)
     private void isImageFile(MultipartFile profileImage) {
         Boolean isImage = profileImage.getContentType().split("/")[0].equals("image");

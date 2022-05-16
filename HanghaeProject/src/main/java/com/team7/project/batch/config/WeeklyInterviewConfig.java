@@ -1,6 +1,6 @@
 package com.team7.project.batch.config;
 
-import com.team7.project.batch.jobListener.JobListener;
+//import com.team7.project.batch.jobListener.JobListener;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;
@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 
+import javax.batch.api.listener.JobListener;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -39,7 +40,7 @@ public class WeeklyInterviewConfig {
     public Job weeklyInterviewJob(Step MigrationStep) {
         return jobBuilderFactory.get("weeklyInterviewJob")
                 .incrementer(new RunIdIncrementer())
-                .listener(new JobListener())
+//                .listener(new JobListener())
                 .start(MigrationStep)
                 .build();
     }
