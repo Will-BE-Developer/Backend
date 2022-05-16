@@ -20,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +104,7 @@ public class InterviewController {
     @PostMapping("/api/interviews/{interviewId}")
     public ResponseEntity<InterviewInfoResponseDto> completeInterview(@PathVariable Long interviewId,
                                                                       @RequestBody InterviewPostRequestDto requestDto,
-                                                                      @AuthenticationPrincipal User user) {
+                                                                      @AuthenticationPrincipal User user) throws IOException {
         if (user == null) {
             throw ErrorMessage.UNAUTHORIZED_USER.throwError();
         }

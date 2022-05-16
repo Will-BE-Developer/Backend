@@ -4,7 +4,6 @@ import javax.swing.*;
 
 public enum CategoryEnum {
     General,
-    OS,
     Database,
     Network,
     DataStructure,
@@ -13,4 +12,7 @@ public enum CategoryEnum {
     React,
     Java,
     Javascript,
+    OS,
+    Web,
+    UIUX,
 }

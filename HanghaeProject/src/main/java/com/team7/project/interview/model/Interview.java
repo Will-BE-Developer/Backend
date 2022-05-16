@@ -60,8 +60,8 @@ public class Interview extends Timestamped {
     List<BATCH_WeeklyInterview> weeklyInterviews = new ArrayList<>();
 
 
-//    making draft
-    public Interview(String videoKey, String thumbnailKey, User user){
+    //    making draft
+    public Interview(String videoKey, String thumbnailKey, User user) {
         this.videoKey = videoKey;
         this.thumbnailKey = thumbnailKey;
         this.user = user;
@@ -72,16 +72,18 @@ public class Interview extends Timestamped {
     }
 
     // complete interview
-    public Interview complete(String memo, Boolean isPublic, Question question){
+    public Interview complete(String memo, Boolean isPublic, Question question, String videoKey, String thumbnailKey) {
         this.memo = memo;
         this.isPublic = isPublic;
         this.question = question;
         this.isDone = true;
+        this.videoKey = videoKey;
+        this.thumbnailKey = thumbnailKey;
         return this;
     }
 
     //  update interview (only memo, isPublic)
-    public Interview update(String memo, Boolean isPublic){
+    public Interview update(String memo, Boolean isPublic) {
         this.memo = memo;
         this.isPublic = isPublic;
         return this;
