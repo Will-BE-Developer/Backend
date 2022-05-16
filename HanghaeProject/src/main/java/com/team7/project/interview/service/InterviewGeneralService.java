@@ -5,10 +5,9 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.team7.project._global.pagination.dto.PaginationResponseDto;
 import com.team7.project.advice.ErrorMessage;
-import com.team7.project.advice.RestException;
 import com.team7.project.category.model.CategoryEnum;
-import com.team7.project.interview.dto.InterviewListResponseDto;
 import com.team7.project.interview.dto.InterviewInfoResponseDto;
+import com.team7.project.interview.dto.InterviewListResponseDto;
 import com.team7.project.interview.dto.InterviewUpdateRequestDto;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
@@ -20,11 +19,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Tuple;
 import java.net.URL;
 import java.util.*;
 

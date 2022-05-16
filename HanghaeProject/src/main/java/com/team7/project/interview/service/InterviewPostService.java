@@ -5,7 +5,6 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.team7.project.advice.ErrorMessage;
-import com.team7.project.advice.RestException;
 import com.team7.project.interview.dto.InterviewInfoResponseDto;
 import com.team7.project.interview.dto.InterviewPostRequestDto;
 import com.team7.project.interview.model.Interview;
@@ -17,7 +16,6 @@ import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
