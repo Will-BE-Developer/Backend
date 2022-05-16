@@ -1,6 +1,4 @@
 package com.team7.project.user.repository;
-
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.team7.project.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

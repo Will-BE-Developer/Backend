@@ -7,6 +7,9 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.team7.project.advice.ErrorMessage;
+import com.team7.project.interview.model.Interview;
+import com.team7.project.interview.repository.InterviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.FFmpeg;
@@ -15,6 +18,7 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.job.FFmpegJob;
 import org.bytedeco.javacpp.Loader;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.activation.FileDataSource;
@@ -45,7 +49,10 @@ public class InterviewConvertService {
 
     String ffmpegPath = Loader.load(org.bytedeco.ffmpeg.ffmpeg.class);
 
-    public String webmToMp4(String objectKey) throws IOException {
+    private final InterviewRepository interviewRepository;
+
+    @Async
+    public String webmToMp4(String objectKey, Long interviewId) throws IOException {
         String downloadPath = objectKey.replace("videos/", "./");
         String uploadPath = downloadPath.replace(".webm",".mp4");
         String newObjectKey = objectKey.replace(".webm",".mp4");
@@ -59,6 +66,11 @@ public class InterviewConvertService {
         Files.deleteIfExists(Paths.get(uploadPath));
 
         log.info("OBJECT KEY " + objectKey + " CONVERT IN " + newObjectKey);
+
+        Interview interview = interviewRepository.findById(interviewId)
+                .orElseThrow(ErrorMessage.NOT_FOUND_DRAFT::throwError);
+        interview.convertVideo();
+
         return newObjectKey;
     }
 

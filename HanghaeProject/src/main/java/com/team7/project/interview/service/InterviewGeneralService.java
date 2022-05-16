@@ -73,12 +73,13 @@ public class InterviewGeneralService {
 
     public InterviewInfoResponseDto createInterviewResponse(Long loginUserId, Set<Long> userScrapsId, Interview interview) {
         Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
+        System.out.println("interview.getIsVideoConverted() = " + interview.getIsVideoConverted());
 
         Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
         Long scrapsCount = (long) interview.getScraps().size();
         Long commentsCount = (long) interview.getComments().size();
 
-        String videoPresignedUrl = generatePresignedUrl(interview.getVideoKey());
+        String videoPresignedUrl = interview.getIsVideoConverted() ? generatePresignedUrl(interview.getVideoKey()) : null;
         String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
         String profilePresignedUrl = generateProfileImageUrl(interview.getUser().getProfileImageUrl());
 
