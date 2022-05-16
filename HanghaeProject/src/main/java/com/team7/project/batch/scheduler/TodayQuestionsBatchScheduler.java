@@ -25,9 +25,9 @@ import java.util.Map;
 public class TodayQuestionsBatchScheduler {
     private final JobLauncher jobLauncher;
     private final TodayQuestionsBatchConfig todayQuestionsBatchConfig;
-    //매일 3시에 실행
+//    매일 3시에 실행
     @Scheduled(cron = "0 0 3 * * *")
-    //매 30초마다 실행 --테스트용
+//    매 30초마다 실행 --테스트용
 //    @Scheduled(cron = "0/30 * * * * *")
     public void runJob() {
         Map<String, JobParameter> configMap = new HashMap<>();

@@ -54,6 +54,10 @@ dependencies {
 	//apache common langs
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 
+	//image crop
+	implementation group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
+	implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.17'
+
 	//ffmpeg cli wrapper
 	implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
 	implementation 'org.bytedeco:ffmpeg:5.0-1.5.7'

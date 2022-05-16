@@ -5,9 +5,6 @@ import com.team7.project.mail.template.MailTemplate;
 import com.team7.project.mail.utils.EmailUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -22,7 +19,6 @@ import java.io.File;
 @Slf4j
 @Service
 public class MailService implements EmailUtils{
-
 
     @Autowired
     private JavaMailSender sender;
