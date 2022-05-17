@@ -268,15 +268,16 @@ public class InterviewGeneralService {
                     lowInterview.updateBadge(newRank);
                     interviewRepository.save(lowInterview);
                 }
+
                 //스크랩, 인터뷰 삭제(위클리도 삭제됨)
-                scrapRepository.deleteByInterviewId(interviewId);
-                interview.makeScrapNullForDelete();
-                interviewRepository.deleteById(interviewId);
+//                scrapRepository.deleteByInterviewId(interviewId);
+//                interview.makeScrapNullForDelete();
+//                interviewRepository.deleteById(interviewId);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
+        interviewRepository.deleteById(interviewId);
         return response;
     }
 
