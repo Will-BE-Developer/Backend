@@ -249,6 +249,7 @@ public class InterviewGeneralService {
 
         InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
 
+        scrapRepository.deleteByInterviewId(interviewId);
         //인터뷰 삭제전 면접왕 뱃지(Gold,Silver,Bronze)가 있으면, 밑에 등수 수정
         if (interview.getBadge().equals("NONE") == false) {
             try {

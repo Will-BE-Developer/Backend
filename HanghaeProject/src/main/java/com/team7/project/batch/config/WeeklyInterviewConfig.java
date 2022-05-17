@@ -1,5 +1,6 @@
 package com.team7.project.batch.config;
 
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.batch.jobListener.JobListener;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
@@ -103,14 +104,15 @@ public class WeeklyInterviewConfig {
                 if (ranking <= 3){
                     weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, badge[ranking-1], weeklyBadge);
                 }else{
-                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, "", weeklyBadge);
+                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, "NONE", weeklyBadge);
                 }
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
                 batch_weeklyInterviewRepository.save(weeklyInterviewEach);
 
                 //인터뷰 뱃지 저장(1,2,3등만)
                 if (ranking <= 3){
-                    Interview interview = weeklyInterview.getInterview();
+                    Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
+                            .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
                     interview.updateBadge(badge[ranking-1]);
                     interviewRepository.save(interview);
                 }
