@@ -26,8 +26,6 @@ public interface BATCH_WeeklyInterviewRepository extends JpaRepository<BATCH_Wee
 
     List<BATCH_WeeklyInterview> findWeeklyInterview(Pageable pageable);
 
-    void deleteByInterviewId(Long interviewId);
-
     BATCH_WeeklyInterview findByWeeklyBadge(String lowRank);
 
     BATCH_WeeklyInterview findByInterviewId(Long interviewId);

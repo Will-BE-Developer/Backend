@@ -28,13 +28,11 @@ import java.util.*;
 @RequiredArgsConstructor
 public class WeeklyInterviewConfig {
 
-    private final BATCH_WeeklyInterviewRepository weeklyInterviewRepository;
+    private final BATCH_WeeklyInterviewRepository batch_weeklyInterviewRepository;
     private final InterviewRepository interviewRepository;
+
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
-    //private final EntityManagerFactory entityManagerFactory;
-    //private final DataSource dataSource;
-    //private final ListItemReader listItemReader;
 
     @Bean
     public Job weeklyInterviewJob(Step MigrationStep) {
@@ -62,7 +60,7 @@ public class WeeklyInterviewConfig {
             System.out.println("weeklyInterviewTasklet is started.");
 
             //기존 인터뷰 뱃지 삭제
-            List<BATCH_WeeklyInterview> lastWeeklyInterview = weeklyInterviewRepository.findAll();
+            List<BATCH_WeeklyInterview> lastWeeklyInterview = batch_weeklyInterviewRepository.findAll();
             for (BATCH_WeeklyInterview lastWeeklyInterviewEach : lastWeeklyInterview){
                 Interview lastInterview = lastWeeklyInterviewEach.getInterview();
                 lastInterview.updateBadge("NONE");
@@ -71,15 +69,15 @@ public class WeeklyInterviewConfig {
 
             //이번주 면접왕 인터뷰 선정 + (추후 추가: 좋아요 숫자, 동점은 인터뷰 최신순)
             //List<Interview> weeklyInterview = interviewRepository.findWeeklyInterview(PageRequest.of(0,3));
-            List<BATCH_WeeklyInterview> weeklyInterview = weeklyInterviewRepository.findWeeklyInterview(PageRequest.of(0,5));
-            log.info("weeklyInterview top 3: {}", weeklyInterview);
+            List<BATCH_WeeklyInterview> weeklyInterviews = batch_weeklyInterviewRepository.findWeeklyInterview(PageRequest.of(0,5));
+            log.info("weeklyInterview top 5: {}", weeklyInterviews);
 
             //기존 위클리 면접왕 삭제
-            weeklyInterviewRepository.deleteAll();
+            batch_weeklyInterviewRepository.deleteAll();
 
             //위클리 면접왕 저장
             int ranking = 0;
-            for (BATCH_WeeklyInterview weeklyInterviewTop3 : weeklyInterview){
+            for (BATCH_WeeklyInterview weeklyInterview : weeklyInterviews){
 
                 ranking ++;
 
@@ -97,22 +95,22 @@ public class WeeklyInterviewConfig {
                 String weeklyBadge = month + "월 "+ week + "째주 " + ranking + "등";
                 System.out.println("weeklyBadge: " + weeklyBadge);
 
-                log.info("weeklyInterviewTop{}: {}", ranking, weeklyInterviewTop3.getInterview().getId());
+                log.info("weeklyInterviewTop{}: {}", ranking, weeklyInterview.getInterview().getId());
 
                 //BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, rankArr[ranking-1], weeklyBadge);
                 BATCH_WeeklyInterview weeklyInterviewEach;
                 //3등까지만 뱃지(골드,실버,브론즈) 저장
                 if (ranking <= 3){
-                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, badge[ranking-1], weeklyBadge);
+                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, badge[ranking-1], weeklyBadge);
                 }else{
-                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, "", weeklyBadge);
+                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, "", weeklyBadge);
                 }
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
-                    weeklyInterviewRepository.save(weeklyInterviewEach);
+                batch_weeklyInterviewRepository.save(weeklyInterviewEach);
 
                 //인터뷰 뱃지 저장(1,2,3등만)
                 if (ranking <= 3){
-                    Interview interview = weeklyInterviewTop3.getInterview();
+                    Interview interview = weeklyInterview.getInterview();
                     interview.updateBadge(badge[ranking-1]);
                     interviewRepository.save(interview);
                 }

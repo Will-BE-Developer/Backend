@@ -28,9 +28,7 @@ public class TopCategoriesBatchConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
-    @Autowired
     private final InterviewRepository interviewRepository;
-    @Autowired
     private final BATCH_TopCategoriesRepository batchTopCategoriesRepository;
 
     @Bean
