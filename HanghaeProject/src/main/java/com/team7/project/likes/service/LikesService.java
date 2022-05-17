@@ -92,20 +92,12 @@ public class LikesService {
        return likesResponseDto;
     }
 
-    public LikesResponseDto getLike(Long videoId, User user){
+    public LikesResponseDto getLike(Long videoId,User user){
         final int INTERVAL = 7;
         int totalCount = 0;
         List<Integer> findTopThree;
         Map<Integer,Integer> map;
-
-        UserInfoResponseDto.UserBody userInfoResponseDto = UserInfoResponseDto.UserBody.builder()
-                .introduce(user.getIntroduce())
-                .profileImageUrl(user.getProfileImageUrl())
-                .nickname(user.getNickname())
-                .id(user.getId())
-                .githubLink(user.getGithubLink())
-                .build();
-
+        LikesResponseDto likesResponseDto;
 
         Interview interview = interviewRepository.findById(videoId).orElseThrow(
                 ()-> new RestException(HttpStatus.BAD_REQUEST,"해당 인터뷰를 찾을 수 없습니다.")
@@ -145,13 +137,29 @@ public class LikesService {
                 findTopThree.add(-1);
             }
         }
-
-        LikesResponseDto likesResponseDto = new LikesResponseDto(likes.getLikesData(),
-                Long.valueOf(findTopThree.get(0))*INTERVAL,
-                Long.valueOf(findTopThree.get(1)) *INTERVAL,
-                Long.valueOf(findTopThree.get(2))*INTERVAL,
-                totalCount,
-                userInfoResponseDto);
+        if(user != null) {
+            UserInfoResponseDto.UserBody userInfoResponseDto = UserInfoResponseDto.UserBody.builder()
+                    .introduce(user.getIntroduce())
+                    .profileImageUrl(user.getProfileImageUrl())
+                    .nickname(user.getNickname())
+                    .id(user.getId())
+                    .githubLink(user.getGithubLink())
+                    .build();
+            likesResponseDto = new LikesResponseDto(likes.getLikesData(),
+                    Long.valueOf(findTopThree.get(0)) * INTERVAL,
+                    Long.valueOf(findTopThree.get(1)) * INTERVAL,
+                    Long.valueOf(findTopThree.get(2)) * INTERVAL,
+                    totalCount,
+                    userInfoResponseDto);
+        }else{
+            likesResponseDto = LikesResponseDto.builder()
+                    .likesData(likes.getLikesData())
+                    .TopOne(Long.valueOf(findTopThree.get(0)) * INTERVAL)
+                    .TopTwo(Long.valueOf(findTopThree.get(1)) * INTERVAL)
+                    .TopThree(Long.valueOf(findTopThree.get(2)) * INTERVAL)
+                    .totalCount(totalCount)
+                    .build();
+        }
 
         return likesResponseDto;
     }

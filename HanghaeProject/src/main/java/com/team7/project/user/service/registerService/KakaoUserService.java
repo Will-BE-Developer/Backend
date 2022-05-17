@@ -177,8 +177,8 @@ import java.util.UUID;
                         .build();
                 userRepository.save(kakaoUser);
             }
-            //가입된 카카오 사용자가 있다면, 업데이트를 진행한다.
-            kakaoUser.updateInfo(kakaoUserInfo.getNickname(), kakaoUserInfo.getImageUrl());
+            //가입된 카카오 사용자가 있다면, 업데이트를 진행한다.-업데이트를 진행하지 않기로함
+//            kakaoUser.updateInfo(kakaoUserInfo.getNickname(), kakaoUserInfo.getImageUrl());
 
             return kakaoUser;
         }
