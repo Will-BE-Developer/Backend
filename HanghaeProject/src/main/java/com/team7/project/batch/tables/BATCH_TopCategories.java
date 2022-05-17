@@ -2,7 +2,6 @@ package com.team7.project.batch.tables;
 
 import com.team7.project.category.model.CategoryEnum;
 import lombok.*;
-import org.springframework.context.annotation.Bean;
 
 import javax.persistence.*;
 

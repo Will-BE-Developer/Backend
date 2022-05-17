@@ -1,9 +1,8 @@
-package com.team7.project.user.service;
+package com.team7.project.user.service.mypageService;
 
 import com.amazonaws.auth.*;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.team7.project.interview.service.InterviewGeneralService;
@@ -15,17 +14,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.transaction.Transactional;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -86,10 +84,10 @@ public class UserMypageService {
                     profileImageUrl = basicProfile;
                 }
             } else {
-                //파일첨부 했으면, 이미지 로컬 및 S3에 저장하기
+                //파일첨부 했으면 크롭 후, 이미지 로컬 및 S3에 저장하기
                 log.info(requestDto.getProfileImage().toString());
 
-                //image 파일 받기
+                //image 파일 받기(for 크롭)
                 File getFile = convert(requestDto.getProfileImage());
                 BufferedImage originalImage = ImageIO.read(getFile);
                 log.info("before crop x : {} ", originalImage.getWidth());
@@ -119,9 +117,12 @@ public class UserMypageService {
                 byte[] imageByte = out.toByteArray();
                 out.close();
                 //original name 이랑 name 에 뭐 들어갈지 잘 모르겟음
-                MultipartFile multipartFile = new ConvertToMultipartFile(imageByte, "CROP"+requestDto.getProfileImage().getName(), requestDto.getProfileImage().getOriginalFilename(), requestDto.getProfileImage().getContentType(), imageByte.length);
+                MultipartFile multipartFile = new ConvertToMultipartFile(imageByte, "CROP", requestDto.getProfileImage().getOriginalFilename(), requestDto.getProfileImage().getContentType(), imageByte.length);
 
-                profileImageUrl = saveFile(multipartFile, user.getId());
+                String oldObjectKey = user.getProfileImageUrl();
+                profileImageUrl = saveFile(multipartFile, user.getId(), oldObjectKey);
+                //profileImageUrl = saveFile(requestDto.getProfileImage(), user.getId());
+                // OBJECT KEY profileImg/userId-8-2022-05-17-05:33:48-2.png
             }
 
             // 프론트에서 공백시 기존값 넘겨주지만, 닉네임만 한번더 체크
@@ -153,12 +154,14 @@ public class UserMypageService {
 
     public File convert(MultipartFile file) throws IOException {
         File convFile = new File(file.getOriginalFilename());
+        System.out.println("file.getOriginalFilename() in convert(): " + file.getOriginalFilename());
         convFile.createNewFile();
         FileOutputStream fos = new FileOutputStream(convFile);
         fos.write(file.getBytes());
         fos.close();
         return convFile;
     }
+
     //이미지 파일 여부 image/gif, image/png, image/jpeg, image/bmp, image/webp  //(jpg등 테스트예정)
     private void isImageFile(MultipartFile profileImage) {
         Boolean isImage = profileImage.getContentType().split("/")[0].equals("image");
@@ -169,7 +172,7 @@ public class UserMypageService {
         }
     }
 
-    private String saveFile(MultipartFile multipartFile, Long userId) throws IOException {
+    private String saveFile(MultipartFile multipartFile, Long userId, String oldObjectKey) throws IOException {
 
         //임시 폴더 생성(지정된 폴더가 없을때만 폴더 생성으로 변경?)
         String dir = Files.createTempDirectory("tempDir").toFile().getAbsolutePath();//EC2 경로 테스트
@@ -191,10 +194,13 @@ public class UserMypageService {
             os.write(multipartFile.getBytes());
 
             //S3로 업로드
-            String objectKey = sendToS3(file, userId, extension, fileName);
+            String objectKey = sendToS3(file, userId, oldObjectKey, fileName);
 
-            //업로드 성공시 폴더,파일 삭제(예정)
-
+            //업로드 성공시 폴더,파일 삭제
+            Path filePath = Paths.get(savedFileNameWithPath);
+            Files.delete(filePath);
+            Path directoryPath = Paths.get(dir);
+            Files.delete(directoryPath);
 
             return objectKey;
 
@@ -204,7 +210,7 @@ public class UserMypageService {
         }
     }
 
-    private String sendToS3(File file, Long userId, String extension, String fileName) throws IOException {
+    private String sendToS3(File file, Long userId, String oldObjectKey, String fileName) throws IOException {
 
         String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss"));
         //String objectKey = "profileImg/object2.png";
@@ -227,6 +233,9 @@ public class UserMypageService {
             expiration.setTime(expTimeMillis);
 
             s3Client.putObject(new PutObjectRequest(bucketName, objectKey, file));
+
+            //S3에서 기존 프로필 이미지 삭제
+            s3Client.deleteObject(bucketName, oldObjectKey);
 
             log.info("OBJECT KEY " + objectKey + " CREATED IN BUCKET " + bucketName);
         } catch (Exception e) {
