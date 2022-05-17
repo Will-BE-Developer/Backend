@@ -152,6 +152,11 @@ public class HomeService {
 
             int commentsCount = commentRepository.countByInterview_Id(interview.getInterview().getId());
 
+            String weeklyBadge = interview.getWeeklyBadge();
+            String[] weekKorean = {"첫째주","둘째주","셋째주","넷째주","다섯째주"};
+            int week = Integer.parseInt(weeklyBadge.substring(3,4)) -1;
+            String weeklyInterviewKing = weeklyBadge.substring(0,3) + weekKorean[week] + " 면접왕" + weeklyBadge.substring(6,9);
+
             InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
                     .id(interview.getInterview().getId())
                     .video(interviewGeneralService.generateProfileImageUrl(interview.getInterview().getVideoKey()))
@@ -167,7 +172,7 @@ public class HomeService {
                             .profileImageUrl(interviewGeneralService.generateProfileImageUrl(interview.getInterview().getUser().getProfileImageUrl()))
                             .introduce(interview.getInterview().getUser().getIntroduce())
                             .build())
-                    .badge(interview.getWeeklyBadge())
+                    .badge(weeklyInterviewKing)
                     .note(interview.getInterview().getMemo())
                     .scrapsMe(scrapMe)
                     .scrapsCount(interview.getScrapCount())
@@ -175,8 +180,6 @@ public class HomeService {
                     .likesCount(0L)
                     .isPublic(interview.getInterview().getIsPublic())
                     .isMine(ismine)
-
-
                     .createdAt(interview.getInterview().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                     .updatedAt(interview.getInterview().getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                     .build();
