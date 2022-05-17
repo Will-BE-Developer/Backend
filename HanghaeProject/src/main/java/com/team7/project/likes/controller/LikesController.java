@@ -10,8 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,9 +20,21 @@ public class LikesController {
     private final LikesService likesService;
 
     @PostMapping("/api/likes")
-    public ResponseEntity<LikesResponseDto> AddLikes(@AuthenticationPrincipal User user, @RequestBody LikeRequestDto likeRequestDto){
+    public ResponseEntity<LikesResponseDto> AddLikes(@AuthenticationPrincipal User user,
+                                                     @RequestBody LikeRequestDto likeRequestDto){
+
         log.info("Current user is {}" ,user.getNickname());
-         LikesResponseDto likesResponseDto =  likesService.addLike(likeRequestDto.getInterviewId(),user,likeRequestDto.getTime());
+
+         LikesResponseDto likesResponseDto =  likesService.addLike(
+                 likeRequestDto.getInterviewId(),
+                 user,
+                 likeRequestDto.getTime(),
+                 likeRequestDto.getCount());
          return new ResponseEntity<LikesResponseDto>(likesResponseDto,HttpStatus.OK);
+    }
+    @GetMapping("/api/likes/{interviewId}")
+    public ResponseEntity<LikesResponseDto> AddLikes(@AuthenticationPrincipal User user, @PathVariable Long interviewId){
+        LikesResponseDto likesResponseDto =  likesService.getLike(interviewId,user);
+        return new ResponseEntity<LikesResponseDto>(likesResponseDto,HttpStatus.OK);
     }
 }
