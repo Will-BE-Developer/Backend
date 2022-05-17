@@ -33,7 +33,7 @@ public class LikesService {
         Likes likes;
         int totalCount = 0;
         int timeSec = time/INTERVAL;
-
+        log.info("LIKE ADD REQUEST!!! ::: count : {}, time : {}, videoId : {}",count, time, videoId);
         Interview interview = interviewRepository.findById(videoId).orElseThrow(
                 ()-> new RestException(HttpStatus.BAD_REQUEST,"해당 인터뷰를 찾을 수 없습니다.")
         );
