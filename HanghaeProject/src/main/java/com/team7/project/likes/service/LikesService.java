@@ -4,17 +4,14 @@ import com.team7.project.advice.RestException;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.likes.dto.LikesResponseDto;
-import com.team7.project.likes.model.Intervals;
 import com.team7.project.likes.model.Likes;
 //import com.team7.project.likes.model.LikesData;
 import com.team7.project.likes.repository.LikesRepository;
 import com.team7.project.user.dto.UserInfoResponseDto;
 import com.team7.project.user.model.User;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;

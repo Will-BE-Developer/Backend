@@ -1,7 +1,5 @@
 package com.team7.project.likes.dto;
 
-import com.team7.project.likes.model.Likes;
-//import com.team7.project.likes.model.LikesData;
 import com.team7.project.user.dto.UserInfoResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
