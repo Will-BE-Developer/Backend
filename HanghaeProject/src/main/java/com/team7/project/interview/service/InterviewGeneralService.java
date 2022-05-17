@@ -137,11 +137,11 @@ public class InterviewGeneralService {
         String profilePresignedUrl = generateProfileImageUrl(interview.getUser().getProfileImageUrl());
 
         //5월 2째주 1등 -> 숫자만 추출
-        BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
-
-        int month = Integer.parseInt(itsWeekly.getWeeklyBadge().substring(0, 1));
-        int week = Integer.parseInt(itsWeekly.getWeeklyBadge().substring(3, 4));
-        int ranking = Integer.parseInt(itsWeekly.getWeeklyBadge().substring(7, 8));
+        BATCH_WeeklyInterview Weekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
+        boolean itsWeekly = Weekly == null ? false : true;
+        int month = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(0, 1)) : -1;
+        int week = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(3, 4)) : -1;
+        int ranking = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(7, 8)) : -1;
 
         return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, profilePresignedUrl,
                                             isMine, scrapsMe, scrapsCount, commentsCount,
