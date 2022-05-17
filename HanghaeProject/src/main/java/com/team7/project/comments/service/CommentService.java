@@ -82,7 +82,8 @@ public class CommentService {
                 if (parentComment.getId().equals(itsParentId)){
                     int index = commentListDto.getComments().indexOf(parentComment);
                     System.out.println("대댓글을 포함시킬 부모댓글의 index: " + index);
-                    commentListDto.addNestedComment(index, eachChild, isMine, eachChild.getUser().getProfileImageUrl());
+                    String childProfileUrl = interviewGeneralService.generateProfileImageUrl(eachChild.getUser().getProfileImageUrl());
+                    commentListDto.addNestedComment(index, eachChild, isMine, childProfileUrl);
                     System.out.println("eachCommentDto: "+ eachChild.getUser().getProfileImageUrl());
                 }
             }
@@ -206,7 +207,6 @@ public class CommentService {
 
         //(신규 작성일때만)comment가 댓글이면, 최신순이므로 1page로
         if (comment.getRootName().equals("interview") && type.equals("save")){
-            System.out.println("save");
             page = 1;
         }else{
             //comment가 대댓글이면 부모댓글의 page로(인터뷰 총 댓글수->)

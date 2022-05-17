@@ -250,6 +250,7 @@ public class InterviewGeneralService {
         InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
 
         scrapRepository.deleteByInterviewId(interviewId);
+
         //인터뷰 삭제전 면접왕 뱃지(Gold,Silver,Bronze)가 있으면, 밑에 등수 수정
         if (interview.getBadge().equals("NONE") == false) {
             try {
@@ -261,10 +262,14 @@ public class InterviewGeneralService {
 
                 String[] badge = {"Gold", "Silver", "Bronze"};
                 int[] totalRank = {1, 2, 3, 4, 5};
+                //전체 랭킹을 현재 면접왕 숫자만큼만
+                int nowTotalRank = (int) weeklyInterviewRepository.count();
+                totalRank = Arrays.copyOf(totalRank, nowTotalRank);
+
                 //전체 5등 중에 하위 등수 애들만 배열
                 int[] lowerRankArray = Arrays.copyOfRange(totalRank, ranking, totalRank.length);
                 //하위 랭킹 for문, 뱃지 수정
-                for (int lowerRanking : lowerRankArray) {
+                for (int lowerRanking : lowerRankArray) { //면접왕이 4등까지만 있을때, 5등이 없어서 에러남
                     //기존 위클리 등수 정보로 위클리 row 뽑아와서
                     String lowerWeeklyRank = weeklyBadge.substring(0, 7) + lowerRanking + "등";
                     BATCH_WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerWeeklyRank);
@@ -293,9 +298,9 @@ public class InterviewGeneralService {
                 }
 
                 //스크랩, 인터뷰 삭제(위클리도 삭제됨)
-//                scrapRepository.deleteByInterviewId(interviewId);
-//                interview.makeScrapNullForDelete();
-//                interviewRepository.deleteById(interviewId);
+                //scrapRepository.deleteByInterviewId(interviewId);
+                //interview.makeScrapNullForDelete();
+                //interviewRepository.deleteById(interviewId);
             } catch (Exception e) {
                 e.printStackTrace();
             }

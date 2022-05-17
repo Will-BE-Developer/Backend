@@ -16,8 +16,6 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
-
-//import javax.batch.api.listener.JobListener;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -98,7 +96,6 @@ public class WeeklyInterviewConfig {
 
                 log.info("weeklyInterviewTop{}: {}", ranking, weeklyInterview.getInterview().getId());
 
-                //BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, rankArr[ranking-1], weeklyBadge);
                 BATCH_WeeklyInterview weeklyInterviewEach;
                 //3등까지만 뱃지(골드,실버,브론즈) 저장
                 if (ranking <= 3){
@@ -111,6 +108,8 @@ public class WeeklyInterviewConfig {
 
                 //인터뷰 뱃지 저장(1,2,3등만)
                 if (ranking <= 3){
+                    //Interview interview = weeklyInterview.getInterview();
+                    //interview레포지토리에서 새로 불러와서
                     Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
                             .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
                     interview.updateBadge(badge[ranking-1]);
@@ -122,4 +121,3 @@ public class WeeklyInterviewConfig {
         };
     }
 }
-
