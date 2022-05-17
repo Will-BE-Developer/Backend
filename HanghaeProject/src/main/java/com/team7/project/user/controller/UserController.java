@@ -11,7 +11,7 @@ import com.team7.project.user.dto.request.LoginRequestDto;
 import com.team7.project.user.dto.request.RegisterRequestDto;
 import com.team7.project.user.model.User;
 import com.team7.project.user.service.registerService.KakaoUserService;
-import com.team7.project.user.service.UserMypageService;
+import com.team7.project.user.service.mypageService.UserMypageService;
 import com.team7.project.user.service.registerService.UserProfileService;
 import com.team7.project.user.service.registerService.UserRegistryService;
 import lombok.RequiredArgsConstructor;

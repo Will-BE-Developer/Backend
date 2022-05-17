@@ -19,12 +19,14 @@ public interface BATCH_WeeklyInterviewRepository extends JpaRepository<BATCH_Wee
             "SELECT interview_id, count(interview_id) as scrap_count FROM scrap " +
             "WHERE created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 WEEK ) AND NOW() " +
             "group by interview_id " +
-            "order by count(interview_id) DESC LIMIT 3 " +
+            "order by count(interview_id) DESC LIMIT 10 " +
             ") s " +
             "ON i.id IN (s.interview_id) " +
             "WHERE i.is_public = 1 order by scrap_count DESC, created_at DESC ", nativeQuery = true)
 
-        //List<Interview> findWeeklyInterview();
-        //Page<Interview> findWeeklyInterview(Pageable pageable);
     List<BATCH_WeeklyInterview> findWeeklyInterview(Pageable pageable);
+
+    void deleteByInterviewId(Long interviewId);
+
+    BATCH_WeeklyInterview findByWeeklyBadge(String lowRank);
 }

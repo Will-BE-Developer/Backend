@@ -1,7 +1,9 @@
 package com.team7.project.interview.model;
 
 import com.team7.project._global.timestamped.model.Timestamped;
+import com.team7.project.batch.tables.BATCH_WeeklyInterview;
 import com.team7.project.comments.model.Comment;
+import com.team7.project.likes.model.Likes;
 import com.team7.project.question.model.Question;
 import com.team7.project.scrap.model.Scrap;
 import com.team7.project.user.model.User;
@@ -58,6 +60,13 @@ public class Interview extends Timestamped {
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<BATCH_WeeklyInterview> weeklyInterviews = new ArrayList<>();
+
+    @OneToOne(cascade=CascadeType.ALL, mappedBy = "interview")
+    @JoinColumn
+    Likes likes;
+
 
     //    making draft
     public Interview(String videoKey, String thumbnailKey, User user) {
@@ -99,7 +108,7 @@ public class Interview extends Timestamped {
         this.badge = badge;
     }
 
-
-//   private WeeklyInterview weeklyInterview;
-
+    public void makeScrapNullForDelete(){
+        this.scraps = null;
+    }
 }

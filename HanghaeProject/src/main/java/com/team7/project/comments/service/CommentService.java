@@ -52,14 +52,7 @@ public class CommentService {
         Page<Comment> commentListPage = getListOfCommentOfInterview(interviewId, pageable);
         List<Comment> commentList = commentListPage.getContent();
 
-        System.out.println("전체 페이지 갯수 : " + commentListPage.getTotalPages());
-        System.out.println("해당 인터뷰의 총 댓글 갯수(대댓글 미포함):  " + commentListPage.getTotalElements());
-        System.out.println("요청 페이지에서 조회 된 댓글 갯수(대댓글 미포함): " + commentListPage.getNumberOfElements());
-        System.out.println("페이지 당 출력 갯수 : " + commentListPage.getSize());
-        System.out.println("마지막 페이지 여부 : " + commentListPage.isLast());
-
         for( Comment eachComment : commentList){
-            System.out.println("댓글 조회: " + eachComment.toString());
             if (user != null){
                 isMine = user.getId().equals(eachComment.getUser().getId());
             }
@@ -70,26 +63,27 @@ public class CommentService {
         //대댓글 조회 + 대댓글 수
         //이 인터뷰의 전체 대댓글 조회, 대댓글의 부모댓글들이 이 페이지의 댓글목록에 있으면 add Nest
         //(-> 대댓글 중에, 현재 페이지 목록을 부모로 가진 대댓글들만 뽑아서 add)
+        //이 인터뷰의 전체 대댓글 조회
         List<Comment> nestedCommentList = getListOfCommentOfComment(interviewId);
-        for( Comment eachComment : nestedCommentList){
-            System.out.println("대댓글 조회: " + eachComment.toString());
-
-            Long RootId = eachComment.getRootId();
+        for( Comment eachChild : nestedCommentList){
+            Long itsParentId = eachChild.getRootId();
 
             List<Comment> result = commentList.stream()
-                    .filter(a -> Objects.equals(a.getId(), RootId))
+                    .filter(a -> Objects.equals(a.getId(), itsParentId))
                     .collect(Collectors.toList());
             System.out.println("부모 댓글 조회: " + result);
 
             if (user != null) {
-                isMine = user.getId().equals(eachComment.getUser().getId());
+                isMine = user.getId().equals(eachChild.getUser().getId());
             }
+            //response의 부모댓글 리스트
             List<CommentListDto.ResponseComment> commentListInDto = commentListDto.getComments();
-            for (CommentListDto.ResponseComment eachCommentDto: commentListInDto){
-                if (eachCommentDto.getId().equals(RootId)){
-                    int index = commentListDto.getComments().indexOf(eachCommentDto);
+            for (CommentListDto.ResponseComment parentComment: commentListInDto){
+                if (parentComment.getId().equals(itsParentId)){
+                    int index = commentListDto.getComments().indexOf(parentComment);
                     System.out.println("대댓글을 포함시킬 부모댓글의 index: " + index);
-                    commentListDto.addNestedComment(index, eachComment, isMine, commentListDto.getComments().get(index).getUser().getProfileImageUrl());
+                    commentListDto.addNestedComment(index, eachChild, isMine, eachChild.getUser().getProfileImageUrl());
+                    System.out.println("eachCommentDto: "+ eachChild.getUser().getProfileImageUrl());
                 }
             }
         }
@@ -192,6 +186,13 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다.")
         );
+        //부모댓글이면 자식댓글도 삭제
+        if (comment.getRootName().equals("interview")){
+            List<Comment> childCommentList = commentRepository.findByRootIdAndRootName(comment.getId(), "comment");
+            for(Comment childComment: childCommentList){
+                commentRepository.deleteById(childComment.getId());
+            }
+        }
         commentRepository.deleteById(comment.getId());
         System.out.println(commentId + "번 댓글이 삭제 되었습니다");
 
@@ -203,7 +204,7 @@ public class CommentService {
     public int getCurrentCommentPage(Comment comment, String type){
         int page = 1;
 
-        //(신규 작성일때만....)comment가 댓글이면, 최신순이므로 1page로
+        //(신규 작성일때만)comment가 댓글이면, 최신순이므로 1page로
         if (comment.getRootName().equals("interview") && type.equals("save")){
             System.out.println("save");
             page = 1;
@@ -233,7 +234,6 @@ public class CommentService {
                 }
             }
             System.out.println("페이지별 부모댓글 목록: " + list);
-            System.out.println("totalComment: " + totalComment);
         }
         System.out.println("등록/수정/삭제한 대댓글의 페이지: " + page);
         return page;

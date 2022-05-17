@@ -29,5 +29,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Integer> rootCommentIdPerPage(Long interviewId, Pageable pageable);
 
     List<Comment> findAllByRootNameOrderByCreatedAtDesc(String rootname, Pageable pageable);
+
+    List<Comment> findByRootIdAndRootName(Long rootId, String rootName);
 }
 
