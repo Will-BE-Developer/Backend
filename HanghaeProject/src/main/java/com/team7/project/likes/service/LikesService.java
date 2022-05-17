@@ -139,6 +139,10 @@ public class LikesService {
             }else if(findTopThree.size() ==1){
                 findTopThree.add(-1);
                 findTopThree.add(-1);
+            }else if(findTopThree.size()==0){
+                findTopThree.add(-1);
+                findTopThree.add(-1);
+                findTopThree.add(-1);
             }
         }
 
