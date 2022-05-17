@@ -94,16 +94,20 @@ public class UserMypageService {
                 log.info("before crop y : {} ", originalImage.getHeight());
 
                 int dw = 200, dh = 200;
-                int ow = originalImage.getWidth();
-                int oh = originalImage.getHeight();
-                int nw = ow ; int nh = ow;
+                int originalImageWidth = originalImage.getWidth();
+                int originalImageHeight = originalImage.getHeight();
+                int newImageWidth = originalImageWidth ;
+                int newImageHeight = originalImageWidth;
 
-                if (nh>oh){
-                    nw = (oh *dw) /dh;
-                    nh = oh;
+                if (newImageHeight>originalImageHeight){
+                    newImageWidth= (originalImageHeight *dw) /dh;
+                    newImageHeight = originalImageHeight;
                 }
                 //이미지 크롭
-                BufferedImage cropImg = Scalr.crop(originalImage, (ow-nw)/2, (oh-nh)/2, nw, nh);
+                BufferedImage cropImg = Scalr.crop(originalImage,
+                        (originalImageWidth-newImageWidth)/2,
+                        (originalImageHeight-newImageHeight)/2,
+                        newImageWidth, newImageHeight);
                 //이미지 리사이징
                 BufferedImage destImg = Scalr.resize(cropImg, dw, dh);
 
