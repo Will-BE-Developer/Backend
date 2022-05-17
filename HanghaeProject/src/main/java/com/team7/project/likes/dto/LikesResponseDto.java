@@ -14,5 +14,5 @@ public class LikesResponseDto {
     private Long Toptwo;
     private Long TopThree;
     private int totalCount;
-    private UserInfoResponseDto userInfoResponseDto;
+    private UserInfoResponseDto.UserBody userInfoResponseDto;
 }

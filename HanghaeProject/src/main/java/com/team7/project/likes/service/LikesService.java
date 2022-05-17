@@ -75,15 +75,14 @@ public class LikesService {
         log.info("Top Three is : {}",findTopThree);
 
 
-        UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.builder()
-                .user(UserInfoResponseDto.UserBody.builder()
+        UserInfoResponseDto.UserBody userInfoResponseDto = UserInfoResponseDto.UserBody.builder()
                         .introduce(user.getIntroduce())
                         .profileImageUrl(user.getProfileImageUrl())
                         .nickname(user.getNickname())
                         .id(user.getId())
                         .githubLink(user.getGithubLink())
-                        .build())
-                .build();
+                        .build();
+
         LikesResponseDto likesResponseDto = new LikesResponseDto(likes.getLikesData(),
                 Long.valueOf(findTopThree.get(0))*INTERVAL,
                 Long.valueOf(findTopThree.get(1)) *INTERVAL,
@@ -91,6 +90,66 @@ public class LikesService {
                 totalCount,
                 userInfoResponseDto);
        return likesResponseDto;
+    }
+
+    public LikesResponseDto getLike(Long videoId, User user){
+        final int INTERVAL = 7;
+        int totalCount = 0;
+        List<Integer> findTopThree;
+        Map<Integer,Integer> map;
+
+        UserInfoResponseDto.UserBody userInfoResponseDto = UserInfoResponseDto.UserBody.builder()
+                .introduce(user.getIntroduce())
+                .profileImageUrl(user.getProfileImageUrl())
+                .nickname(user.getNickname())
+                .id(user.getId())
+                .githubLink(user.getGithubLink())
+                .build();
+
+
+        Interview interview = interviewRepository.findById(videoId).orElseThrow(
+                ()-> new RestException(HttpStatus.BAD_REQUEST,"해당 인터뷰를 찾을 수 없습니다.")
+        );
+
+        Likes likes = likesRepository.findByInterviewId(videoId);
+
+        if(likes ==null) {
+            map = new HashMap<Integer,Integer>();
+
+            likes = likesRepository.save(Likes.builder()
+                    .interview(interview)
+                    .likesData(map)
+                    .build());
+            totalCount =0;
+            findTopThree=new ArrayList<>();
+            findTopThree.add(-1);
+            findTopThree.add(-1);
+            findTopThree.add(-1);
+        }else{
+            map = likes.getLikesData();
+            for (int value : likes.getLikesData().values()) {
+                totalCount += value;
+            }
+
+            findTopThree = map.entrySet().stream().sorted(Map.Entry.<Integer,Integer>comparingByValue()
+                    .reversed()).limit(3).map(Map.Entry::getKey).collect(Collectors.toList());
+
+            if(findTopThree.size() ==2){
+                findTopThree.add(-1);
+            }else if(findTopThree.size() ==1){
+                findTopThree.add(-1);
+                findTopThree.add(-1);
+            }
+        }
+
+        LikesResponseDto likesResponseDto = new LikesResponseDto(likes.getLikesData(),
+                Long.valueOf(findTopThree.get(0))*INTERVAL,
+                Long.valueOf(findTopThree.get(1)) *INTERVAL,
+                Long.valueOf(findTopThree.get(2))*INTERVAL,
+                totalCount,
+                userInfoResponseDto);
+
+        return likesResponseDto;
     }
 
 }
