@@ -47,118 +47,105 @@ public class UserMypageService {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
-    private String basicProfile = "profileImg/100.jpeg"; //temp
+    private String basicProfile = "profileImg/100.jpeg";
+
+    boolean isStringEmpty(String nickname) {
+        return nickname == null || nickname.trim().isEmpty();
+    }
 
     @Transactional
     public UserInfoResponseDto save(UserRequestDto requestDto, User user) throws IOException {
-        String profileImageUrl = "";
+        String profileImageUrl = null;
 
         userRepository.findById(user.getId()).orElseThrow(
                 () -> new IllegalArgumentException("없는 사용자입니다.")
         );
 
+        //닉네임을 입력 안했으면, 랜덤 닉네임 저장
+        if(isStringEmpty(requestDto.getNickname())){
+            long number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
+            String randomGenName = "윌비@" + number;
+            requestDto.setNickname(randomGenName);
+        }
 
-        //이미지 안넣었으면 그냥 회원정보만 저장
-        if (requestDto.getProfileImage() == null) {
-            System.out.println("requestDto.getGithubLink():" + requestDto.getGithubLink());
-            //닉네임 공백이면
-            if (requestDto.getNickname().trim().length() > 0) { //랜덤으로 수정?
-                user.updateInfo(requestDto.getNickname(),
-                        requestDto.getGithubLink(),
-                        requestDto.getIntroduce(),
-                        user.getProfileImageUrl());
-            } else {
-                user.updateInfo(user.getNickname(),
-                        requestDto.getGithubLink(),
-                        requestDto.getIntroduce(),
-                        user.getProfileImageUrl());
-            }
-        } else {
-            //기존 코드
+        //파일첨부 했으면 크롭 후, 이미지 로컬 및 S3에 저장하기(첨부 안했으면 null->프론트에서 default이미지)
+        if (requestDto.getProfileImage() != null) {
+            //이미지 파일 여부
             isImageFile(requestDto.getProfileImage());
 
-            //파일첨부 안했으면 원래이미지, 원래 이미지가 없다면 기본이미지 저장
-            if (requestDto.getProfileImage().isEmpty()) {
-                //기존에도 프로필 이미지가 없으면
-                if (user.getProfileImageUrl().isEmpty()) {
-                    profileImageUrl = basicProfile;
-                }
-            } else {
-                //파일첨부 했으면 크롭 후, 이미지 로컬 및 S3에 저장하기
-                log.info(requestDto.getProfileImage().toString());
+            //image 파일 받기(for 크롭)
+            File getFile = convert(requestDto.getProfileImage());
+            BufferedImage originalImage = ImageIO.read(getFile);
+            log.info("before crop x : {} ", originalImage.getWidth());
+            log.info("before crop y : {} ", originalImage.getHeight());
 
-                //image 파일 받기(for 크롭)
-                File getFile = convert(requestDto.getProfileImage());
-                BufferedImage originalImage = ImageIO.read(getFile);
-                log.info("before crop x : {} ", originalImage.getWidth());
-                log.info("before crop y : {} ", originalImage.getHeight());
+            int dw = 200, dh = 200;
+            int originalImageWidth = originalImage.getWidth();
+            int originalImageHeight = originalImage.getHeight();
+            int newImageWidth = originalImageWidth ;
+            int newImageHeight = originalImageWidth;
 
-                int dw = 200, dh = 200;
-                int originalImageWidth = originalImage.getWidth();
-                int originalImageHeight = originalImage.getHeight();
-                int newImageWidth = originalImageWidth ;
-                int newImageHeight = originalImageWidth;
-
-                if (newImageHeight>originalImageHeight){
-                    newImageWidth= (originalImageHeight *dw) /dh;
-                    newImageHeight = originalImageHeight;
-                }
-                //이미지 크롭
-                BufferedImage cropImg = Scalr.crop(originalImage,
-                        (originalImageWidth-newImageWidth)/2,
-                        (originalImageHeight-newImageHeight)/2,
-                        newImageWidth, newImageHeight);
-                //이미지 리사이징
-                BufferedImage destImg = Scalr.resize(cropImg, dw, dh);
-
-                log.info("after crop & resizing x : {} ", destImg.getWidth());
-                log.info("after crop & resizing y : {} ", destImg.getHeight());
-
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                ImageIO.write(destImg,requestDto.getProfileImage().getContentType().split("/")[1], out);
-                log.info(requestDto.getProfileImage().getContentType().split("/")[1]);
-
-                byte[] imageByte = out.toByteArray();
-                out.close();
-                //original name 이랑 name 에 뭐 들어갈지 잘 모르겟음
-                MultipartFile multipartFile = new ConvertToMultipartFile(imageByte, "CROP", requestDto.getProfileImage().getOriginalFilename(), requestDto.getProfileImage().getContentType(), imageByte.length);
-
-                String oldObjectKey = user.getProfileImageUrl();
-                profileImageUrl = saveFile(multipartFile, user.getId(), oldObjectKey);
-                //profileImageUrl = saveFile(requestDto.getProfileImage(), user.getId());
-                // OBJECT KEY profileImg/userId-8-2022-05-17-05:33:48-2.png
+            if (newImageHeight>originalImageHeight){
+                newImageWidth= (originalImageHeight *dw) /dh;
+                newImageHeight = originalImageHeight;
             }
+            //이미지 크롭
+            BufferedImage cropImg = Scalr.crop(originalImage,
+                    (originalImageWidth-newImageWidth)/2,
+                    (originalImageHeight-newImageHeight)/2,
+                    newImageWidth, newImageHeight);
+            //이미지 리사이징
+            BufferedImage destImg = Scalr.resize(cropImg, dw, dh);
 
-            // 프론트에서 공백시 기존값 넘겨주지만, 닉네임만 한번더 체크
-            if (requestDto.getNickname().trim().length() > 0) {
-                user.updateInfo(requestDto.getNickname(),
-                        requestDto.getGithubLink(),
-                        requestDto.getIntroduce(),
-                        profileImageUrl);
-            } else {
-                user.updateInfo(user.getNickname(),
-                        requestDto.getGithubLink(),
-                        requestDto.getIntroduce(),
-                        profileImageUrl);
-            }
+            log.info("after crop & resizing x : {} ", destImg.getWidth());
+            log.info("after crop & resizing y : {} ", destImg.getHeight());
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ImageIO.write(destImg,requestDto.getProfileImage().getContentType().split("/")[1], out);
+            log.info(requestDto.getProfileImage().getContentType().split("/")[1]);
+
+            byte[] imageByte = out.toByteArray();
+            out.close();
+            MultipartFile multipartFile = new ConvertToMultipartFile(imageByte, "CROP", requestDto.getProfileImage().getOriginalFilename(), requestDto.getProfileImage().getContentType(), imageByte.length);
+
+            String oldObjectKey = user.getProfileImageUrl();
+            profileImageUrl = saveFile(multipartFile, user.getId(), oldObjectKey);
+            //profileImageUrl = saveFile(requestDto.getProfileImage(), user.getId());
         }
+
+        user.updateInfo(requestDto.getNickname(), requestDto.getGithubLink(),
+                        requestDto.getIntroduce(), profileImageUrl);
+
+        System.out.println("user.getProfileImageUrl():"+ user.getProfileImageUrl());
+
         userRepository.save(user);
 
-
-        return UserInfoResponseDto.builder()
-                .user(UserInfoResponseDto.UserBody.builder()
-                .id(user.getId())
-                .nickname(user.getNickname())
-                .githubLink(user.getGithubLink())
-                .profileImageUrl(interviewGeneralService.generateProfileImageUrl(user.getProfileImageUrl()))
-                .introduce(user.getIntroduce())
-                .build())
-         .build();
+        //프로필 이미지 첨부 안했으면
+        if (requestDto.getProfileImage() == null){
+            return UserInfoResponseDto.builder()
+                    .user(UserInfoResponseDto.UserBody.builder()
+                    .id(user.getId())
+                    .nickname(user.getNickname())
+                    .githubLink(user.getGithubLink())
+                    .profileImageUrl(null)
+                    .introduce(user.getIntroduce())
+                    .build())
+             .build();
+        }else{
+            return UserInfoResponseDto.builder()
+                    .user(UserInfoResponseDto.UserBody.builder()
+                    .id(user.getId())
+                    .nickname(user.getNickname())
+                    .githubLink(user.getGithubLink())
+                    .profileImageUrl(interviewGeneralService.generateProfileImageUrl(user.getProfileImageUrl()))
+                    .introduce(user.getIntroduce())
+                    .build())
+            .build();
+        }
     }
 
     public File convert(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
-        System.out.println("file.getOriginalFilename() in convert(): " + file.getOriginalFilename());
+        File convFile = new File(file.getOriginalFilename()); //서버 루트폴더에 저장됨
         convFile.createNewFile();
         FileOutputStream fos = new FileOutputStream(convFile);
         fos.write(file.getBytes());
@@ -183,14 +170,9 @@ public class UserMypageService {
 
         File file = new File(dir + File.separator + multipartFile.getOriginalFilename());
 
+        String fileName = file.getName();
         String savedFileNameWithPath = String.valueOf(file.getCanonicalFile());
         System.out.println("저장될 파일의 경로 포함 파일명: " + savedFileNameWithPath);
-
-        String fileName = file.getName();
-
-        //substring(): beginIndex 부터 끝까지 문자열을 잘라서 리턴
-        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
-        System.out.println("파일 확장자: " + extension);
 
         //MultipatrFile클래스의 getBytes()로 multipartFile의 데이터를 바이트배열로 추출한 후, FileOutputStream클래스의 write()로 파일을 저장
         try (OutputStream os = new FileOutputStream(file)) {
@@ -200,7 +182,7 @@ public class UserMypageService {
             //S3로 업로드
             String objectKey = sendToS3(file, userId, oldObjectKey, fileName);
 
-            //업로드 성공시 폴더,파일 삭제
+            //업로드 성공시, 서버에 생성한 폴더,파일 삭제
             Path filePath = Paths.get(savedFileNameWithPath);
             Files.delete(filePath);
             Path directoryPath = Paths.get(dir);
@@ -217,18 +199,14 @@ public class UserMypageService {
     private String sendToS3(File file, Long userId, String oldObjectKey, String fileName) throws IOException {
 
         String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss"));
-        //String objectKey = "profileImg/object2.png";
         String s3Folder = "profileImg/";
         String objectKey = s3Folder + "userId-" + userId + "-" + suffix + "-" + fileName;
-
-        Regions region = Regions.AP_NORTHEAST_2;
-        String bucketName = bucket;
 
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         try {
             AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
                     .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                    .withRegion(region)
+                    .withRegion(Regions.AP_NORTHEAST_2)
                     .build();
 
             java.util.Date expiration = new java.util.Date();
@@ -236,12 +214,14 @@ public class UserMypageService {
             expTimeMillis += 1000 * 60 * 60;
             expiration.setTime(expTimeMillis);
 
-            s3Client.putObject(new PutObjectRequest(bucketName, objectKey, file));
+            s3Client.putObject(new PutObjectRequest(bucket, objectKey, file));
 
             //S3에서 기존 프로필 이미지 삭제
-            s3Client.deleteObject(bucketName, oldObjectKey);
+            if (oldObjectKey != null){
+                s3Client.deleteObject(bucket, oldObjectKey);
+            }
 
-            log.info("OBJECT KEY " + objectKey + " CREATED IN BUCKET " + bucketName);
+            log.info("OBJECT KEY " + objectKey + " CREATED IN BUCKET " + bucket);
         } catch (Exception e) {
             e.printStackTrace();
         }

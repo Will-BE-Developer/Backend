@@ -17,7 +17,7 @@ import static javax.persistence.FetchType.LAZY;
 public class BATCH_WeeklyInterview {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(unique = true, nullable = false)
     private Long id;
 
