@@ -1,8 +1,14 @@
 package com.team7.project.interview.service;
 
 import com.amazonaws.HttpMethod;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.team7.project._global.pagination.dto.PaginationResponseDto;
 import com.team7.project.advice.ErrorMessage;
 import com.team7.project.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;
@@ -44,6 +50,15 @@ public class InterviewGeneralService {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;  // S3 버킷 이름
 
+    @Value("${cloud.aws.credentials.access-key-upload}")
+    private String accessKey;
+
+    @Value("${cloud.aws.credentials.secret-key-upload}")
+    private String secretKey;
+
+    @Value("${cloud.aws.region.static}")
+    private String region;
+
     public String generatePresignedUrl(String objectKey) {
 
         Date expireTime = new Date();
@@ -67,6 +82,30 @@ public class InterviewGeneralService {
         return (image.contains("http://") | image.contains("https://")) ? image : generatePresignedUrl(image);
     }
 
+    public String generateThumbnailImageUrl(Interview interview) {
+        if (interview.getIsThumbnailConverted()) {
+            return generatePresignedUrl(interview.getThumbnailKey());
+        } else {
+            AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+            try {
+                AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                        .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                        .withRegion(region)
+                        .build();
+                boolean doesItExists = s3Client.doesObjectExist(bucket, interview.getThumbnailKey());
+                if (doesItExists) {
+                    interview.convertThumbnail();
+                    return generatePresignedUrl(interview.getThumbnailKey());
+                } else {
+                    return null;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     public Set<Long> createUserScrapIds(User user) {
         Set<Long> userScrapsId = new HashSet<>();
         if (user != null) {
@@ -77,16 +116,25 @@ public class InterviewGeneralService {
         return userScrapsId;
     }
 
-    public InterviewInfoResponseDto createInterviewResponse(Long loginUserId, Set<Long> userScrapsId, Interview interview) {
-        Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
-        System.out.println("interview.getIsVideoConverted() = " + interview.getIsVideoConverted());
+    @Transactional
+    public void initInterview(){
+        List<Interview> interviews = interviewRepository.findAll();
+        for(Interview interview1 : interviews){
+            interview1.convertThumbnail();
+        }
+    }
 
+    public InterviewInfoResponseDto createInterviewResponse(Long loginUserId, Set<Long> userScrapsId, Interview interview) {
+//        initInterview();
+        Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
         Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
         Long scrapsCount = (long) interview.getScraps().size();
         Long commentsCount = (long) interview.getComments().size();
 
+
+
         String videoPresignedUrl = interview.getIsVideoConverted() ? generatePresignedUrl(interview.getVideoKey()) : null;
-        String imagePresignedUrl = generatePresignedUrl(interview.getThumbnailKey());
+        String imagePresignedUrl = generateThumbnailImageUrl(interview);
         String profilePresignedUrl = generateProfileImageUrl(interview.getUser().getProfileImageUrl());
 
         return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, profilePresignedUrl, isMine, scrapsMe, scrapsCount, commentsCount);
@@ -195,24 +243,24 @@ public class InterviewGeneralService {
         InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
 
         //인터뷰 삭제전 면접왕 뱃지가 있으면, 밑에 등수 수정
-        if (interview.getBadge().equals("NONE") == false){
-            try{
+        if (interview.getBadge().equals("NONE") == false) {
+            try {
                 String badge = interview.getBadge();
                 int ranking = Integer.parseInt(badge.substring(8, 9));
 
                 int[] totalRank = {1, 2, 3, 4, 5};
                 int[] lowerRankArray = Arrays.copyOfRange(totalRank, ranking, totalRank.length);
                 //하위 랭킹 for문, 뱃지 수정
-                for(int num: lowerRankArray){
+                for (int num : lowerRankArray) {
                     String lowerRank = badge.substring(0, 8) + num + "등";
                     BATCH_WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerRank);
 
-                    String newRank = badge.substring(0, 8) + (num-1) + "등";
+                    String newRank = badge.substring(0, 8) + (num - 1) + "등";
                     System.out.println("기존 랭킹: " + lowerRank + ", 수정된 랭킹: " + newRank);
 
                     //위클리 테이블 랭링 수정
                     weekly.setWeeklyBadge(newRank);
-                    weekly.setBadge((num-1) + "등");
+                    weekly.setBadge((num - 1) + "등");
                     weeklyInterviewRepository.save(weekly);
 
                     //인터뷰 테이블 랭킹 수정
@@ -224,7 +272,7 @@ public class InterviewGeneralService {
                 scrapRepository.deleteByInterviewId(interviewId);
                 interview.makeScrapNullForDelete();
                 interviewRepository.deleteById(interviewId);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
