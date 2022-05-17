@@ -66,7 +66,7 @@ public class Interview extends Timestamped {
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
     List<BATCH_WeeklyInterview> weeklyInterviews = new ArrayList<>();
 
-    @OneToOne(cascade=CascadeType.ALL, mappedBy = "interview")
+    @OneToOne(cascade=CascadeType.ALL, mappedBy = "interview",orphanRemoval = true)
     @JoinColumn
     Likes likes;
 
