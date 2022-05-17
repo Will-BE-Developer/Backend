@@ -132,14 +132,21 @@ public class InterviewGeneralService {
         Long commentsCount = (long) interview.getComments().size();
 
 
-
         String videoPresignedUrl = interview.getIsVideoConverted() ? generatePresignedUrl(interview.getVideoKey()) : null;
         String imagePresignedUrl = generateThumbnailImageUrl(interview);
         String profilePresignedUrl = generateProfileImageUrl(interview.getUser().getProfileImageUrl());
 
-        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, profilePresignedUrl, isMine, scrapsMe, scrapsCount, commentsCount);
-    }
+        //5월 2째주 1등 -> 숫자만 추출
+        BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
 
+        int month = Integer.parseInt(itsWeekly.getWeeklyBadge().substring(0, 1));
+        int week = Integer.parseInt(itsWeekly.getWeeklyBadge().substring(3, 4));
+        int ranking = Integer.parseInt(itsWeekly.getWeeklyBadge().substring(7, 8));
+
+        return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, profilePresignedUrl,
+                                            isMine, scrapsMe, scrapsCount, commentsCount,
+                                            month, week, ranking);
+    }
 
     public InterviewListResponseDto readAllInterviews(Long loginUserId, String sort, String filter, Pageable pageable) {
 
@@ -242,30 +249,45 @@ public class InterviewGeneralService {
 
         InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
 
-        //인터뷰 삭제전 면접왕 뱃지가 있으면, 밑에 등수 수정
+        //인터뷰 삭제전 면접왕 뱃지(Gold,Silver,Bronze)가 있으면, 밑에 등수 수정
         if (interview.getBadge().equals("NONE") == false) {
             try {
-                String badge = interview.getBadge();
-                int ranking = Integer.parseInt(badge.substring(8, 9));
+                //인터뷰의 위클리 row 검색해서, 위클리뱃지를 가져오고
+                BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
+                String weeklyBadge = itsWeekly.getWeeklyBadge(); //5월 2째주 1등
+                String itsBadge = interview.getBadge(); //Gold
+                int ranking = Integer.parseInt(weeklyBadge.substring(7, 8));
 
+                String[] badge = {"Gold", "Silver", "Bronze"};
                 int[] totalRank = {1, 2, 3, 4, 5};
+                //전체 5등 중에 하위 등수 애들만 배열
                 int[] lowerRankArray = Arrays.copyOfRange(totalRank, ranking, totalRank.length);
                 //하위 랭킹 for문, 뱃지 수정
-                for (int num : lowerRankArray) {
-                    String lowerRank = badge.substring(0, 8) + num + "등";
-                    BATCH_WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerRank);
+                for (int lowerRanking : lowerRankArray) {
+                    //기존 위클리 등수 정보로 위클리 row 뽑아와서
+                    String lowerWeeklyRank = weeklyBadge.substring(0, 7) + lowerRanking + "등";
+                    BATCH_WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerWeeklyRank);
+                    //새로운 등수 부여
+                    int lowerNewRanking = lowerRanking - 1;
+                    String newWeeklyRank = weeklyBadge.substring(0, 7) + (lowerRanking - 1) + "등";
+                    System.out.println("기존 랭킹: " + lowerWeeklyRank + ", 수정된 랭킹: " + newWeeklyRank);
 
-                    String newRank = badge.substring(0, 8) + (num - 1) + "등";
-                    System.out.println("기존 랭킹: " + lowerRank + ", 수정된 랭킹: " + newRank);
-
-                    //위클리 테이블 랭링 수정
-                    weekly.setWeeklyBadge(newRank);
-                    weekly.setBadge((num - 1) + "등");
+                    //위클리 테이블 랭링 수정 저장
+                    weekly.setWeeklyBadge(newWeeklyRank);
+                    if (lowerNewRanking <= 3){
+                        weekly.setBadge(badge[lowerNewRanking-1]);
+                    }else{
+                        weekly.setBadge("NONE");
+                    }
                     weeklyInterviewRepository.save(weekly);
 
-                    //인터뷰 테이블 랭킹 수정
+                    //인터뷰 테이블 뱃지 수정 저장
                     Interview lowInterview = weekly.getInterview();
-                    lowInterview.updateBadge(newRank);
+                    if (lowerNewRanking <= 3){
+                        lowInterview.updateBadge(badge[lowerNewRanking-1]);
+                    }else{
+                        lowInterview.updateBadge("NONE");
+                    }
                     interviewRepository.save(lowInterview);
                 }
                 //스크랩, 인터뷰 삭제(위클리도 삭제됨)

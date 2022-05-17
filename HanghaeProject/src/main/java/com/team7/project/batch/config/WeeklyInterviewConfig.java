@@ -84,8 +84,8 @@ public class WeeklyInterviewConfig {
                 ranking ++;
 
                 //인터뷰 뱃지 골드,실버,브론즈 저장
-                //String[] badge = {"Gold", "Silver", "Bronze"};
-                String[] badge = {"1등", "2등", "3등", "4등", "5등"};
+                String[] badge = {"Gold", "Silver", "Bronze"};
+                String[] rankArr = {"1등", "2등", "3등", "4등", "5등"};
 
                 //현재날짜의 지난주
                 Date currentDate = new Date();
@@ -93,21 +93,29 @@ public class WeeklyInterviewConfig {
                 calendar.setTime(currentDate);
                 String month = String.valueOf(calendar.get(Calendar.MONTH)+1);
                 String week = String.valueOf(calendar.get(Calendar.WEEK_OF_MONTH)-1);  //지난주
-                //String weeklyBadge = month + "월 "+ week + "번째주 " + badge[ranking-1];
-                String weeklyBadge = month + "월 "+ week + "번째주 " + ranking + "등";
+                //String weeklyBadge = month + "월 "+ week + "째주 " + badge[ranking-1];
+                String weeklyBadge = month + "월 "+ week + "째주 " + ranking + "등";
                 System.out.println("weeklyBadge: " + weeklyBadge);
 
                 log.info("weeklyInterviewTop{}: {}", ranking, weeklyInterviewTop3.getInterview().getId());
 
-                BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, badge[ranking-1], weeklyBadge);
-                weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
-                weeklyInterviewRepository.save(weeklyInterviewEach);
+                //BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, rankArr[ranking-1], weeklyBadge);
+                BATCH_WeeklyInterview weeklyInterviewEach;
+                //3등까지만 뱃지(골드,실버,브론즈) 저장
+                if (ranking <= 3){
+                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, badge[ranking-1], weeklyBadge);
+                }else{
+                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterviewTop3, "", weeklyBadge);
+                }
+                    weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
+                    weeklyInterviewRepository.save(weeklyInterviewEach);
 
-                //인터뷰 뱃지 저장
-                Interview interview = weeklyInterviewTop3.getInterview();
-                //interview.updateBadge(badge[ranking-1]);
-                interview.updateBadge(weeklyBadge);
-                interviewRepository.save(interview);
+                //인터뷰 뱃지 저장(1,2,3등만)
+                if (ranking <= 3){
+                    Interview interview = weeklyInterviewTop3.getInterview();
+                    interview.updateBadge(badge[ranking-1]);
+                    interviewRepository.save(interview);
+                }
             }
 
            return RepeatStatus.FINISHED;

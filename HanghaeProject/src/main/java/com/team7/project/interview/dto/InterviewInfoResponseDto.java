@@ -30,6 +30,9 @@ public class InterviewInfoResponseDto {
         private UserInfoResponseDto.UserBody user;
 
         private String badge;
+        private int month;
+        private int week;
+        private int ranking;
         private String note;
         private Boolean scrapsMe;
         private Long scrapsCount;
@@ -44,7 +47,9 @@ public class InterviewInfoResponseDto {
         private String updatedAt;
     }
 
-    public InterviewInfoResponseDto(Interview interview, String videoUrl, String imageUrl, String profileUrl, Boolean isMine, Boolean scrapsMe, Long scrapsCount, Long commentsCount){
+    public InterviewInfoResponseDto(Interview interview, String videoUrl, String imageUrl,
+                                    String profileUrl, Boolean isMine, Boolean scrapsMe,
+                                    Long scrapsCount, Long commentsCount){
         Question question = interview.getQuestion();
         Long questionId = question.getId();
         String questionCategory = question.getCategory().name();
@@ -83,4 +88,52 @@ public class InterviewInfoResponseDto {
                 .updatedAt(interview.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
     }
+
+    public InterviewInfoResponseDto(Interview interview, String videoUrl, String imageUrl,
+                                    String profileUrl, Boolean isMine, Boolean scrapsMe,
+                                    Long scrapsCount, Long commentsCount,
+                                    int month, int week, int ranking){
+        Question question = interview.getQuestion();
+        Long questionId = question.getId();
+        String questionCategory = question.getCategory().name();
+        String questionContents = question.getContents();
+        String questionReference = question.getReference();
+
+        User user = interview.getUser();
+        Long userId = user.getId();
+        String userNickname = user.getNickname();
+        String userGithubLink = user.getGithubLink();
+        String userIntroduce = user.getIntroduce();
+
+        UserInfoResponseDto.UserBody userBody = UserInfoResponseDto.UserBody.builder()
+                .id(userId)
+                .nickname(userNickname)
+                .githubLink(userGithubLink)
+                .profileImageUrl(profileUrl)
+                .introduce(userIntroduce)
+                .build();
+
+        this.interview = Data.builder()
+                .id(interview.getId())
+                .video(videoUrl)
+                .thumbnail(imageUrl)
+                .question(new QuestionResponseDto.data(questionId, questionCategory, questionContents,questionReference))
+                .user(userBody)
+                .badge(interview.getBadge())
+                .month(month)
+                .week(week)
+                .ranking(ranking)
+                .note(interview.getMemo())
+                .scrapsMe(scrapsMe)
+                .scrapsCount(scrapsCount)
+                .commentsCount(commentsCount)
+                .likesCount(0L)
+                .isPublic(interview.getIsPublic())
+                .isMine(isMine)
+                .createdAt(interview.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .updatedAt(interview.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .build();
+    }
+
+
 }
