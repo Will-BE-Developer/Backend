@@ -9,5 +9,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class LikeRequestDto {
     private Long  interviewId;
-    private String time;
+    private int time;
+    private int count;
 }

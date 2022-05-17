@@ -13,5 +13,6 @@ public class LikesResponseDto {
     private Long TopOne;
     private Long Toptwo;
     private Long TopThree;
+    private int totalCount;
     private UserInfoResponseDto userInfoResponseDto;
 }

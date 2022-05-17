@@ -28,9 +28,12 @@ public class LikesService {
     private final InterviewRepository interviewRepository;
 
 
-    public LikesResponseDto addLike(Long videoId, User user, String time){
-
+    public LikesResponseDto addLike(Long videoId, User user, int time, int count){
+        final int INTERVAL = 7;
         Likes likes;
+        int totalCount = 0;
+        int timeSec = time/INTERVAL;
+
         Interview interview = interviewRepository.findById(videoId).orElseThrow(
                 ()-> new RestException(HttpStatus.BAD_REQUEST,"해당 인터뷰를 찾을 수 없습니다.")
         );
@@ -49,15 +52,19 @@ public class LikesService {
             map = likes.getLikesData();
         }
 
-        int timeSec = (Integer.parseInt(time.split(":")[0])*60+Integer.parseInt(time.split(":")[1]))/10;
         log.info("time convet to sec is : {}",timeSec);
         log.info("what is value in {} : {} ",timeSec,map.getOrDefault(timeSec,0));
-        map.put(timeSec,map.getOrDefault(timeSec,0)+1);
+        map.put(timeSec,map.getOrDefault(timeSec,0) + count);
         likes.setLikesData(map);
-
+        log.info("************GET TOTAL COUNT***************");
+        for (int value : likes.getLikesData().values()) {
+            totalCount += value;
+        }
+        log.info("total count is : {}", totalCount);
         log.info("*************GET TOP THREE**************");
         List<Integer> findTopThree = map.entrySet().stream().sorted(Map.Entry.<Integer,Integer>comparingByValue()
                 .reversed()).limit(3).map(Map.Entry::getKey).collect(Collectors.toList());
+
 
         if(findTopThree.size() ==2){
             findTopThree.add(-1);
@@ -65,6 +72,8 @@ public class LikesService {
             findTopThree.add(-1);
             findTopThree.add(-1);
         }
+        log.info("Top Three is : {}",findTopThree);
+
 
         UserInfoResponseDto userInfoResponseDto = UserInfoResponseDto.builder()
                 .user(UserInfoResponseDto.UserBody.builder()
@@ -75,8 +84,12 @@ public class LikesService {
                         .githubLink(user.getGithubLink())
                         .build())
                 .build();
-        LikesResponseDto likesResponseDto = new LikesResponseDto(likes.getLikesData(), Long.valueOf(findTopThree.get(0))
-                , Long.valueOf(findTopThree.get(1)), Long.valueOf(findTopThree.get(2)),userInfoResponseDto);
+        LikesResponseDto likesResponseDto = new LikesResponseDto(likes.getLikesData(),
+                Long.valueOf(findTopThree.get(0))*INTERVAL,
+                Long.valueOf(findTopThree.get(1)) *INTERVAL,
+                Long.valueOf(findTopThree.get(2))*INTERVAL,
+                totalCount,
+                userInfoResponseDto);
        return likesResponseDto;
     }
 

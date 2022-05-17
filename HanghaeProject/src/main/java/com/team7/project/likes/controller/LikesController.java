@@ -21,9 +21,16 @@ public class LikesController {
     private final LikesService likesService;
 
     @PostMapping("/api/likes")
-    public ResponseEntity<LikesResponseDto> AddLikes(@AuthenticationPrincipal User user, @RequestBody LikeRequestDto likeRequestDto){
+    public ResponseEntity<LikesResponseDto> AddLikes(@AuthenticationPrincipal User user,
+                                                     @RequestBody LikeRequestDto likeRequestDto){
+
         log.info("Current user is {}" ,user.getNickname());
-         LikesResponseDto likesResponseDto =  likesService.addLike(likeRequestDto.getInterviewId(),user,likeRequestDto.getTime());
+
+         LikesResponseDto likesResponseDto =  likesService.addLike(
+                 likeRequestDto.getInterviewId(),
+                 user,
+                 likeRequestDto.getTime(),
+                 likeRequestDto.getCount());
          return new ResponseEntity<LikesResponseDto>(likesResponseDto,HttpStatus.OK);
     }
 }
