@@ -89,13 +89,13 @@ public class InterviewPostService {
             throw ErrorMessage.INVALID_INTERVIEW_POST.throwError();
         }
 
-        String convertedObjectkey = interviewConvertService.webmToMp4(interview.getVideoKey());
+        String convertedObjectkey = interviewConvertService.webmToMp4(interview.getVideoKey(), interview.getId());
         log.info(interview.getVideoKey() + " To " + convertedObjectkey);
 
         interview.complete(requestDto.getNote(),
                 requestDto.getIsPublic(),
                 question,
-                convertedObjectkey,
+                interview.getVideoKey().replace(".webm",".mp4"),
                 "re" + interview.getThumbnailKey());
 
         return new InterviewInfoResponseDto(interview,

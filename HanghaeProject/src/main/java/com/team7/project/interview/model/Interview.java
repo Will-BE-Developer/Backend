@@ -43,6 +43,9 @@ public class Interview extends Timestamped {
     @Column(nullable = false)
     private String badge;
 
+    @Column(nullable = true)
+    private Boolean isVideoConverted;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -74,6 +77,7 @@ public class Interview extends Timestamped {
         this.isPublic = false;
         this.isDone = false;
         this.badge = "NONE";
+        this.isVideoConverted = false;
     }
 
     // complete interview
@@ -91,6 +95,12 @@ public class Interview extends Timestamped {
     public Interview update(String memo, Boolean isPublic) {
         this.memo = memo;
         this.isPublic = isPublic;
+        return this;
+    }
+
+    //  convert webm to mp4
+    public Interview convertVideo() {
+        this.isVideoConverted = true;
         return this;
     }
 
