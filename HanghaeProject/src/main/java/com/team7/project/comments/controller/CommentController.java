@@ -1,25 +1,16 @@
 package com.team7.project.comments.controller;
 
-import com.team7.project.advice.RestException;
 import com.team7.project.comments.dto.CommentListDto;
 import com.team7.project.comments.dto.CommentRequestDto;
-import com.team7.project.comments.dto.CommentResponseDto;
 import com.team7.project.comments.model.Comment;
 import com.team7.project.comments.service.CommentService;
 import com.team7.project.user.model.User;
-import com.team7.project.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @RestController
 public class CommentController {

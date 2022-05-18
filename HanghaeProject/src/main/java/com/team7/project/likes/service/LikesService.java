@@ -1,17 +1,15 @@
 package com.team7.project.likes.service;
 
-import com.team7.project.advice.RestException;
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.interview.model.Interview;
 import com.team7.project.interview.repository.InterviewRepository;
 import com.team7.project.likes.dto.LikesResponseDto;
 import com.team7.project.likes.model.Likes;
-//import com.team7.project.likes.model.LikesData;
 import com.team7.project.likes.repository.LikesRepository;
 import com.team7.project.user.dto.UserInfoResponseDto;
 import com.team7.project.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -33,9 +31,10 @@ public class LikesService {
         Likes likes;
         int totalCount = 0;
         int timeSec = time/INTERVAL;
+
         log.info("LIKE ADD REQUEST!!! ::: count : {}, time : {}, videoId : {}",count, time, videoId);
         Interview interview = interviewRepository.findById(videoId).orElseThrow(
-                ()-> new RestException(HttpStatus.BAD_REQUEST,"해당 인터뷰를 찾을 수 없습니다.")
+                ()-> ErrorMessage.NOT_FOUND_INTERVIEW.throwError()
         );
 
 
@@ -64,7 +63,6 @@ public class LikesService {
         log.info("*************GET TOP THREE**************");
         List<Integer> findTopThree = map.entrySet().stream().sorted(Map.Entry.<Integer,Integer>comparingByValue()
                 .reversed()).limit(3).map(Map.Entry::getKey).collect(Collectors.toList());
-
 
         if(findTopThree.size() ==2){
             findTopThree.add(-1);
@@ -100,7 +98,7 @@ public class LikesService {
         LikesResponseDto likesResponseDto;
 
         Interview interview = interviewRepository.findById(videoId).orElseThrow(
-                ()-> new RestException(HttpStatus.BAD_REQUEST,"해당 인터뷰를 찾을 수 없습니다.")
+                ()-> ErrorMessage.NOT_FOUND_INTERVIEW.throwError()
         );
 
         Likes likes = likesRepository.findByInterviewId(videoId);

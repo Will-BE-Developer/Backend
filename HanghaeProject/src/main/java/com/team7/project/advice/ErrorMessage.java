@@ -9,9 +9,11 @@ public enum ErrorMessage {
     INVALID_INTERVIEW_UPDATE(HttpStatus.BAD_REQUEST,"현재 사용자는 해당 인터뷰를 수정 할 수 없습니다."),
     INVALID_INTERVIEW_DELETE(HttpStatus.BAD_REQUEST,"현재 사용자는 해당 인터뷰를 삭제 할 수 없습니다."),
 
-
     INVALID_PAGINATION_SIZE(HttpStatus.BAD_REQUEST,"한 페이지 단위(per)는 0보다 커야 합니다."),
     INVALID_PAGINATION_CATEGORY(HttpStatus.BAD_REQUEST,"잘못된 카테고리를 입력했습니다."),
+
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED,"유효한 토큰이 아닙니다."),
+    INVALID_EMAIL(HttpStatus.BAD_REQUEST,"이메일 인증이 되지 않았습니다."),
 
     UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED,"해당 요청은 로그인이 필요합니다."),
 
@@ -20,13 +22,14 @@ public enum ErrorMessage {
     NOT_FOUND_INTERVIEW(HttpStatus.NOT_FOUND,"해당 인터뷰가 존재하지 않습니다."),
     NOT_FOUND_DRAFT(HttpStatus.NOT_FOUND,"해당 인터뷰의 초안이 존재하지 않습니다."),
     NOT_FOUND_QUESTION(HttpStatus.NOT_FOUND,"해당 면접 질문이 존재하지 않습니다."),
+    NOT_FOUND_PASSWORD(HttpStatus.NOT_FOUND,"비밀번호가 일치하지 않습니다."),
+    USER_AlREADY_FOUND(HttpStatus.BAD_REQUEST, "이미 로그인된 사용자 입니다."),
 
     CONFLICT_SCRAP_POST(HttpStatus.CONFLICT,"이미 스크랩한 게시글 입니다."),
     CONFLICT_SCRAP_DELETE(HttpStatus.CONFLICT,"해당 스크랩 정보가 존재하지 않습니다."),
+    CONFLICT_USER_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일 입니다."),
 
-    INVALID_USER_REQUEST(HttpStatus.BAD_REQUEST, "로그아웃 후에 회원가입을 진행 해 주세요."),
-    PASSWORD_MISSMATCHED(HttpStatus.BAD_REQUEST, "비밀번호와 비밀번호확인이 일치하지 않습니다.");
-
+    PASSWORD_MISMATCHED(HttpStatus.BAD_REQUEST, "비밀번호와 비밀번호확인이 일치하지 않습니다."),
 
     ;
 

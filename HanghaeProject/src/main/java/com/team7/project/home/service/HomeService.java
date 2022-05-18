@@ -1,6 +1,6 @@
 package com.team7.project.home.service;
 
-import com.team7.project.advice.RestException;
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.batch.BATCH_repository.BATCH_TodayQuestionRepository;
 import com.team7.project.batch.BATCH_repository.BATCH_TopCategoriesRepository;
 import com.team7.project.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;
@@ -23,9 +23,7 @@ import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -59,7 +57,7 @@ public class HomeService {
         List<QuestionResponseDto> todaysQuestionsDto = new ArrayList<>();
         for (BATCH_TodayQuestion todayQuestion : todaysQuestions) {
             Question question = questionRepository.findById(todayQuestion.getQuestionId()).orElseThrow(
-                    () -> new RestException(HttpStatus.BAD_REQUEST, "해당 질문이 존재하지 않습니다")
+                    () -> ErrorMessage.NOT_FOUND_QUESTION.throwError()
             );
             QuestionResponseDto n = new QuestionResponseDto(new QuestionResponseDto.data(
                     question.getId(),

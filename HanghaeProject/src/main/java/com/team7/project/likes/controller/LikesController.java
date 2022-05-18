@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import static com.team7.project.advice.ErrorMessage.UNAUTHORIZED_USER;
+
 @Slf4j
 @RequiredArgsConstructor
 @Controller
@@ -23,6 +25,9 @@ public class LikesController {
     public ResponseEntity<LikesResponseDto> AddLikes(@AuthenticationPrincipal User user,
                                                      @RequestBody LikeRequestDto likeRequestDto){
 
+        if(user ==null){
+            throw UNAUTHORIZED_USER.throwError();
+        }
         log.info("Current user is {}" ,user.getNickname());
 
          LikesResponseDto likesResponseDto =  likesService.addLike(

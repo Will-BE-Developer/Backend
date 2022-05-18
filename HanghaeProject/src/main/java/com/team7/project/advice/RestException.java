@@ -16,4 +16,9 @@ public class RestException extends RuntimeException {
         this.httpStatus = httpStatus;
         this.message = message;
     }
+
+    public RestException() {
+        this.httpStatus = null;
+        this.message = null;
+    }
 }

@@ -2,7 +2,6 @@ package com.team7.project.scrap.controller;
 
 
 import com.team7.project.advice.ErrorMessage;
-import com.team7.project.advice.RestException;
 import com.team7.project.scrap.dto.ScrapInfoResponseDto;
 import com.team7.project.scrap.service.ScrapService;
 import com.team7.project.user.model.User;

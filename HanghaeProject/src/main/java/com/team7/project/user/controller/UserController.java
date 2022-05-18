@@ -1,6 +1,7 @@
 package com.team7.project.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.advice.RestException;
 import com.team7.project.advice.Success;
 import com.team7.project.interview.service.InterviewGeneralService;
@@ -11,25 +12,23 @@ import com.team7.project.user.dto.request.LoginRequestDto;
 import com.team7.project.user.dto.request.RegisterRequestDto;
 import com.team7.project.user.model.User;
 import com.team7.project.user.service.registerService.KakaoUserService;
-import com.team7.project.user.service.mypageService.UserMypageService;
 import com.team7.project.user.service.registerService.UserProfileService;
 import com.team7.project.user.service.registerService.UserRegistryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
+
+import static com.team7.project.advice.ErrorMessage.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,7 +38,6 @@ public class UserController {
     private final UserRegistryService userRegistryService;
     private final UserProfileService userProfileService;
     private final KakaoUserService kakaoUserService;
-    private final UserMypageService userMypageService;
     private final MailService mailService;
     private final InterviewGeneralService interviewGeneralService;
 
@@ -49,7 +47,7 @@ public class UserController {
                                                       HttpServletResponse response, Errors errors) {
         //이미 로그인되어 있다면 사용자는 로그인 할 수 없다.
         if(users !=null){
-            throw new RestException(HttpStatus.BAD_REQUEST, "이미 로그인된 사용자 입니다.");
+            throw ErrorMessage.USER_AlREADY_FOUND.throwError();
         }
 
         //requestbody 에서 들어온 에러를 처리한다
@@ -84,7 +82,7 @@ public class UserController {
     public ResponseEntity<UserInfoResponseDto> userSignup(@AuthenticationPrincipal User users, @Valid @RequestBody RegisterRequestDto requestDto, Errors errors) {
         //이미 사용자가 로그인 되어있을 경우 회원가입을 할 수 없다.
         if(users !=null){
-            throw new RestException(HttpStatus.BAD_REQUEST, "로그아웃 후에 회원가입을 진행 해 주세요.");
+            throw ErrorMessage.USER_AlREADY_FOUND.throwError();
         }
         log.info("SIGN_UP() >> 로그인 되지 않은 사용자 입니다. 회원가입을 시행하겠습니다");
         //Request body에서 에러가 나면 에러를 보내준다
@@ -96,12 +94,12 @@ public class UserController {
         log.info("SIGN_UP() >> 이메일 중복검사 시행 중...");
         //중복된 이메일이 존재 한다
         if(userRegistryService.isEmailExist(requestDto.getEmail())){
-            throw new RestException(HttpStatus.BAD_REQUEST, "중복된 이메일이 존재합니다");
+            throw ErrorMessage.CONFLICT_USER_EMAIL.throwError();
         }
         log.info("SIGN_UP() >> 비밀번호와 비밀번호가 일치하는지 확인중...");
         //비밀번호와 비밀번호 확인이 일치
         if (!requestDto.getPassword().equals( requestDto.getPasswordCheck())) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "비밀번호와 비밀번호확인이 일치하지 않습니다.");
+            throw ErrorMessage.PASSWORD_MISMATCHED.throwError();
         } else {
             log.info("SIGN_UP() >> 회원가입 진행중.. ");
             //모든 조건이 충족될경우에 회원가입을 진행한다.
@@ -166,7 +164,7 @@ public class UserController {
         //유저가 로그인 되어있지 않는 경우에는 유저정보를 반환하지 않는다
         log.info("GET_USER_INFO >> 유저 정보를 조회하는 중입니다.");
         if(user ==null){
-            throw new RestException(HttpStatus.BAD_REQUEST, "유저정보가 존재하지 않습니다.");
+            throw UNAUTHORIZED_USER.throwError();
         }
         log.info("GET_USER_INFO >> {}의 유저 정보를 반환 합니다 ",user.getNickname());
         //로그인 된 사용자의 이름과 닉네임을 반환한다.
@@ -185,6 +183,9 @@ public class UserController {
 
     @DeleteMapping("api/users/me")
     public ResponseEntity<Success> deleteUser(@AuthenticationPrincipal User user){
+        if(user ==null){
+            throw UNAUTHORIZED_USER.throwError();
+        }
         log.info("DELETE_USER >> {} 의 유저정보 삭제를 요청합니다. ", user.getNickname());
         User deleting = userProfileService.deleteUser(user);
         log.info("DELETE_USER >> {} 의 유저정보 삭제 처리를 완료 했습니다. 현제 isDeleted: {} ", deleting.getNickname(),deleting.getIsDeleted());
@@ -195,7 +196,7 @@ public class UserController {
     public ResponseEntity<UserInfoResponseDto> kakaoLogin(@AuthenticationPrincipal User users, @RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         //로그인 되는게 확인 될 경우에 에러를 반환한다.
         if(users != null){
-            throw new RestException(HttpStatus.BAD_REQUEST, "로그아웃 후에 회원가입을 진행 해 주세요.");
+            throw ErrorMessage.USER_AlREADY_FOUND.throwError();
         }
         User user =  kakaoUserService.kakaoLogin(code);
 

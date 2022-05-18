@@ -1,9 +1,8 @@
 package com.team7.project.mail.utils;
 
-import com.team7.project.advice.RestException;
+import org.springframework.http.ResponseEntity;
 
-import java.util.Map;
 
 public interface EmailUtils {
-    RestException sendEmail(String toEmail, String token, String nicknmae);
+    ResponseEntity sendEmail(String toEmail, String token, String nicknmae);
 }

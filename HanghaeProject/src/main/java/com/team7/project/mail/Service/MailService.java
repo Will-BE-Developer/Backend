@@ -1,12 +1,12 @@
 package com.team7.project.mail.Service;
 
-import com.team7.project.advice.RestException;
+import com.team7.project.advice.Success;
 import com.team7.project.mail.template.MailTemplate;
 import com.team7.project.mail.utils.EmailUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,10 @@ public class MailService implements EmailUtils{
     private MailTemplate mailTemplate = new MailTemplate();
 
     @Override
-    public RestException sendEmail(String toEmail, String token, String nickname){
-        RestException result = new RestException(null,null);
+    public ResponseEntity<Success> sendEmail(String toEmail, String token, String nickname){
+
+        ResponseEntity<Success> result ;
+
         try{
 
             File f1 = new File("");
@@ -40,15 +42,12 @@ public class MailService implements EmailUtils{
             helper.setText(body,true);
 
             FileDataSource fileDataSource = new FileDataSource("./logo.png");
-
             helper.addInline("logo",fileDataSource);
             sender.send(message);
-            result.setMessage("메일 발송 성공");
-            result.setHttpStatus(HttpStatus.OK);
+            result = new ResponseEntity<Success>(new Success(true, "메일 발송 성공!"),HttpStatus.OK);
         }catch (MessagingException e){
             e.printStackTrace();
-            result.setMessage("메일 발송 실패");
-            result.setHttpStatus(HttpStatus.BAD_REQUEST);
+            result = new ResponseEntity<Success>(new Success(false, "메일 발송 실패!"),HttpStatus.BAD_REQUEST);
         }
 
 

@@ -4,8 +4,6 @@ package com.team7.project.mail.template;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Base64;
-import java.util.UUID;
 
 @Getter
 @NoArgsConstructor

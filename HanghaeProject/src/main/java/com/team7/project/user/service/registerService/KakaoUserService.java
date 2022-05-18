@@ -31,22 +31,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.UUID;
 
-//https://kauth.kakao.com/oauth/authorize?client_id=본인의 REST API키&redirect_uri=http://localhost:8080/user/kakao/callback&response_type=code
 
-
-    @Service
-    @Slf4j
-    @RequiredArgsConstructor
-    public class KakaoUserService {
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class KakaoUserService {
         private final PasswordEncoder passwordEncoder;
         private final UserRepository userRepository;
-        private final InterviewGeneralService interviewGeneralService;
-
-//        @Autowired
-//        public KakaoUserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-//            this.userRepository = userRepository;
-//            this.passwordEncoder = passwordEncoder;
-//        }
 
         public User kakaoLogin(String code) throws JsonProcessingException {
             log.info("Contorller : KAKAO_LOGIN >> 1. 인가코드로 액세스 토큰 요청");
@@ -55,7 +46,6 @@ import java.util.UUID;
             log.info("Contorller : KAKAO_LOGIN >> 2. 액세스 토큰으로 카카오 사용자 정보 가져오기");
             KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
 
-
             log.info("Contorller : KAKAO_LOGIN >> 3. 카카오 사용자 정보로 필요시 회원가입");
             User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo, accessToken);
 
@@ -63,6 +53,7 @@ import java.util.UUID;
             forceLogin(kakaoUser);
             return kakaoUser;
         }
+
         private String getAccessToken(String code) throws JsonProcessingException {
             log.info("Contorller : GET_ACCESS_TOKEN>> 카카오 로그인 엑세스 토큰 발급 중입니다...");
             log.info("Contorller : GET_ACCESS_TOKEN>> 인가코드 : {}",code);
@@ -75,7 +66,6 @@ import java.util.UUID;
             body.add("grant_type", "authorization_code");
             body.add("client_id", "95272555e8189d2f079be8adc9c37e4f");
             body.add("redirect_uri", "https://willbedeveloper.com/user/kakao/callback");
-//            body.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
             body.add("client_secret","oAfSkjWSsZb7DoeYcffn4XDYf8eMmgIr");
             body.add("code", code);
 
@@ -89,7 +79,6 @@ import java.util.UUID;
                     kakaoTokenRequest,
                     String.class
             );
-
 
             log.info("Contorller : GET_ACCESS_TOKEN>> 엑세스 토큰을 파싱중입니다.");
             String responseBody = response.getBody();
@@ -125,7 +114,6 @@ import java.util.UUID;
 
             String email = jsonNode.get("kakao_account")
                     .get("email").asText();
-
             try {
                 nickname = jsonNode.get("properties")
                         .get("nickname").asText();
