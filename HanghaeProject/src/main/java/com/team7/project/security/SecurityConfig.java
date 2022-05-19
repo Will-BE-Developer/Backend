@@ -58,17 +58,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
+                .antMatchers("/home").permitAll()
                 .antMatchers("/signup/**").permitAll()
                 .antMatchers("/signin/**").permitAll()
-                .antMatchers("/h2-console").permitAll()
-                .antMatchers("/user/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/api/**").permitAll()
-                .antMatchers(HttpMethod.GET,"/users/me").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout()
-                .logoutSuccessUrl("/");
+                .logoutUrl("/signout")
+                .logoutSuccessUrl("/home");
     }
 
     @Bean
@@ -77,10 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("http://localhost:8080");
-        configuration.addAllowedOrigin("https://localhost:3000");
         configuration.addAllowedOrigin("https://localhost:8080");
-        configuration.addAllowedOrigin("http://dev.d3rdkt99yi3hok.amplifyapp.com");
-        configuration.addAllowedOrigin("https://dev.d3rdkt99yi3hok.amplifyapp.com");
         configuration.addAllowedOrigin("http://willbedeveloper.com");
         configuration.addAllowedOrigin("https://willbedeveloper.com");
         configuration.addAllowedHeader("*");
