@@ -24,6 +24,7 @@ public class HomeController {
     private final JwtTokenProvider jwtTokenProvider;
     @GetMapping("/api/home")
     public ResponseEntity<HomeResponseDto> home(@AuthenticationPrincipal User users) {
+
         return new ResponseEntity<HomeResponseDto>(new HomeResponseDto(homeService.getLatestInterview(users),homeService.getWeeklyInterview(users),
                 homeService.getTodayQuestion(),homeService.getTopCatetories()), HttpStatus.OK);
     }
