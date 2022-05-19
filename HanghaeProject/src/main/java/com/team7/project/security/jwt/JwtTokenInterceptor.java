@@ -26,7 +26,7 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
             log.info("ACCESS TOKEN: {} >>NULL_POINT_EXCEPTION",accessToken);
             return true;
         }
-        if(accessToken =="undefined"){
+        if(accessToken.equals("undefined")){
             return true;
         }
         if (accessToken != null && !jwtTokenProvider.validateToken(accessToken)) {
