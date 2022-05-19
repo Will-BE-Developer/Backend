@@ -21,6 +21,9 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	//mail service
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -32,8 +35,50 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	//oauth 2.0
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+	implementation 'commons-codec:commons-codec:1.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+	compileOnly 'com.auth0:java-jwt:3.13.0'
+
+	//AWS
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	//batch
+	implementation 'org.springframework.batch:spring-batch-core:4.3.5'
+
+	//apache common langs
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+	//image crop
+	implementation group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
+	implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.17'
+
+	//json-type class
+	implementation 'com.vladmihalcea:hibernate-types-52:2.16.1'
+
+//	//ffmpeg cli wrapper
+//	implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
+//	implementation 'org.bytedeco:ffmpeg:5.0-1.5.7'
+//	implementation 'org.bytedeco:javacpp:1.5.7'
+//	implementation 'org.bytedeco:javacv-platform:1.5.7'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+//github actions 위해 주석처리
+//tasks.named('test') {
+//	useJUnitPlatform()
+//}
+
+//빌드시 plain jar 파일은 만들어지지 않도록
+jar {
+	enabled = false
+}
+
+wrapper {
+	gradleVersion = '7.1.1'
+	distributionUrl = distributionUrl.replace("bin", "all")
 }
