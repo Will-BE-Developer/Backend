@@ -249,7 +249,7 @@ public class InterviewGeneralService {
 
         InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
 
-        scrapRepository.deleteByInterviewId(interviewId);
+        //scrapRepository.deleteByInterviewId(interviewId);
 
         //인터뷰 삭제전 면접왕 뱃지(Gold,Silver,Bronze)가 있으면, 밑에 등수 수정
         if (interview.getBadge().equals("NONE") == false) {
@@ -297,14 +297,15 @@ public class InterviewGeneralService {
                     interviewRepository.save(lowInterview);
                 }
 
-                //스크랩, 인터뷰 삭제(위클리도 삭제됨)
-                //scrapRepository.deleteByInterviewId(interviewId);
-                //interview.makeScrapNullForDelete();
+                //스크랩 삭제
+                scrapRepository.deleteByInterviewId(interviewId);
+                interview.makeScrapNullForDelete();
                 //interviewRepository.deleteById(interviewId);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        //인터뷰 삭제(위클리도 삭제됨)
         interviewRepository.deleteById(interviewId);
         return response;
     }
