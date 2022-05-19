@@ -181,9 +181,11 @@ public class UserMypageService {
 
             //S3로 업로드
             String objectKey = sendToS3(file, userId, oldObjectKey, fileName);
+            os.close();
 
             //업로드 성공시, 서버에 생성한 폴더,파일 삭제
             Path filePath = Paths.get(savedFileNameWithPath);
+            System.out.println("savedFileNameWithPath: "+savedFileNameWithPath);
             Files.delete(filePath);
             Path directoryPath = Paths.get(dir);
             Files.delete(directoryPath);

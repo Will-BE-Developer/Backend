@@ -305,7 +305,7 @@ public class InterviewGeneralService {
                 e.printStackTrace();
             }
         }
-        //인터뷰 삭제(위클리도 삭제됨)
+        //인터뷰 삭제(면접왕이면 위클리도 삭제됨)
         interviewRepository.deleteById(interviewId);
         return response;
     }
