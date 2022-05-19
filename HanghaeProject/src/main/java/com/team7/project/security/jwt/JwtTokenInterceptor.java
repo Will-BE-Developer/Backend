@@ -17,13 +17,13 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object Handler) throws IOException{
         System.out.println("JwtToken 호출");
         String accessToken = request.getHeader("Authorization");
-        if(accessToken != null && jwtTokenProvider.validateToken(accessToken)){
-            return true;
+        if(accessToken != null && !jwtTokenProvider.validateToken(accessToken)) {
+            response.setStatus(401);
+            response.setHeader("Authorization", accessToken);
+            response.setHeader("msg", "Token is not valid. Server block the request");
+            return false;
         }
 
-        response.setStatus(401);
-        response.setHeader("Authorization",accessToken);
-        response.setHeader("msg","Token is not valid. Server block the request");
-        return false;
+        return true;
     }
 }
