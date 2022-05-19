@@ -23,7 +23,7 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
 
         response.setStatus(401);
         response.setHeader("Authorization",accessToken);
-        response.setHeader("msg","Token is not valid");
+        response.setHeader("msg","Token is not valid. Server block the request");
         return false;
     }
 }

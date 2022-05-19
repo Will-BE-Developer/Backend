@@ -25,11 +25,6 @@ public class HomeController {
     @GetMapping("/api/home")
     public ResponseEntity<HomeResponseDto> home(HttpServletRequest request, @AuthenticationPrincipal User users) {
 
-        String accessToken = request.getHeader("Authorization");
-        if(accessToken != null && !jwtTokenProvider.validateToken(accessToken)){
-            throw ErrorMessage.INVALID_TOKEN.throwError();
-        }
-
         return new ResponseEntity<HomeResponseDto>(new HomeResponseDto(homeService.getLatestInterview(users),homeService.getWeeklyInterview(users),
                 homeService.getTodayQuestion(),homeService.getTopCatetories()), HttpStatus.OK);
     }
