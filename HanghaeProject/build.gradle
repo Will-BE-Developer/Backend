@@ -68,6 +68,17 @@ dependencies {
 //	implementation 'org.bytedeco:javacv-platform:1.5.7'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+//github actions 위해 주석처리
+//tasks.named('test') {
+//	useJUnitPlatform()
+//}
+
+//빌드시 plain jar 파일은 만들어지지 않도록
+jar {
+	enabled = false
+}
+
+wrapper {
+	gradleVersion = '7.1.1'
+	distributionUrl = distributionUrl.replace("bin", "all")
 }
