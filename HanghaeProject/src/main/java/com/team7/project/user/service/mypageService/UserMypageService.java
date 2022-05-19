@@ -106,6 +106,7 @@ public class UserMypageService {
 
             byte[] imageByte = out.toByteArray();
             out.close();
+            Files.deleteIfExists(Paths.get(getFile.getPath()));
             MultipartFile multipartFile = new ConvertToMultipartFile(imageByte, "CROP", requestDto.getProfileImage().getOriginalFilename(), requestDto.getProfileImage().getContentType(), imageByte.length);
 
             String oldObjectKey = user.getProfileImageUrl();
@@ -185,7 +186,6 @@ public class UserMypageService {
 
             //업로드 성공시, 서버에 생성한 폴더,파일 삭제
             Path filePath = Paths.get(savedFileNameWithPath);
-            System.out.println("savedFileNameWithPath: "+savedFileNameWithPath);
             Files.delete(filePath);
             Path directoryPath = Paths.get(dir);
             Files.delete(directoryPath);
