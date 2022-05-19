@@ -34,7 +34,7 @@ public class InterviewPostService {
     private final InterviewRepository interviewRepository;
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
-    private final InterviewConvertService interviewConvertService;
+//    private final InterviewConvertService interviewConvertService;
 
     private static final long ONE_HOUR = 1000 * 60 * 60; // 1시간
     private final AmazonS3Client amazonS3Client;
@@ -74,35 +74,35 @@ public class InterviewPostService {
 
         return interview;
     }
-
-    @Transactional
-    public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) throws IOException {
-
-        Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_DRAFT::throwError);
-
-        Question question = questionRepository.findById(requestDto.getQuestionId())
-                .orElseThrow(ErrorMessage.NOT_FOUND_QUESTION::throwError);
-
-
-        if (interview.getUser().getId() != loginUserId) {
-            throw ErrorMessage.INVALID_INTERVIEW_POST.throwError();
-        }
-
-        String convertedObjectkey = interviewConvertService.webmToMp4(interview.getVideoKey(), interview.getId());
-        log.info(interview.getVideoKey() + " To " + convertedObjectkey);
-
-        interview.complete(requestDto.getNote(),
-                requestDto.getIsPublic(),
-                question,
-                interview.getVideoKey().replace(".webm",".mp4"),
-                "re" + interview.getThumbnailKey());
-
-        return new InterviewInfoResponseDto(interview,
-                interviewGeneralService.generatePresignedUrl(interview.getVideoKey()),
-                interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()),
-                interviewGeneralService.generateProfileImageUrl(interview.getUser().getProfileImageUrl()),
-                true, false, 0L, 0L);
-    }
+//
+//    @Transactional
+//    public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) throws IOException {
+//
+//        Interview interview = interviewRepository.findById(interviewId)
+//                .orElseThrow(ErrorMessage.NOT_FOUND_DRAFT::throwError);
+//
+//        Question question = questionRepository.findById(requestDto.getQuestionId())
+//                .orElseThrow(ErrorMessage.NOT_FOUND_QUESTION::throwError);
+//
+//
+//        if (interview.getUser().getId() != loginUserId) {
+//            throw ErrorMessage.INVALID_INTERVIEW_POST.throwError();
+//        }
+//
+//        String convertedObjectkey = interviewConvertService.webmToMp4(interview.getVideoKey(), interview.getId());
+//        log.info(interview.getVideoKey() + " To " + convertedObjectkey);
+//
+//        interview.complete(requestDto.getNote(),
+//                requestDto.getIsPublic(),
+//                question,
+//                interview.getVideoKey().replace(".webm",".mp4"),
+//                "re" + interview.getThumbnailKey());
+//
+//        return new InterviewInfoResponseDto(interview,
+//                interviewGeneralService.generatePresignedUrl(interview.getVideoKey()),
+//                interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()),
+//                interviewGeneralService.generateProfileImageUrl(interview.getUser().getProfileImageUrl()),
+//                true, false, 0L, 0L);
+//    }
 
 }
