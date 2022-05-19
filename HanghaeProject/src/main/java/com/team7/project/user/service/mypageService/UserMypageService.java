@@ -106,11 +106,13 @@ public class UserMypageService {
 
             byte[] imageByte = out.toByteArray();
             out.close();
+            Files.deleteIfExists(Paths.get(getFile.getPath()));
             MultipartFile multipartFile = new ConvertToMultipartFile(imageByte, "CROP", requestDto.getProfileImage().getOriginalFilename(), requestDto.getProfileImage().getContentType(), imageByte.length);
 
             String oldObjectKey = user.getProfileImageUrl();
             profileImageUrl = saveFile(multipartFile, user.getId(), oldObjectKey);
             //profileImageUrl = saveFile(requestDto.getProfileImage(), user.getId());
+
         }
 
         user.updateInfo(requestDto.getNickname(), requestDto.getGithubLink(),
