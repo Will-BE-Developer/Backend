@@ -18,8 +18,6 @@ import java.util.List;
 public class CommentListDto {
     private List<ResponseComment> comments = new ArrayList<>();
 
-    //private Page pagination;
-
     int totalComments;
 
     public void addComment(Comment comment, Boolean isMine, String profileUrl){

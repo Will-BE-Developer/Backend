@@ -5,6 +5,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.interview.service.InterviewGeneralService;
 import com.team7.project.user.dto.UserInfoResponseDto;
 import com.team7.project.user.dto.UserRequestDto;
@@ -58,8 +59,7 @@ public class UserMypageService {
         String profileImageUrl = null;
 
         userRepository.findById(user.getId()).orElseThrow(
-                () -> new IllegalArgumentException("없는 사용자입니다.")
-        );
+                () -> ErrorMessage.NOT_FOUND_USER.throwError());
 
         //닉네임을 입력 안했으면, 랜덤 닉네임 저장
         if(isStringEmpty(requestDto.getNickname())){
@@ -160,15 +160,14 @@ public class UserMypageService {
         Boolean isImage = profileImage.getContentType().split("/")[0].equals("image");
         Boolean isGif = profileImage.getContentType().equals("image/gif");
         if ((isImage == false) || (isGif == true)) {
-            log.info("isImageFile() >> 프로필 이미지는 png, jpg, bmp, webp 확장자만 가능합니다.");
-            throw new IllegalArgumentException("프로필 이미지는 png, jpg, bmp, webp 확장자만 가능합니다.");
+            ErrorMessage.INVALID_IMAGE_FILE.throwError();
         }
     }
 
     private String saveFile(MultipartFile multipartFile, Long userId, String oldObjectKey) throws IOException {
 
-        //임시 폴더 생성(지정된 폴더가 없을때만 폴더 생성으로 변경?)
-        String dir = Files.createTempDirectory("tempDir").toFile().getAbsolutePath();//EC2 경로 테스트
+        //임시 폴더 생성
+        String dir = Files.createTempDirectory("tempDir").toFile().getAbsolutePath();
 
         File file = new File(dir + File.separator + multipartFile.getOriginalFilename());
 
@@ -195,7 +194,7 @@ public class UserMypageService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Unable to save file", e);
+            throw ErrorMessage.UNABLE_UPLOAD_TO_S3.throwError();
         }
     }
 

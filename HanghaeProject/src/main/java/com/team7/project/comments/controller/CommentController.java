@@ -38,8 +38,6 @@ public class CommentController {
                                       @AuthenticationPrincipal User user) {
 
         Comment comment = commentService.saveComment(requestDto, user);
-        // 기존 response
-        //CommentResponseDto responseDto = new CommentResponseDto(comment, true);
 
         // 댓글 리스트 response
         int page = commentService.getCurrentCommentPage(comment, "save");
