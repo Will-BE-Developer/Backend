@@ -58,6 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
+                .antMatchers("/").permitAll()
                 .antMatchers("/home").permitAll()
                 .antMatchers("/signup/**").permitAll()
                 .antMatchers("/signin/**").permitAll()
@@ -66,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/signout")
-                .logoutSuccessUrl("/home");
+                .logoutSuccessUrl("/");
     }
 
     @Bean
