@@ -58,15 +58,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
                 .antMatchers("/home").permitAll()
                 .antMatchers("/signup/**").permitAll()
                 .antMatchers("/signin/**").permitAll()
+                .antMatchers("/user/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/api/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout()
-                .logoutUrl("/signout")
                 .logoutSuccessUrl("/");
     }
 
