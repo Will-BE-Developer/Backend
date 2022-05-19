@@ -6,7 +6,7 @@ public enum CategoryEnum {
     General,
     Database,
     Network,
-    DataStructure,
+    Python,
     Algorithm,
     Spring,
     React,

@@ -112,6 +112,7 @@ public class UserMypageService {
             String oldObjectKey = user.getProfileImageUrl();
             profileImageUrl = saveFile(multipartFile, user.getId(), oldObjectKey);
             //profileImageUrl = saveFile(requestDto.getProfileImage(), user.getId());
+
         }
 
         user.updateInfo(requestDto.getNickname(), requestDto.getGithubLink(),
