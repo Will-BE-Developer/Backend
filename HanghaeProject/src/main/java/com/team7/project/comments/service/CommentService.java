@@ -1,5 +1,6 @@
 package com.team7.project.comments.service;
 
+import com.team7.project.advice.ErrorMessage;
 import com.team7.project.advice.RestException;
 import com.team7.project.comments.dto.CommentListDto;
 import com.team7.project.comments.dto.CommentRequestDto;
@@ -38,7 +39,7 @@ public class CommentService {
     //1개 인터뷰의 댓글 리스트 조회(댓글+대댓글)
     public CommentListDto makeCommentList(Long interviewId, User user, int per, int page){
         if (per < 1) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
+            throw ErrorMessage.INVALID_PAGINATION_SIZE.throwError();
         }
         // note that pageable start with 0
         Pageable pageable = PageRequest.of(page-1, per, Sort.by("createdAt").descending());
@@ -128,22 +129,20 @@ public class CommentService {
     public Comment saveComment(CommentRequestDto requestDto, User user) {
 
         userRepository.findById(user.getId()).orElseThrow(
-                () -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다."));
+                () -> ErrorMessage.NOT_FOUND_USER.throwError());
 
         //rootname이 인터뷰면, interview repo에서 rootId(=interview id)로 interview를 찾고, 없으면 에러
         //rootname이 댓글이면, comment repo에서 rootId(=comment id)로 comment를 찾고, 없으면 에러, 그 코멘트의 인터뷰를 get
         Comment comment = new Comment();
         if (requestDto.getRootName().equals("interview")){
             Interview interview = interviewRepository.findById(requestDto.getRootId()).orElseThrow(
-                    () -> new IllegalArgumentException("해당 인터뷰는 존재하지 않습니다.")
-            );
+                    () -> ErrorMessage.NOT_FOUND_INTERVIEW.throwError());
             System.out.println("댓글 작성한 인터뷰 ID: " + interview.getId());
             comment = new Comment(requestDto, user, interview);
             commentRepository.save(comment);
         }else if(requestDto.getRootName().equals("comment")){
             Comment rootComment = commentRepository.findById(requestDto.getRootId()).orElseThrow(
-                    () -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다.")
-            );
+                    () -> ErrorMessage.NOT_FOUND_COMMENT.throwError());
             Interview interview = rootComment.getInterview();
             comment = new Comment(requestDto, user, interview);
             commentRepository.save(comment);
@@ -154,12 +153,11 @@ public class CommentService {
     @Transactional
     public Comment editComment(Long commentId, CommentRequestDto requestDto, User user) {
         userRepository.findById(user.getId()).orElseThrow(
-                () -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다."));
+                () -> ErrorMessage.NOT_FOUND_USER.throwError());
 
         //수정하려는 댓글 id가 존재하는지
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다.")
-        );
+                () -> ErrorMessage.NOT_FOUND_COMMENT.throwError());
 
         //기존에 rootName과 일치하는지
         if (comment.getRootName().equals(requestDto.getRootName())){
@@ -168,10 +166,10 @@ public class CommentService {
                 //수정 실시
                 comment.update(requestDto);
             }else{
-                throw new RestException(HttpStatus.BAD_REQUEST, "rootId가 일치하지 않습니다.");
+                throw ErrorMessage.INVALID_ROOT_ID.throwError();
             }
         }else{
-            throw new RestException(HttpStatus.BAD_REQUEST, "rootName이 일치하지 않습니다.");
+            throw ErrorMessage.INVALID_ROOT_NAME.throwError();
         }
 
         return comment;
@@ -180,13 +178,11 @@ public class CommentService {
     @Transactional
     public Comment deleteComment(Long commentId, User user) {
         userRepository.findById(user.getId()).orElseThrow(
-                () -> new IllegalArgumentException("해당 사용자는 존재하지 않습니다.")
-        );
+                () -> ErrorMessage.NOT_FOUND_USER.throwError());
 
         //삭제 전 response를 위해 조회
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new IllegalArgumentException("해당 댓글은 존재하지 않습니다.")
-        );
+                () -> ErrorMessage.NOT_FOUND_COMMENT.throwError());
         //부모댓글이면 자식댓글도 삭제
         if (comment.getRootName().equals("interview")){
             List<Comment> childCommentList = commentRepository.findByRootIdAndRootName(comment.getId(), "comment");

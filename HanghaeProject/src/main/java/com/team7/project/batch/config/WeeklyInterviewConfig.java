@@ -67,7 +67,6 @@ public class WeeklyInterviewConfig {
             }
 
             //이번주 면접왕 인터뷰 선정 + (추후 추가: 좋아요 숫자, 동점은 인터뷰 최신순)
-            //List<Interview> weeklyInterview = interviewRepository.findWeeklyInterview(PageRequest.of(0,3));
             List<BATCH_WeeklyInterview> weeklyInterviews = batch_weeklyInterviewRepository.findWeeklyInterview(PageRequest.of(0,5));
             log.info("weeklyInterview top 5: {}", weeklyInterviews);
 
@@ -90,7 +89,6 @@ public class WeeklyInterviewConfig {
                 calendar.setTime(currentDate);
                 String month = String.valueOf(calendar.get(Calendar.MONTH)+1);
                 String week = String.valueOf(calendar.get(Calendar.WEEK_OF_MONTH)-1);  //지난주
-                //String weeklyBadge = month + "월 "+ week + "째주 " + badge[ranking-1];
                 String weeklyBadge = month + "월 "+ week + "째주 " + ranking + "등";
                 System.out.println("weeklyBadge: " + weeklyBadge);
 
