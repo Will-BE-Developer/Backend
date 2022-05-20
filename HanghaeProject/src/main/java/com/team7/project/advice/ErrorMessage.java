@@ -35,7 +35,9 @@ public enum ErrorMessage {
     INVALID_ROOT_ID(HttpStatus.BAD_REQUEST, "수정하려는 댓글의 RootId가 일치하지 않습니다."),
     INVALID_ROOT_NAME(HttpStatus.BAD_REQUEST, "수정하려는 댓글의 RootName이 일치하지 않습니다."),
     INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST, "프로필 이미지는 png, jpg, bmp, webp 확장자만 가능합니다."),
-    UNABLE_UPLOAD_TO_S3(HttpStatus.SERVICE_UNAVAILABLE, "프로필 이미지 업로드가 실패하였습니다."),
+    UNABLE_UPLOAD_TO_S3(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 업로드가 실패하였습니다."),
+    UNABLE_SAVE_PROFILE_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 저장 또는 업로드가 실패하였습니다."),
+    FAIL_DELETE_INTERVIEW(HttpStatus.INTERNAL_SERVER_ERROR, "면접왕인 인터뷰 삭제가 실패하였습니다."),
     ;
 
     private final RestException exception;

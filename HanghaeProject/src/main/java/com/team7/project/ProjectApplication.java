@@ -3,7 +3,6 @@ package com.team7.project;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -16,7 +15,6 @@ import java.util.TimeZone;
 @EnableScheduling
 @EnableJpaAuditing
 @SpringBootApplication
-//@EnableAspectJAutoProxy(proxyTargetClass = true)  //NoSuchMethodException: com.sun.proxy
 public class ProjectApplication {
 	static {
 		//amazon EC2가 아닌 환경(로컬)에서 테스트시 Failed to connect to service endpoint 에러 방지용

@@ -35,12 +35,12 @@ public class WeeklyInterviewScheduler {
 
         try {
             jobLauncher.run(weeklyInterviewJob, jobParameters);
-            log.info("weeklyInterviewJob 배치 실행됨: " + Calendar.getInstance().getTime());
+            log.info("weekly Interview 배치 스케쥴러 실행됨 >> Time: {}", Calendar.getInstance().getTime());
         } catch (JobExecutionAlreadyRunningException |
                 JobInstanceAlreadyCompleteException |
                 JobParametersInvalidException |
                 JobRestartException e) {
-            log.error(e.getMessage());
+            log.error("weekly Interview 배치 스케쥴러 실패됨 >> Time: {} Error: {}", Calendar.getInstance().getTime(), e.getMessage());
         }
     }
 }

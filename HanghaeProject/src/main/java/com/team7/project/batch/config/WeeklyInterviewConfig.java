@@ -56,7 +56,6 @@ public class WeeklyInterviewConfig {
     @Transactional
     public Tasklet weeklyInterviewTasklet() {
         return (contribution, chunkContext) -> {
-            System.out.println("weeklyInterviewTasklet is started.");
 
             //기존 인터뷰 뱃지 삭제
             List<BATCH_WeeklyInterview> lastWeeklyInterview = batch_weeklyInterviewRepository.findAll();
@@ -68,7 +67,7 @@ public class WeeklyInterviewConfig {
 
             //이번주 면접왕 인터뷰 선정 + (추후 추가: 좋아요 숫자, 동점은 인터뷰 최신순)
             List<BATCH_WeeklyInterview> weeklyInterviews = batch_weeklyInterviewRepository.findWeeklyInterview(PageRequest.of(0,5));
-            log.info("weeklyInterview top 5: {}", weeklyInterviews);
+            log.info("weeklyInterview top 5 >> {}등까지 추출됨", weeklyInterviews.size());
 
             //기존 위클리 면접왕 삭제
             batch_weeklyInterviewRepository.deleteAll();
@@ -90,12 +89,10 @@ public class WeeklyInterviewConfig {
                 String month = String.valueOf(calendar.get(Calendar.MONTH)+1);
                 String week = String.valueOf(calendar.get(Calendar.WEEK_OF_MONTH)-1);  //지난주
                 String weeklyBadge = month + "월 "+ week + "째주 " + ranking + "등";
-                System.out.println("weeklyBadge: " + weeklyBadge);
+                log.info("New Weekly Interview >> {} (InterviewId: {})", weeklyBadge, weeklyInterview.getInterview().getId());
 
-                log.info("weeklyInterviewTop{}: {}", ranking, weeklyInterview.getInterview().getId());
-
-                BATCH_WeeklyInterview weeklyInterviewEach;
                 //3등까지만 뱃지(골드,실버,브론즈) 저장
+                BATCH_WeeklyInterview weeklyInterviewEach;
                 if (ranking <= 3){
                     weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, badge[ranking-1], weeklyBadge);
                 }else{
