@@ -8,7 +8,7 @@ import org.springframework.batch.core.JobExecutionListener;
 @Slf4j
 public class JobListener implements JobExecutionListener {
 
-    private static String BEFORE_MESSAGE = "{} job 이 실행됩니다.";
+    private static String BEFORE_MESSAGE = "{} job이 실행됩니다.";
 
     private static String AFTER_MESSAGE = "{} job이 끝났습니다. (상태: {})";
 
@@ -24,8 +24,7 @@ public class JobListener implements JobExecutionListener {
                 jobExecution.getStatus());
 
         if (jobExecution.getStatus() == BatchStatus.FAILED) {
-
-            log.info("주간 면접왕 배치 작업이 실패 되었습니다.");
+            log.error("주간 면접왕 배치 작업이 실패되었습니다.");
         }
     }
 }

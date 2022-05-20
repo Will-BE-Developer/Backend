@@ -8,7 +8,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.team7.project._global.pagination.dto.PaginationResponseDto;
 import com.team7.project.advice.ErrorMessage;
 import com.team7.project.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;
@@ -24,6 +23,7 @@ import com.team7.project.scrap.repository.ScrapRepository;
 import com.team7.project.user.model.User;
 import com.team7.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.URL;
 import java.util.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
-//@Transactional(readOnly = true)
 @Transactional
 public class InterviewGeneralService {
     private final InterviewRepository interviewRepository;
@@ -44,11 +44,11 @@ public class InterviewGeneralService {
     private final BATCH_WeeklyInterviewRepository weeklyInterviewRepository;
     private final ScrapRepository scrapRepository;
 
-    private static final long ONE_HOUR = 1000 * 60 * 60; // 1시간
+    private static final long ONE_HOUR = 1000 * 60 * 60; //1시간
     private final AmazonS3Client amazonS3Client;
 
     @Value("${cloud.aws.s3.bucket}")
-    public String bucket;  // S3 버킷 이름
+    public String bucket;
 
     @Value("${cloud.aws.credentials.access-key-upload}")
     private String accessKey;
@@ -276,7 +276,7 @@ public class InterviewGeneralService {
                     //새로운 등수 부여
                     int lowerNewRanking = lowerRanking - 1;
                     String newWeeklyRank = weeklyBadge.substring(0, 7) + (lowerRanking - 1) + "등";
-                    System.out.println("기존 랭킹: " + lowerWeeklyRank + ", 수정된 랭킹: " + newWeeklyRank);
+                    log.info("기존 랭킹: {}, 수정된 랭킹: {}", lowerWeeklyRank, newWeeklyRank);
 
                     //위클리 테이블 랭링 수정 저장
                     weekly.setWeeklyBadge(newWeeklyRank);
@@ -300,9 +300,9 @@ public class InterviewGeneralService {
                 //스크랩 삭제
                 scrapRepository.deleteByInterviewId(interviewId);
                 interview.makeScrapNullForDelete();
-                //interviewRepository.deleteById(interviewId);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("인터뷰(면접왕) ID {}번 삭제 에러", interviewId, e);
+                throw ErrorMessage.FAIL_DELETE_INTERVIEW.throwError();
             }
         }
         //인터뷰 삭제(면접왕이면 위클리도 삭제됨)

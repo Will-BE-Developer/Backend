@@ -1,7 +1,6 @@
 package com.team7.project.comments.service;
 
 import com.team7.project.advice.ErrorMessage;
-import com.team7.project.advice.RestException;
 import com.team7.project.comments.dto.CommentListDto;
 import com.team7.project.comments.dto.CommentRequestDto;
 import com.team7.project.comments.model.Comment;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -44,7 +42,7 @@ public class CommentService {
         // note that pageable start with 0
         Pageable pageable = PageRequest.of(page-1, per, Sort.by("createdAt").descending());
 
-        //로그인 안했으면 isMine null
+        //로그인 안했으면
         Boolean isMine = null;
 
         CommentListDto commentListDto = new CommentListDto();
@@ -72,7 +70,7 @@ public class CommentService {
             List<Comment> result = commentList.stream()
                     .filter(a -> Objects.equals(a.getId(), itsParentId))
                     .collect(Collectors.toList());
-            System.out.println("부모 댓글 조회: " + result);
+            log.info("부모 댓글 조회 : {}", result);
 
             if (user != null) {
                 isMine = user.getId().equals(eachChild.getUser().getId());
@@ -82,10 +80,9 @@ public class CommentService {
             for (CommentListDto.ResponseComment parentComment: commentListInDto){
                 if (parentComment.getId().equals(itsParentId)){
                     int index = commentListDto.getComments().indexOf(parentComment);
-                    System.out.println("대댓글을 포함시킬 부모댓글의 index: " + index);
+                    log.info("대댓글을 포함시킬 부모댓글의 index : {}", index);
                     String childProfileUrl = interviewGeneralService.generateProfileImageUrl(eachChild.getUser().getProfileImageUrl());
                     commentListDto.addNestedComment(index, eachChild, isMine, childProfileUrl);
-                    System.out.println("eachCommentDto: "+ eachChild.getUser().getProfileImageUrl());
                 }
             }
         }
@@ -137,7 +134,8 @@ public class CommentService {
         if (requestDto.getRootName().equals("interview")){
             Interview interview = interviewRepository.findById(requestDto.getRootId()).orElseThrow(
                     () -> ErrorMessage.NOT_FOUND_INTERVIEW.throwError());
-            System.out.println("댓글 작성한 인터뷰 ID: " + interview.getId());
+            log.info("댓글 작성한 인터뷰 ID : {}", interview.getId());
+
             comment = new Comment(requestDto, user, interview);
             commentRepository.save(comment);
         }else if(requestDto.getRootName().equals("comment")){
@@ -191,12 +189,12 @@ public class CommentService {
             }
         }
         commentRepository.deleteById(comment.getId());
-        System.out.println(commentId + "번 댓글이 삭제 되었습니다");
+        log.info("{}번 댓글이 삭제 되었습니다", commentId);
 
         return comment;
     }
 
-    // 작성/수정/삭제한 댓글의 댓글 목록을 response 하기 위한 페이지 넘버 찾기
+    // 작성/수정/삭제한 댓글의 댓글 목록을 response 하기 위한 페이지 번호 찾기
     // 작성한 댓글 ID를 불러오고, 그 ID의 인터뷰ID와 댓글 page번호를 알아내서, 그 댓글 페이지 조회
     public int getCurrentCommentPage(Comment comment, String type){
         int page = 1;
@@ -204,14 +202,17 @@ public class CommentService {
         //(신규 작성일때만)comment가 댓글이면, 최신순이므로 1page로
         if (comment.getRootName().equals("interview") && type.equals("save")){
             page = 1;
+        //수정/삭제한 댓글, 등록/수정/삭제한 대댓글의 페이지를 알아내기 위해
         }else{
-            //comment가 대댓글이면 부모댓글의 page로(인터뷰 총 댓글수->)
+            //comment가 대댓글이면 부모댓글의 페이지로
             //댓글(수정,삭제)이면 그 댓글의 원래 페이지로
             Long interviewId = comment.getInterview().getId();
             int commentIdNeedToKnowPage = 0;
-            if(comment.getRootName().equals("interview")){ //댓글(수정,삭제)
+            //수정/삭제한 댓글의 ID
+            if(comment.getRootName().equals("interview")){ 
                 commentIdNeedToKnowPage = Math.toIntExact(comment.getId());
-            }else{ //대댓글
+            //등록/수정/삭제한 대댓글의 부모댓글 ID
+            }else{ 
                 commentIdNeedToKnowPage = Math.toIntExact(comment.getRootId());
             }
             int totalComment = commentRepository.countByInterview_IdAndRootName(interviewId,"interview"); //대댓글 제외
@@ -219,19 +220,21 @@ public class CommentService {
             int totalPage = totalComment/per + 1;
             List<List<Integer>> list = new ArrayList<>();
 
+            //전체 페이지를 돌면서 그 안에
             for (int i = 1; i <= totalPage; i++){
+                //각 페이지에서 부모댓글 리스트를 뽑고
                 Pageable pageable = PageRequest.of(i-1, per, Sort.by("createdAt").descending());
                 List<Integer> thisPageRootCommentIds = commentRepository.rootCommentIdPerPage(interviewId, pageable);
-                System.out.println("i: " + i + ", thisPageRootCommentIds: " + thisPageRootCommentIds);
+                log.info("댓글 페이지번호: {}, 이 페이지의 부모댓글 리스트: {}", i, thisPageRootCommentIds);
                 list.add(thisPageRootCommentIds);
+                //이 페이지 부모댓글 리스트에 찾으려는 댓글ID가 있으면
                 if (thisPageRootCommentIds.contains(commentIdNeedToKnowPage)){
-                    System.out.println("contains i: " + i);
                     page = i;
                 }
             }
-            System.out.println("페이지별 부모댓글 목록: " + list);
+            log.info("페이지별 부모댓글 목록 : {}", list);
         }
-        System.out.println("등록/수정/삭제한 대댓글의 페이지: " + page);
+        log.info("등록/수정/삭제한 대댓글의 페이지 : {}", page);
         return page;
     }
 }

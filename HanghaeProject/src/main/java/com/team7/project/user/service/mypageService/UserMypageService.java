@@ -118,7 +118,7 @@ public class UserMypageService {
         user.updateInfo(requestDto.getNickname(), requestDto.getGithubLink(),
                         requestDto.getIntroduce(), profileImageUrl);
 
-        System.out.println("user.getProfileImageUrl():"+ user.getProfileImageUrl());
+        log.info("user.getProfileImageUrl() : {}", user.getProfileImageUrl());
 
         userRepository.save(user);
 
@@ -173,7 +173,7 @@ public class UserMypageService {
 
         String fileName = file.getName();
         String savedFileNameWithPath = String.valueOf(file.getCanonicalFile());
-        System.out.println("저장될 파일의 경로 포함 파일명: " + savedFileNameWithPath);
+        log.info("저장될 파일의 경로 포함 파일명: {}", savedFileNameWithPath);
 
         //MultipatrFile클래스의 getBytes()로 multipartFile의 데이터를 바이트배열로 추출한 후, FileOutputStream클래스의 write()로 파일을 저장
         try (OutputStream os = new FileOutputStream(file)) {
@@ -191,10 +191,9 @@ public class UserMypageService {
             Files.delete(directoryPath);
 
             return objectKey;
-
         } catch (Exception e) {
-            e.printStackTrace();
-            throw ErrorMessage.UNABLE_UPLOAD_TO_S3.throwError();
+            log.error("saveFile() >> 프로필 이미지 수정 에러(userId: {}, fileName: {})", userId, fileName);
+            throw ErrorMessage.UNABLE_SAVE_PROFILE_IMAGE.throwError();
         }
     }
 
@@ -221,11 +220,11 @@ public class UserMypageService {
             //S3에서 기존 프로필 이미지 삭제
             if (oldObjectKey != null){
                 s3Client.deleteObject(bucket, oldObjectKey);
+                log.error("S3에서 기존 프로필 이미지 삭제 에러(userId: {}, 기존 objectKey: {})", userId, oldObjectKey);
             }
-
-            log.info("OBJECT KEY " + objectKey + " CREATED IN BUCKET " + bucket);
+            log.info("OBJECT KEY : {}, CREATED IN BUCKET : {}", objectKey, bucket);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw ErrorMessage.UNABLE_UPLOAD_TO_S3.throwError();
         }
         return objectKey;
     }
