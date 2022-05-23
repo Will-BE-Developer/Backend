@@ -4,8 +4,8 @@ plugins {
 	id 'java'
 }
 
-group = 'com.team7'
-version = '0.0.1-SNAPSHOT'
+group = 'com.sparta'
+version = '1.0.0'
 sourceCompatibility = '1.8'
 
 configurations {
