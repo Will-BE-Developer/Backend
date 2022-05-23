@@ -63,8 +63,10 @@ public class Interview extends Timestamped {
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Comment> comments = new ArrayList<>();
 
-    @OneToOne(mappedBy = "interview", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    BATCH_WeeklyInterview weeklyInterviews ;
+    //@OneToOne(mappedBy = "interview", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    //BATCH_WeeklyInterview weeklyInterviews ;
+    @OneToMany(mappedBy = "interview", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    List<BATCH_WeeklyInterview> weeklyInterviews = new ArrayList<>();
 
     @OneToOne(cascade=CascadeType.ALL, mappedBy = "interview",orphanRemoval = true)
     @JoinColumn

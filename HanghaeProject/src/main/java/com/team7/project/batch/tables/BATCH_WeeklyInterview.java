@@ -21,7 +21,8 @@ public class BATCH_WeeklyInterview {
     @Column(unique = true, nullable = false)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    //@OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="interview_id")
     private Interview interview;
 
