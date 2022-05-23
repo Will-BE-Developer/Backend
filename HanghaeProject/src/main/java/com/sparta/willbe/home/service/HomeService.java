@@ -1,9 +1,9 @@
 package com.sparta.willbe.home.service;
 
 import com.sparta.willbe.advice.ErrorMessage;
-import com.sparta.willbe.batch.BATCH_repository.BATCH_TodayQuestionRepository;
-import com.sparta.willbe.batch.BATCH_repository.BATCH_TopCategoriesRepository;
-import com.sparta.willbe.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;
+import com.sparta.willbe.batch.repository.TodayQuestionRepository;
+import com.sparta.willbe.batch.repository.TopCategoriesRepository;
+import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;
 import com.sparta.willbe.batch.tables.BATCH_TopCategories;
 import com.sparta.willbe.batch.tables.BATCH_WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
@@ -40,10 +40,10 @@ import java.util.Set;
 public class HomeService {
     private final UserRepository userRepository;
     private final InterviewGeneralService interviewGeneralService;
-    private final BATCH_WeeklyInterviewRepository batch_weeklyInterviewRepository;
+    private final WeeklyInterviewRepository batch_weeklyInterviewRepository;
     private final QuestionRepository questionRepository;
-    private final BATCH_TodayQuestionRepository batch_todayQuestionRepository;
-    private final BATCH_TopCategoriesRepository batch_topCategoriesRepository;
+    private final TodayQuestionRepository batch_todayQuestionRepository;
+    private final TopCategoriesRepository batch_topCategoriesRepository;
     private final CommentRepository commentRepository;
     private final InterviewRepository interviewRepository;
 

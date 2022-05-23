@@ -1,7 +1,7 @@
 package com.sparta.willbe.batch.config;
 
 import com.sparta.willbe.advice.ErrorMessage;
-import com.sparta.willbe.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;
+import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;
 import com.sparta.willbe.batch.jobListener.JobListener;
 import com.sparta.willbe.batch.tables.BATCH_WeeklyInterview;
 import com.sparta.willbe.interview.model.Interview;
@@ -27,7 +27,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class WeeklyInterviewConfig {
 
-    private final BATCH_WeeklyInterviewRepository batch_weeklyInterviewRepository;
+    private final WeeklyInterviewRepository batch_weeklyInterviewRepository;
     private final InterviewRepository interviewRepository;
 
     private final JobBuilderFactory jobBuilderFactory;

@@ -1,7 +1,7 @@
 package com.sparta.willbe.batch.config;
 
 
-import com.sparta.willbe.batch.BATCH_repository.BATCH_TopCategoriesRepository;
+import com.sparta.willbe.batch.repository.TopCategoriesRepository;
 import com.sparta.willbe.batch.tables.BATCH_TopCategories;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.interview.repository.InterviewRepository;
@@ -28,7 +28,7 @@ public class TopCategoriesBatchConfig {
     private final StepBuilderFactory stepBuilderFactory;
 
     private final InterviewRepository interviewRepository;
-    private final BATCH_TopCategoriesRepository batchTopCategoriesRepository;
+    private final TopCategoriesRepository batchTopCategoriesRepository;
 
     @Bean
     public Job jobTopCategoies(){

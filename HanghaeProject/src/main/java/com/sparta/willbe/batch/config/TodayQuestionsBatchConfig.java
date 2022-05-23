@@ -1,6 +1,6 @@
 package com.sparta.willbe.batch.config;
 
-import com.sparta.willbe.batch.BATCH_repository.BATCH_TodayQuestionRepository;
+import com.sparta.willbe.batch.repository.TodayQuestionRepository;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.question.model.Question;
 import com.sparta.willbe.question.repostitory.QuestionRepository;
@@ -30,7 +30,7 @@ public class TodayQuestionsBatchConfig {
     @Autowired
     private final QuestionRepository questionRepository;
     @Autowired
-    private final BATCH_TodayQuestionRepository batch_todayQuestionRepository;
+    private final TodayQuestionRepository batch_todayQuestionRepository;
 
     @Bean
     public Job jobTodayQuestions() {

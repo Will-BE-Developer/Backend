@@ -1,4 +1,4 @@
-package com.sparta.willbe.batch.BATCH_repository;
+package com.sparta.willbe.batch.repository;
 
 import com.sparta.willbe.batch.tables.BATCH_WeeklyInterview;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BATCH_WeeklyInterviewRepository extends JpaRepository<BATCH_WeeklyInterview, Long> {
+public interface WeeklyInterviewRepository extends JpaRepository<BATCH_WeeklyInterview, Long> {
 
     /** reverse('null') as weekly_badge
      *  Field 'weekly_badge' doesn't have a default value에러 때문에 가상의 컬럼 추가함
