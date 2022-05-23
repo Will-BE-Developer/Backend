@@ -249,13 +249,15 @@ public class InterviewGeneralService {
 
         InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
 
-        //scrapRepository.deleteByInterviewId(interviewId);
+        BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
+
 
         //인터뷰 삭제전 면접왕 뱃지(Gold,Silver,Bronze)가 있으면, 밑에 등수 수정
-        if (interview.getBadge().equals("NONE") == false) {
+        //if (interview.getBadge().equals("NONE") == false) {
+        if (itsWeekly != null) {
             try {
                 //인터뷰의 위클리 row 검색해서, 위클리뱃지를 가져오고
-                BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
+                //BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
                 String weeklyBadge = itsWeekly.getWeeklyBadge(); //5월 2째주 1등
                 String itsBadge = interview.getBadge(); //Gold
                 int ranking = Integer.parseInt(weeklyBadge.substring(7, 8));
@@ -306,7 +308,11 @@ public class InterviewGeneralService {
             }
         }
         //인터뷰 삭제(면접왕이면 위클리도 삭제됨)
-        interviewRepository.deleteById(interviewId);
+        try{
+            interviewRepository.deleteById(interviewId);
+        }catch(Exception e){
+            log.error("인터뷰 ID {}번 삭제 에러", interviewId, e);
+        }
         return response;
     }
 
