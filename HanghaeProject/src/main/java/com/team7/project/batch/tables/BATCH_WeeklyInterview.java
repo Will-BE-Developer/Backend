@@ -41,4 +41,11 @@ public class BATCH_WeeklyInterview {
         this.weeklyBadge = weeklyBadge;
     }
 
+    public BATCH_WeeklyInterview(Interview interview, Long ScrapCount, String badge, String weeklyBadge) {
+        this.interview = interview;
+        this.scrapCount = ScrapCount;
+        this.badge = badge;
+        this.weeklyBadge = weeklyBadge;
+    }
+
 }
