@@ -91,16 +91,6 @@ public class WeeklyInterviewConfig {
                 String weeklyBadge = month + "월 "+ week + "째주 " + ranking + "등";
                 log.info("New Weekly Interview >> {} (InterviewId: {})", weeklyBadge, weeklyInterview.getInterview().getId());
 
-                //3등까지만 뱃지(골드,실버,브론즈) 저장
-                BATCH_WeeklyInterview weeklyInterviewEach;
-                if (ranking <= 3){
-                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, badge[ranking-1], weeklyBadge);
-                }else{
-                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, "NONE", weeklyBadge);
-                }
-                    weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
-                batch_weeklyInterviewRepository.save(weeklyInterviewEach);
-
                 //인터뷰 뱃지 저장(1,2,3등만)
                 if (ranking <= 3){
                     //Interview interview = weeklyInterview.getInterview();
@@ -108,8 +98,29 @@ public class WeeklyInterviewConfig {
                     Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
                             .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
                     interview.updateBadge(badge[ranking-1]);
-                    interviewRepository.save(interview);
+                    interview = interviewRepository.save(interview);
+                    //edit
+                    BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(interview, weeklyInterview.getScrapCount(), badge[ranking-1], weeklyBadge);
+                    weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
+                    batch_weeklyInterviewRepository.save(weeklyInterviewEach);
+                }else{
+                    Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
+                            .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+                    BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(interview, weeklyInterview.getScrapCount(), "NONE", weeklyBadge);
+                    weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
+                    batch_weeklyInterviewRepository.save(weeklyInterviewEach);
                 }
+
+                //3등까지만 뱃지(골드,실버,브론즈) 저장(기존)
+//                BATCH_WeeklyInterview weeklyInterviewEach;
+//                if (ranking <= 3){
+//                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, badge[ranking-1], weeklyBadge);
+//                }else{
+//                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, "NONE", weeklyBadge);
+//                }
+//                    weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
+//                batch_weeklyInterviewRepository.save(weeklyInterviewEach);
+
             }
 
            return RepeatStatus.FINISHED;
