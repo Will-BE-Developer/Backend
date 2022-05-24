@@ -10,7 +10,11 @@ import java.util.List;
 @Repository
 public interface TodayQuestionRepository extends JpaRepository<TodayQuestion, Long> {
     TodayQuestion save(TodayQuestion batch_todayQuestion);
+
     void deleteAll();
+
     List<TodayQuestion> findAll();
+
     List<TodayQuestion> findTop3ByOrderByCreatedAtDesc();
+}
 
