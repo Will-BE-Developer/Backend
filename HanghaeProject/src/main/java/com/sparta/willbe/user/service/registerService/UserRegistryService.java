@@ -48,12 +48,7 @@ public class UserRegistryService {
     }
 
     public boolean isEmailExist(String email){
-        User user = userRepository.findByEmailAndIsValid(email,false).orElse(null);
-        if(user != null){
-            userRepository.delete(user);
-            log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 가능 ");
-            return false;
-        }else if(userRepository.findByEmail(email).isPresent()){
+        if( userRepository.findByEmailAndIsValid(email,true).isPresent()){
             log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 불가능 ");
             return true;
         }else {

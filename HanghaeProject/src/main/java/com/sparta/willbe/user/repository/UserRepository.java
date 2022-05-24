@@ -7,8 +7,10 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String userEmail);
-    Optional<User> findByEmailAndProvider(String email, String provider);
-    Optional<User> findByEmailAndIsValid(String email, Boolean isValid);
-
+    //active user
+    Optional<User> findByEmailAndIsDeletedFalseAndIsValidTrue(String userEmail);
+    //email register but not valid user
+    Optional<User> findByEmailAndIsDeletedFalseAndIsValidFalse(String userEmail);
+    Optional<User> findByEmailAndProviderAndIsDeletedFalse(String email, String provider);
+    Optional<User> findByEmailAndIsValid(String email, boolean isValid);
 }

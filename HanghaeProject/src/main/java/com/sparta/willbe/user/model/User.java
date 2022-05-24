@@ -89,16 +89,6 @@ public class User extends Timestamped implements UserDetails {
         this.role=role;
     }
 
-    public User update(String nickname, String password,String githubLink,String introduce,String profileImageUrl,String token){
-        this.nickname = nickname;
-        this.password = password;
-        this.githubLink = githubLink;
-        this.introduce = introduce;
-        this.profileImageUrl = profileImageUrl;
-        this.token = token;
-
-        return this;
-    }
     public void setIsDeleted(boolean deleted){
         this.isDeleted = deleted;
     }
@@ -116,9 +106,8 @@ public class User extends Timestamped implements UserDetails {
         this.introduce = introduce;
         this.profileImageUrl = profileImageUrl;
     }
-    public void updateInfo(String nickname, String profileImageUrl){
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
+    public void updateInfo(String accessToken){
+        this.token = accessToken;
     }
 
     @Override

@@ -134,7 +134,7 @@ public class KakaoUserService {
             String email = kakaoUserInfo.getEmail();
 
             //가입된 카카오 사용자가 있는지 조회한다.
-            User kakaoUser = userRepository.findByEmailAndProvider(email,provider)
+            User kakaoUser = userRepository.findByEmailAndProviderAndIsDeletedFalse(email,provider)
                     .orElse(null);
 
             //가입된 카카오 사용자가 없다면, 가입을 진행한다
@@ -163,8 +163,8 @@ public class KakaoUserService {
                         .build();
                 userRepository.save(kakaoUser);
             }
-            //가입된 카카오 사용자가 있다면, 업데이트를 진행한다.-업데이트를 진행하지 않기로함
-//            kakaoUser.updateInfo(kakaoUserInfo.getNickname(), kakaoUserInfo.getImageUrl());
+            //가입된 카카오 사용자가 있다면, 토큰을 갈아 끼워 준다.
+            kakaoUser.updateInfo(accessToken);
 
             return kakaoUser;
         }

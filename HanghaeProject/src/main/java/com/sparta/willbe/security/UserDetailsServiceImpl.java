@@ -16,9 +16,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    //TODO:에러 메세지 출력 확인
     public UserDetails loadUserByUsername(String username) {
-       return userRepository.findByEmail(username)
+       return userRepository.findByEmailAndIsDeletedFalseAndIsValidTrue(username)
                .orElseThrow(() -> ErrorMessage.NOT_FOUND_USER.throwError());
     }
 }
