@@ -48,6 +48,9 @@ public class UserMypageService {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
+    @Value("${spring.servlet.multipart.maxFileSize}")
+    private String maxFileSize = "";
+
     private String basicProfile = "profileImg/100.jpeg";
 
     boolean isStringEmpty(String nickname) {
@@ -71,8 +74,10 @@ public class UserMypageService {
         //파일첨부 했으면 크롭 후, 이미지 로컬 및 S3에 저장하기(첨부 안했으면 null->프론트에서 default이미지)
         if (requestDto.getProfileImage() != null) {
             //이미지 파일 여부
-            //isImageFile(requestDto.getProfileImage());
             isImageFile(requestDto.getProfileImage(), user.getId());
+
+            //이미지 용량 확인
+            checkFileSize(requestDto.getProfileImage(), user.getId());
 
             //image 파일 받기(for 크롭)
             File getFile = convert(requestDto.getProfileImage());
@@ -166,6 +171,22 @@ public class UserMypageService {
         if ((isImage == false) || extension.equals("webp") || extension.equals("bmp")) {
             log.error("프로필 이미지 파일 타입({}) 에러(userId: {})", contentType, userId);
             throw ErrorMessage.INVALID_IMAGE_FILE.throwError();
+        }
+    }
+
+    private void checkFileSize(MultipartFile profileImage, Long userId) {
+        if (profileImage.isEmpty()) {
+            log.error("프로필 이미지 파일 0 byte (userId: {})", userId);
+            throw ErrorMessage.INVALID_IMAGE_SIZE_ZERO.throwError();
+        }
+        double bytes = profileImage.getSize();
+        double kilobytes = Math.round(bytes / 1024*1000.0)/1000.0;
+        double megabytes = Math.round(kilobytes / 1024*1000.0)/1000.0;
+
+        if (megabytes >= 5.0) {
+            //handleMultipartException에서 Response되지만 더블체크
+            log.error("프로필 이미지 5MB 초과 :: userId: {}, 파일사이즈: {}MB", userId, megabytes);
+            throw ErrorMessage.INVALID_IMAGE_SIZE.throwError();
         }
     }
 
