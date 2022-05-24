@@ -18,4 +18,5 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
 
     @Modifying
     void deleteAllByInterviewId(Long interviewId);
+
 }
