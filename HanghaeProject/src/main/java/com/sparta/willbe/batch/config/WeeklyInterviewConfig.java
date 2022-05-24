@@ -3,7 +3,7 @@ package com.sparta.willbe.batch.config;
 import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;
 import com.sparta.willbe.batch.jobListener.JobListener;
-import com.sparta.willbe.batch.tables.BATCH_WeeklyInterview;
+import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -58,15 +58,15 @@ public class WeeklyInterviewConfig {
         return (contribution, chunkContext) -> {
 
             //기존 인터뷰 뱃지 삭제
-            List<BATCH_WeeklyInterview> lastWeeklyInterview = batch_weeklyInterviewRepository.findAll();
-            for (BATCH_WeeklyInterview lastWeeklyInterviewEach : lastWeeklyInterview){
+            List<WeeklyInterview> lastWeeklyInterview = batch_weeklyInterviewRepository.findAll();
+            for (WeeklyInterview lastWeeklyInterviewEach : lastWeeklyInterview){
                 Interview lastInterview = lastWeeklyInterviewEach.getInterview();
                 lastInterview.updateBadge("NONE");
                 interviewRepository.save(lastInterview);
             }
 
             //이번주 면접왕 인터뷰 선정 + (추후 추가: 좋아요 숫자, 동점은 인터뷰 최신순)
-            List<BATCH_WeeklyInterview> weeklyInterviews = batch_weeklyInterviewRepository.findWeeklyInterview(PageRequest.of(0,5));
+            List<WeeklyInterview> weeklyInterviews = batch_weeklyInterviewRepository.findWeeklyInterview(PageRequest.of(0,5));
             log.info("weeklyInterview top 5 >> {}등까지 추출됨", weeklyInterviews.size());
 
             //기존 위클리 면접왕 삭제
@@ -74,7 +74,7 @@ public class WeeklyInterviewConfig {
 
             //위클리 면접왕 저장
             int ranking = 0;
-            for (BATCH_WeeklyInterview weeklyInterview : weeklyInterviews){
+            for (WeeklyInterview weeklyInterview : weeklyInterviews){
 
                 ranking ++;
 
@@ -100,13 +100,13 @@ public class WeeklyInterviewConfig {
                     interview.updateBadge(badge[ranking-1]);
                     interview = interviewRepository.save(interview);
                     //edit
-                    BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(interview, weeklyInterview.getScrapCount(), badge[ranking-1], weeklyBadge);
+                    WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), badge[ranking-1], weeklyBadge);
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
                     batch_weeklyInterviewRepository.save(weeklyInterviewEach);
                 }else{
                     Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
                             .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
-                    BATCH_WeeklyInterview weeklyInterviewEach = new BATCH_WeeklyInterview(interview, weeklyInterview.getScrapCount(), "NONE", weeklyBadge);
+                    WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), "NONE", weeklyBadge);
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
                     batch_weeklyInterviewRepository.save(weeklyInterviewEach);
                 }

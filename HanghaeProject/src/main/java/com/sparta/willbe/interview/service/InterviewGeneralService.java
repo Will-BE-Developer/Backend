@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.sparta.willbe.batch.tables.BATCH_WeeklyInterview;
+import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
 import com.sparta.willbe.interview.dto.InterviewListResponseDto;
 import com.sparta.willbe.interview.dto.InterviewUpdateRequestDto;
@@ -137,7 +137,7 @@ public class InterviewGeneralService {
         String profilePresignedUrl = generateProfileImageUrl(interview.getUser().getProfileImageUrl());
 
         //5월 2째주 1등 -> 숫자만 추출
-        BATCH_WeeklyInterview Weekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
+        WeeklyInterview Weekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
         boolean itsWeekly = Weekly == null ? false : true;
         int month = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(0, 1)) : -1;
         int week = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(3, 4)) : -1;
@@ -248,7 +248,9 @@ public class InterviewGeneralService {
         Set<Long> userScrapsId = createUserScrapIds(user);
 
         InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
-        BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
+
+        WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
+
 
         //인터뷰 삭제전 면접왕 뱃지(Gold,Silver,Bronze)가 있으면, 밑에 등수 수정
         //if (interview.getBadge().equals("NONE") == false) {
@@ -272,7 +274,7 @@ public class InterviewGeneralService {
                 for (int lowerRanking : lowerRankArray) { //면접왕이 4등까지만 있을때, 5등이 없어서 에러남
                     //기존 위클리 등수 정보로 위클리 row 뽑아와서
                     String lowerWeeklyRank = weeklyBadge.substring(0, 7) + lowerRanking + "등";
-                    BATCH_WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerWeeklyRank);
+                    WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerWeeklyRank);
                     //새로운 등수 부여
                     int lowerNewRanking = lowerRanking - 1;
                     String newWeeklyRank = weeklyBadge.substring(0, 7) + (lowerRanking - 1) + "등";
@@ -298,8 +300,8 @@ public class InterviewGeneralService {
                 }
 
                 //스크랩 삭제
-                //scrapRepository.deleteByInterviewId(interviewId);
-                //interview.makeScrapNullForDelete();
+                scrapRepository.deleteByInterviewId(interviewId);
+                interview.makeScrapNullForDelete();
             } catch (Exception e) {
                 log.error("인터뷰(면접왕) ID {}번 삭제 에러", interviewId, e);
                 throw ErrorMessage.FAIL_DELETE_INTERVIEW.throwError();
@@ -307,10 +309,6 @@ public class InterviewGeneralService {
         }
         //인터뷰 삭제(면접왕이면 위클리도 삭제됨)
         try{
-            //스크랩 삭제
-            scrapRepository.deleteByInterviewId(interviewId);
-            //scrapRepository.deleteAllByInterviewId(interviewId);
-            interview.makeScrapNullForDelete();
             interviewRepository.deleteById(interviewId);
         }catch(Exception e){
             log.error("인터뷰 ID {}번 삭제 에러", interviewId, e);

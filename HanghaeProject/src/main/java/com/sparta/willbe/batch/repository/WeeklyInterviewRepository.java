@@ -1,6 +1,6 @@
 package com.sparta.willbe.batch.repository;
 
-import com.sparta.willbe.batch.tables.BATCH_WeeklyInterview;
+import com.sparta.willbe.batch.tables.WeeklyInterview;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface WeeklyInterviewRepository extends JpaRepository<BATCH_WeeklyInterview, Long> {
+public interface WeeklyInterviewRepository extends JpaRepository<WeeklyInterview, Long> {
 
     /** reverse('null') as weekly_badge
      *  Field 'weekly_badge' doesn't have a default value에러 때문에 가상의 컬럼 추가함
@@ -24,9 +24,9 @@ public interface WeeklyInterviewRepository extends JpaRepository<BATCH_WeeklyInt
             "ON i.id IN (s.interview_id) " +
             "WHERE i.is_public = 1 order by scrap_count DESC, created_at DESC ", nativeQuery = true)
 
-    List<BATCH_WeeklyInterview> findWeeklyInterview(Pageable pageable);
+    List<WeeklyInterview> findWeeklyInterview(Pageable pageable);
 
-    BATCH_WeeklyInterview findByWeeklyBadge(String lowRank);
+    WeeklyInterview findByWeeklyBadge(String lowRank);
 
-    BATCH_WeeklyInterview findByInterviewId(Long interviewId);
+    WeeklyInterview findByInterviewId(Long interviewId);
 }

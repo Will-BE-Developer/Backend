@@ -1,6 +1,6 @@
 package com.sparta.willbe.interview.model;
 
-import com.sparta.willbe.batch.tables.BATCH_WeeklyInterview;
+import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.likes.model.Likes;
 import com.sparta.willbe._global.timestamped.model.Timestamped;
 import com.sparta.willbe.comments.model.Comment;
@@ -67,7 +67,7 @@ public class Interview extends Timestamped {
     //@OneToOne(mappedBy = "interview", cascade = CascadeType.REMOVE, orphanRemoval = true)
     //BATCH_WeeklyInterview weeklyInterviews ;
     @OneToMany(mappedBy = "interview", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    List<BATCH_WeeklyInterview> weeklyInterviews = new ArrayList<>();
+    List<WeeklyInterview> weeklyInterviews = new ArrayList<>();
 
     @OneToOne(cascade=CascadeType.ALL, mappedBy = "interview",orphanRemoval = true)
     @JoinColumn

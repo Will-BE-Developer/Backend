@@ -4,7 +4,7 @@ import com.sparta.willbe.batch.repository.TodayQuestionRepository;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.question.model.Question;
 import com.sparta.willbe.question.repostitory.QuestionRepository;
-import com.sparta.willbe.batch.tables.BATCH_TodayQuestion;
+import com.sparta.willbe.batch.tables.TodayQuestion;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -56,8 +56,6 @@ public class TodayQuestionsBatchConfig {
     public Step stepTodayQuestions() {
         return stepBuilderFactory.get("stepTodayQuestions")
                 .tasklet((contribution, chunkContext) -> {
-                    //한번 돌때마다 데이터 베이스를 다 지워준다
-                    batch_todayQuestionRepository.deleteAll();
                     //카테고리를 먼저 생성 한다
                     Map<CategoryEnum, List<Question>> categories = selectCategories();
                     //카테고리 안에서 isshow 가 false 인 문제를 찾아서 랜덤 질문을 뽑는다.
@@ -97,7 +95,7 @@ public class TodayQuestionsBatchConfig {
             int num = (int) (Math.random() * v.size());
             Question selected = v.get(num);
             selected.setShow(true);
-            batch_todayQuestionRepository.save(new BATCH_TodayQuestion(selected.getId()));
+            batch_todayQuestionRepository.save(new TodayQuestion(selected));
         });
     }
 

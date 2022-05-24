@@ -186,7 +186,7 @@ public class KakaoUserService {
                 conn.setRequestProperty("Authorization","Bearer "+ accessToken);
 
                 int responseCode = conn.getResponseCode();
-                log.info("responseCode : " + responseCode);
+                log.debug("KAKAO_LOGOUT >> responseCode : " + responseCode);
 
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
@@ -196,7 +196,7 @@ public class KakaoUserService {
                 while((line = br.readLine()) != null) {
                     result += line;
                 }
-                log.info("result is {}",result);
+                log.debug("result is {}",result);
 
             }catch(IOException e){
                 e.printStackTrace();

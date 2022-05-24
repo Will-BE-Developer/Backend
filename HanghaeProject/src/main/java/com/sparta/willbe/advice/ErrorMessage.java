@@ -2,7 +2,7 @@ package com.sparta.willbe.advice;
 
 import org.springframework.http.HttpStatus;
 
-public enum ErrorMessage {
+public enum ErrorMessage{
 
     INVALID_INTERVIEW_VIEW(HttpStatus.BAD_REQUEST,"현재 사용자는 해당 인터뷰를 조회 할 수 없습니다."),
     INVALID_INTERVIEW_POST(HttpStatus.BAD_REQUEST,"현재 사용자는 해당 인터뷰를 게시 할 수 없습니다."),
