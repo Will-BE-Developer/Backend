@@ -248,9 +248,7 @@ public class InterviewGeneralService {
         Set<Long> userScrapsId = createUserScrapIds(user);
 
         InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
-
         BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
-
 
         //인터뷰 삭제전 면접왕 뱃지(Gold,Silver,Bronze)가 있으면, 밑에 등수 수정
         //if (interview.getBadge().equals("NONE") == false) {
@@ -300,8 +298,8 @@ public class InterviewGeneralService {
                 }
 
                 //스크랩 삭제
-                scrapRepository.deleteByInterviewId(interviewId);
-                interview.makeScrapNullForDelete();
+                //scrapRepository.deleteByInterviewId(interviewId);
+                //interview.makeScrapNullForDelete();
             } catch (Exception e) {
                 log.error("인터뷰(면접왕) ID {}번 삭제 에러", interviewId, e);
                 throw ErrorMessage.FAIL_DELETE_INTERVIEW.throwError();
@@ -309,6 +307,10 @@ public class InterviewGeneralService {
         }
         //인터뷰 삭제(면접왕이면 위클리도 삭제됨)
         try{
+            //스크랩 삭제
+            scrapRepository.deleteByInterviewId(interviewId);
+            //scrapRepository.deleteAllByInterviewId(interviewId);
+            interview.makeScrapNullForDelete();
             interviewRepository.deleteById(interviewId);
         }catch(Exception e){
             log.error("인터뷰 ID {}번 삭제 에러", interviewId, e);
