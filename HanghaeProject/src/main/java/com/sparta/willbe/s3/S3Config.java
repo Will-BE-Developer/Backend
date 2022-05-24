@@ -19,6 +19,12 @@ public class S3Config {
     @Value("${cloud.aws.credentials.secret-key}")
     private String secretKey;
 
+    @Value("${cloud.aws.credentials.access-key-upload}")
+    private String fullAccessKey;
+
+    @Value("${cloud.aws.credentials.secret-key-upload}")
+    private String fullSecretKey;
+
     @Value("${cloud.aws.region.static}")
     private String region;
 
@@ -30,4 +36,14 @@ public class S3Config {
                 .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                 .build();
     }
+
+    @Bean
+    public AmazonS3Client amazonFullS3Client() {
+        BasicAWSCredentials awsCreds = new BasicAWSCredentials(fullAccessKey, fullSecretKey);
+        return (AmazonS3Client) AmazonS3ClientBuilder.standard()
+                .withRegion(region)
+                .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+                .build();
+    }
+
 }
