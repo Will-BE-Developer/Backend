@@ -51,7 +51,7 @@ public class MailTemplate {
             "            </div>\n" +
             "        </div>\n" +
             "        <div style=\"color:#6D727C; font-weight: 400; font-size:12px; line-height: 14px; margin-top:24px\">\n" +
-            "            <p><span>Will Be</span><span>항해 project : team 7</span> </p>\n" +
+            "            <p><span>Will Be</span><span>sparta project : team 7</span> </p>\n" +
             "            <p>주소: 비밀~\uD83D\uDD12</p></div>\n" +
             "        </footer>\n" +
             "    </body>";
