@@ -13,3 +13,4 @@ public interface TopCategoriesRepository extends JpaRepository<TopCategories, Lo
    TopCategories save(TopCategories batch_topCategories);
    List<TopCategories> findTop6ByOrderByCreatedAtDesc();
 }
+
