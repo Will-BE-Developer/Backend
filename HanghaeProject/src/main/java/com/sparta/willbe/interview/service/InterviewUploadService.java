@@ -42,7 +42,7 @@ public class InterviewUploadService {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;  // S3 버킷 이름
 
-    public String generatePresignedPost(String objectKey) {
+    public String getPresignedPost(String objectKey) {
         Date expireTime = new Date();
         expireTime.setTime(expireTime.getTime() + ONE_HOUR);
 

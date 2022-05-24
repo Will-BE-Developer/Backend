@@ -37,15 +37,6 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 public class InterviewConvertService {
 
-    @Value("${cloud.aws.credentials.access-key-upload}")
-    private String accessKey;
-
-    @Value("${cloud.aws.credentials.secret-key-upload}")
-    private String secretKey;
-
-    @Value("${cloud.aws.region.static}")
-    private String region;
-
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
     private final AmazonS3Client amazonFullS3Client;
@@ -134,29 +125,20 @@ public class InterviewConvertService {
     public void upload(String objectKey, String uploadFilePath) {
         String newObjectKey = objectKey.replace(".webm", ".mp4");
 
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         try {
-            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                    .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                    .withRegion(region)
-                    .build();
-
-            java.util.Date expiration = new java.util.Date();
-            long expTimeMillis = expiration.getTime();
-            expTimeMillis += 1000 * 60 * 60;
-            expiration.setTime(expTimeMillis);
-
             FileDataSource fileDataSource = new FileDataSource(uploadFilePath);
             File file = fileDataSource.getFile();
 
-            s3Client.putObject(new PutObjectRequest(bucket, newObjectKey, file));
-            if (s3Client.doesObjectExist(bucket, objectKey)) {
-                s3Client.deleteObject(bucket, objectKey);
+            amazonFullS3Client.putObject(new PutObjectRequest(bucket, newObjectKey, file));
+            if (amazonFullS3Client.doesObjectExist(bucket, objectKey)) {
+                amazonFullS3Client.deleteObject(bucket, objectKey);
             }
 
             log.info("OBJECT KEY " + objectKey + " CREATED IN BUCKET " + bucket);
+
         } catch (Exception e) {
             e.printStackTrace();
+
         }
     }
 

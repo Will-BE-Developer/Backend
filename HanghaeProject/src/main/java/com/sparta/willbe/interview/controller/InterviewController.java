@@ -1,12 +1,12 @@
 package com.sparta.willbe.interview.controller;
 
-import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
-import com.sparta.willbe.interview.dto.InterviewListResponseDto;
-import com.sparta.willbe.interview.dto.InterviewUpdateRequestDto;
+import com.sparta.willbe.interview.dto.*;
 import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.advice.RestException;
 import com.sparta.willbe.category.model.CategoryEnum;
+import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.service.InterviewService;
+import com.sparta.willbe.interview.service.InterviewUploadService;
 import com.sparta.willbe.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +29,7 @@ import java.util.List;
 @RestController
 public class InterviewController {
     private final InterviewService interviewService;
-
+    private final InterviewUploadService interviewUploadService;
 
     @GetMapping("/api/interviews")
     public ResponseEntity<InterviewListResponseDto> readInterviews(@RequestParam(value = "per", defaultValue = "6") int per,
@@ -76,43 +77,43 @@ public class InterviewController {
         InterviewInfoResponseDto body = interviewService.readOneInterview(interviewId, loginUserId);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
-//
-//    @PostMapping("/api/interviews/draft")
-//    public ResponseEntity<InterviewDraftResponseDto> createInterviewDraft(@AuthenticationPrincipal User user) {
-//
-//        if (user == null) {
-//            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
-//        }
-//        Long loginUserId = user.getId();
-//
-//        log.info("UID " + loginUserId + " INIT POST INTERVIEW");
-//
-//        Interview interview = interviewPostService.createInterviewDraft(loginUserId);
-//
-//        String videoUrl = interviewPostService.generatePresignedPost(interview.getVideoKey());
-//        String thumbnailUrl = interviewPostService.generatePresignedPost(interview.getThumbnailKey());
-//
-//        InterviewDraftResponseDto body = new InterviewDraftResponseDto(new InterviewDraftResponseDto.InterviewDraftBody(interview.getId()),
-//                new InterviewDraftResponseDto.UrlBody(videoUrl, thumbnailUrl));
-//
-//        return new ResponseEntity<>(body, HttpStatus.OK);
-//    }
-//
-//    @PostMapping("/api/interviews/{interviewId}")
-//    public ResponseEntity<InterviewInfoResponseDto> completeInterview(@PathVariable Long interviewId,
-//                                                                      @RequestBody InterviewPostRequestDto requestDto,
-//                                                                      @AuthenticationPrincipal User user) throws IOException {
-//        if (user == null) {
-//            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
-//        }
-//        Long loginUserId = user.getId();
-//
-//        log.info("UID " + loginUserId + " COMPLETE POST INTERVIEW " + interviewId);
-//
-//        InterviewInfoResponseDto body = interviewPostService.completeInterview(loginUserId, interviewId, requestDto);
-//
-//        return new ResponseEntity<>(body, HttpStatus.OK);
-//    }
+
+    @PostMapping("/api/interviews/draft")
+    public ResponseEntity<InterviewDraftResponseDto> createInterviewDraft(@AuthenticationPrincipal User user) {
+
+        if (user == null) {
+            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
+        }
+        Long loginUserId = user.getId();
+
+        log.info("UID " + loginUserId + " INIT POST INTERVIEW");
+
+        Interview interview = interviewUploadService.createInterviewDraft(loginUserId);
+
+        String videoUrl = interviewUploadService.getPresignedPost(interview.getVideoKey());
+        String thumbnailUrl = interviewUploadService.getPresignedPost(interview.getThumbnailKey());
+
+        InterviewDraftResponseDto body = new InterviewDraftResponseDto(new InterviewDraftResponseDto.InterviewDraftBody(interview.getId()),
+                new InterviewDraftResponseDto.UrlBody(videoUrl, thumbnailUrl));
+
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/interviews/{interviewId}")
+    public ResponseEntity<InterviewInfoResponseDto> completeInterview(@PathVariable Long interviewId,
+                                                                      @RequestBody InterviewPostRequestDto requestDto,
+                                                                      @AuthenticationPrincipal User user) throws IOException {
+        if (user == null) {
+            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
+        }
+        Long loginUserId = user.getId();
+
+        log.info("UID " + loginUserId + " COMPLETE POST INTERVIEW " + interviewId);
+
+        InterviewInfoResponseDto body = interviewUploadService.completeInterview(loginUserId, interviewId, requestDto);
+
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
 
     @PutMapping("/api/interviews/{interviewId}")
     public ResponseEntity<InterviewInfoResponseDto> updateInterview(@PathVariable Long interviewId,
