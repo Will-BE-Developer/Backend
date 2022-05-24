@@ -61,8 +61,9 @@ dependencies {
 	//json-type class
 	implementation 'com.vladmihalcea:hibernate-types-52:2.16.1'
 
-//	//ffmpeg cli wrapper
-//	implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
+	//ffmpeg cli wrapper
+	implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
+
 //	implementation 'org.bytedeco:ffmpeg:5.0-1.5.7'
 //	implementation 'org.bytedeco:javacpp:1.5.7'
 //	implementation 'org.bytedeco:javacv-platform:1.5.7'
