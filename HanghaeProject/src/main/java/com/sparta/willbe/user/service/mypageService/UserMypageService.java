@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.sparta.willbe.advice.ErrorMessage;
-import com.sparta.willbe.interview.service.InterviewGeneralService;
+import com.sparta.willbe.interview.service.InterviewService;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
 import com.sparta.willbe.user.dto.UserRequestDto;
 import com.sparta.willbe.user.model.User;
@@ -34,7 +34,7 @@ import java.time.format.DateTimeFormatter;
 public class UserMypageService {
 
     private final UserRepository userRepository;
-    private final InterviewGeneralService interviewGeneralService;
+    private final InterviewService interviewService;
 
     @Value("${cloud.aws.credentials.access-key-upload}")
     private String accessKey;
@@ -139,7 +139,7 @@ public class UserMypageService {
                     .id(user.getId())
                     .nickname(user.getNickname())
                     .githubLink(user.getGithubLink())
-                    .profileImageUrl(interviewGeneralService.generateProfileImageUrl(user.getProfileImageUrl()))
+                    .profileImageUrl(interviewService.getProfileImageUrl(user.getProfileImageUrl()))
                     .introduce(user.getIntroduce())
                     .build())
             .build();

@@ -1,8 +1,6 @@
 package com.sparta.willbe.interview.service;
 
-import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
 import com.sparta.willbe._global.pagination.dto.PaginationResponseDto;
 import com.sparta.willbe.advice.ErrorMessage;
@@ -18,9 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +24,7 @@ import java.util.Set;
 @Service
 @Transactional(readOnly = true)
 public class InterviewMyPageService {
-    private final InterviewGeneralService interviewGeneralService;
+    private final InterviewService interviewService;
     private final InterviewRepository interviewRepository;
     private final UserRepository userRepository;
 
@@ -37,22 +33,6 @@ public class InterviewMyPageService {
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;  // S3 버킷 이름
-
-    public String generatePresignedUrl(String objectKey) {
-
-        Date expireTime = new Date();
-        expireTime.setTime(expireTime.getTime() + ONE_HOUR);
-
-        // Generate the pre-signed URL.
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest(bucket, objectKey)
-                        .withMethod(HttpMethod.GET)
-                        .withExpiration(expireTime);
-
-        URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
-
-        return url.toString();
-    }
 
     public InterviewListResponseDto readAllMyInterviews(Pageable pageable, Long loginUserId) {
 
@@ -63,11 +43,11 @@ public class InterviewMyPageService {
 
         List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
 
-        Set<Long> userScrapsId = interviewGeneralService.createUserScrapIds(user);
+        Set<Long> userScrapsId = interviewService.getScrapedInterviewIds(user);
 
         for (Interview interview : interviews.getContent()) {
 
-            InterviewInfoResponseDto response = interviewGeneralService.createInterviewResponse(loginUserId, userScrapsId, interview);
+            InterviewInfoResponseDto response = interviewService.getInterviewResponse(loginUserId, userScrapsId, interview);
 
             responses.add(response.getInterview());
 
@@ -89,11 +69,11 @@ public class InterviewMyPageService {
 
         List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
 
-        Set<Long> userScrapsId = interviewGeneralService.createUserScrapIds(user);
+        Set<Long> userScrapsId = interviewService.getScrapedInterviewIds(user);
 
         for (Interview interview : interviews.getContent()) {
 
-            InterviewInfoResponseDto response = interviewGeneralService.createInterviewResponse(loginUserId, userScrapsId, interview);
+            InterviewInfoResponseDto response = interviewService.getInterviewResponse(loginUserId, userScrapsId, interview);
 
             responses.add(response.getInterview());
 

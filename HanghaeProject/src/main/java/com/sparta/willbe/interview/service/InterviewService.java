@@ -1,12 +1,7 @@
 package com.sparta.willbe.interview.service;
 
 import com.amazonaws.HttpMethod;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
@@ -38,28 +33,21 @@ import java.util.*;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class InterviewGeneralService {
+public class InterviewService {
     private final InterviewRepository interviewRepository;
     private final UserRepository userRepository;
     private final WeeklyInterviewRepository weeklyInterviewRepository;
     private final ScrapRepository scrapRepository;
 
     private static final long ONE_HOUR = 1000 * 60 * 60; //1시간
+
     private final AmazonS3Client amazonS3Client;
+    private final AmazonS3Client amazonFullS3Client;
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
-    @Value("${cloud.aws.credentials.access-key-upload}")
-    private String accessKey;
-
-    @Value("${cloud.aws.credentials.secret-key-upload}")
-    private String secretKey;
-
-    @Value("${cloud.aws.region.static}")
-    private String region;
-
-    public String generatePresignedUrl(String objectKey) {
+    public String getPresignedUrl(String objectKey) {
 
         Date expireTime = new Date();
         expireTime.setTime(expireTime.getTime() + ONE_HOUR);
@@ -75,27 +63,22 @@ public class InterviewGeneralService {
         return url.toString();
     }
 
-    public String generateProfileImageUrl(String image) {
+    public String getProfileImageUrl(String image) {
         if (image == null) {
             return null;
         }
-        return (image.contains("http://") | image.contains("https://")) ? image : generatePresignedUrl(image);
+        return (image.contains("http://") | image.contains("https://")) ? image : getPresignedUrl(image);
     }
 
-    public String generateThumbnailImageUrl(Interview interview) {
+    public String getThumbnailImageUrl(Interview interview) {
         if (interview.getIsThumbnailConverted()) {
-            return generatePresignedUrl(interview.getThumbnailKey());
+            return getPresignedUrl(interview.getThumbnailKey());
         } else {
-            AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
             try {
-                AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                        .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                        .withRegion(region)
-                        .build();
-                boolean doesItExists = s3Client.doesObjectExist(bucket, interview.getThumbnailKey());
+                boolean doesItExists = amazonFullS3Client.doesObjectExist(bucket, interview.getThumbnailKey());
                 if (doesItExists) {
                     interview.convertThumbnail();
-                    return generatePresignedUrl(interview.getThumbnailKey());
+                    return getPresignedUrl(interview.getThumbnailKey());
                 } else {
                     return null;
                 }
@@ -106,7 +89,7 @@ public class InterviewGeneralService {
         return null;
     }
 
-    public Set<Long> createUserScrapIds(User user) {
+    public Set<Long> getScrapedInterviewIds(User user) {
         Set<Long> userScrapsId = new HashSet<>();
         if (user != null) {
             for (Scrap scrap : user.getScraps()) {
@@ -116,36 +99,26 @@ public class InterviewGeneralService {
         return userScrapsId;
     }
 
-    @Transactional
-    public void initInterview(){
-        List<Interview> interviews = interviewRepository.findAll();
-        for(Interview interview1 : interviews){
-            interview1.convertThumbnail();
-        }
-    }
-
-    public InterviewInfoResponseDto createInterviewResponse(Long loginUserId, Set<Long> userScrapsId, Interview interview) {
-//        initInterview();
+    public InterviewInfoResponseDto getInterviewResponse(Long loginUserId, Set<Long> userScrapsId, Interview interview) {
         Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
         Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
         Long scrapsCount = (long) interview.getScraps().size();
         Long commentsCount = (long) interview.getComments().size();
 
-
-        String videoPresignedUrl = interview.getIsVideoConverted() ? generatePresignedUrl(interview.getVideoKey()) : null;
-        String imagePresignedUrl = generateThumbnailImageUrl(interview);
-        String profilePresignedUrl = generateProfileImageUrl(interview.getUser().getProfileImageUrl());
+        String videoPresignedUrl = interview.getIsVideoConverted() ? getPresignedUrl(interview.getVideoKey()) : null;
+        String imagePresignedUrl = getThumbnailImageUrl(interview);
+        String profilePresignedUrl = getProfileImageUrl(interview.getUser().getProfileImageUrl());
 
         //5월 2째주 1등 -> 숫자만 추출
         WeeklyInterview Weekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
-        boolean itsWeekly = Weekly == null ? false : true;
+        boolean itsWeekly = Weekly != null;
         int month = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(0, 1)) : -1;
         int week = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(3, 4)) : -1;
         int ranking = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(7, 8)) : -1;
 
         return new InterviewInfoResponseDto(interview, videoPresignedUrl, imagePresignedUrl, profilePresignedUrl,
-                                            isMine, scrapsMe, scrapsCount, commentsCount,
-                                            month, week, ranking);
+                isMine, scrapsMe, scrapsCount, commentsCount,
+                month, week, ranking);
     }
 
     public InterviewListResponseDto readAllInterviews(Long loginUserId, String sort, String filter, Pageable pageable) {
@@ -170,11 +143,11 @@ public class InterviewGeneralService {
                     interviewRepository.findAllByIsDoneAndIsPublicAndQuestion_Category(true, true, CategoryEnum.valueOf(filter), pageable);
         }
 
-        Set<Long> userScrapsId = createUserScrapIds(user);
+        Set<Long> userScrapsId = getScrapedInterviewIds(user);
 
         for (Interview interview : interviews.getContent()) {
 
-            InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
+            InterviewInfoResponseDto response = getInterviewResponse(loginUserId, userScrapsId, interview);
 
             responses.add(response.getInterview());
 
@@ -204,9 +177,9 @@ public class InterviewGeneralService {
             throw ErrorMessage.INVALID_INTERVIEW_VIEW.throwError();
         }
 
-        Set<Long> userScrapsId = createUserScrapIds(user);
+        Set<Long> userScrapsId = getScrapedInterviewIds(user);
 
-        return createInterviewResponse(loginUserId, userScrapsId, interview);
+        return getInterviewResponse(loginUserId, userScrapsId, interview);
     }
 
     @Transactional
@@ -226,9 +199,9 @@ public class InterviewGeneralService {
         interview.update(requestDto.getNote(), requestDto.getIsPublic());
         interviewRepository.saveAndFlush(interview);
 
-        Set<Long> userScrapsId = createUserScrapIds(user);
+        Set<Long> userScrapsId = getScrapedInterviewIds(user);
 
-        return createInterviewResponse(loginUserId, userScrapsId, interview);
+        return getInterviewResponse(loginUserId, userScrapsId, interview);
     }
 
     @Transactional
@@ -245,9 +218,9 @@ public class InterviewGeneralService {
             throw ErrorMessage.INVALID_INTERVIEW_DELETE.throwError();
         }
 
-        Set<Long> userScrapsId = createUserScrapIds(user);
+        Set<Long> userScrapsId = getScrapedInterviewIds(user);
 
-        InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
+        InterviewInfoResponseDto response = getInterviewResponse(loginUserId, userScrapsId, interview);
 
         WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
 
@@ -282,18 +255,18 @@ public class InterviewGeneralService {
 
                     //위클리 테이블 랭링 수정 저장
                     weekly.setWeeklyBadge(newWeeklyRank);
-                    if (lowerNewRanking <= 3){
-                        weekly.setBadge(badge[lowerNewRanking-1]);
-                    }else{
+                    if (lowerNewRanking <= 3) {
+                        weekly.setBadge(badge[lowerNewRanking - 1]);
+                    } else {
                         weekly.setBadge("NONE");
                     }
                     weeklyInterviewRepository.save(weekly);
 
                     //인터뷰 테이블 뱃지 수정 저장
                     Interview lowInterview = weekly.getInterview();
-                    if (lowerNewRanking <= 3){
-                        lowInterview.updateBadge(badge[lowerNewRanking-1]);
-                    }else{
+                    if (lowerNewRanking <= 3) {
+                        lowInterview.updateBadge(badge[lowerNewRanking - 1]);
+                    } else {
                         lowInterview.updateBadge("NONE");
                     }
                     interviewRepository.save(lowInterview);
@@ -308,13 +281,13 @@ public class InterviewGeneralService {
             }
         }
         //인터뷰 삭제(면접왕이면 위클리도 삭제됨)
-        try{
+        try {
             //스크랩 삭제
             scrapRepository.deleteByInterviewId(interviewId);
             //scrapRepository.deleteAllByInterviewId(interviewId);
             interview.makeScrapNullForDelete();
             interviewRepository.deleteById(interviewId);
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error("인터뷰 ID {}번 삭제 에러", interviewId, e);
         }
         return response;

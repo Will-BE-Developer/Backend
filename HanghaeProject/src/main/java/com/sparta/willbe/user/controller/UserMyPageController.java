@@ -5,7 +5,6 @@ import com.sparta.willbe.user.service.mypageService.UserMypageService;
 import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.advice.RestException;
 import com.sparta.willbe.interview.service.InterviewMyPageService;
-import com.sparta.willbe.interview.service.InterviewPostService;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
 import com.sparta.willbe.user.dto.UserRequestDto;
 import com.sparta.willbe.user.model.User;
@@ -28,7 +27,6 @@ import java.io.IOException;
 @RestController
 public class UserMyPageController {
     private final UserMypageService userMypageService;
-    private final InterviewPostService interviewPostService;
     private final InterviewMyPageService interviewMyPageService;
 
     @GetMapping("/api/users/me/interviews")

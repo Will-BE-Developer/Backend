@@ -6,8 +6,7 @@ import com.sparta.willbe.interview.dto.InterviewUpdateRequestDto;
 import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.advice.RestException;
 import com.sparta.willbe.category.model.CategoryEnum;
-import com.sparta.willbe.interview.service.InterviewGeneralService;
-import com.sparta.willbe.interview.service.InterviewPostService;
+import com.sparta.willbe.interview.service.InterviewService;
 import com.sparta.willbe.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 public class InterviewController {
-    private final InterviewPostService interviewPostService;
-    private final InterviewGeneralService interviewGeneralService;
+    private final InterviewService interviewService;
 
 
     @GetMapping("/api/interviews")
@@ -63,7 +61,7 @@ public class InterviewController {
                 PageRequest.of(page - 1, per, Sort.by("createdAt").descending());
 
 
-        InterviewListResponseDto body = interviewGeneralService.readAllInterviews(loginUserId, sort, filter, pageable);
+        InterviewListResponseDto body = interviewService.readAllInterviews(loginUserId, sort, filter, pageable);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
@@ -75,7 +73,7 @@ public class InterviewController {
 
         log.info("UID " + loginUserId + " READ INTERVIEW " + interviewId);
 
-        InterviewInfoResponseDto body = interviewGeneralService.readOneInterview(interviewId, loginUserId);
+        InterviewInfoResponseDto body = interviewService.readOneInterview(interviewId, loginUserId);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 //
@@ -127,7 +125,7 @@ public class InterviewController {
 
         log.info("UID " + loginUserId + " UPDATE INTERVIEW " + interviewId);
 
-        InterviewInfoResponseDto body = interviewGeneralService.updateInterview(loginUserId, interviewId, requestDto);
+        InterviewInfoResponseDto body = interviewService.updateInterview(loginUserId, interviewId, requestDto);
 
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
@@ -142,7 +140,7 @@ public class InterviewController {
 
         log.info("UID " + loginUserId + " DELETE INTERVIEW " + interviewId);
 
-        InterviewInfoResponseDto body = interviewGeneralService.deleteInterview(loginUserId, interviewId);
+        InterviewInfoResponseDto body = interviewService.deleteInterview(loginUserId, interviewId);
 
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
