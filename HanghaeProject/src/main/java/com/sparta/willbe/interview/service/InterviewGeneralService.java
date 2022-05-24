@@ -200,7 +200,7 @@ public class InterviewGeneralService {
                 );
 
 
-        if (interview.getIsPublic() == false & interview.getUser().getId() != loginUserId) {
+        if (interview.getIsPublic() == false && interview.getUser().getId() != loginUserId) {
             throw ErrorMessage.INVALID_INTERVIEW_VIEW.throwError();
         }
 

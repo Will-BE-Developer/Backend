@@ -135,16 +135,19 @@ public class InterviewController {
     @DeleteMapping("/api/interviews/{interviewId}")
     public ResponseEntity<InterviewInfoResponseDto> deleteInterview(@PathVariable Long interviewId,
                                                                     @AuthenticationPrincipal User user) {
-        if (user == null) {
-            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
-        }
-        Long loginUserId = user.getId();
-
+//        if (user == null) {
+//            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
+//        }
+//        Long loginUserId = user.getId();
+        Long loginUserId = 2L;
         log.info("UID " + loginUserId + " DELETE INTERVIEW " + interviewId);
 
-        InterviewInfoResponseDto body = interviewGeneralService.deleteInterview(loginUserId, interviewId);
-
-        return new ResponseEntity<>(body, HttpStatus.OK);
+//        InterviewInfoResponseDto body = interviewGeneralService.deleteInterview(loginUserId, interviewId);
+        interviewGeneralService.deleteInterview(loginUserId,interviewId);
+//        return new ResponseEntity<>(body, HttpStatus.OK);
+        return new ResponseEntity<>(InterviewInfoResponseDto.builder()
+                .build(), HttpStatus.OK);
     }
+
 
 }

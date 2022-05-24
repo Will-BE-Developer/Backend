@@ -59,27 +59,15 @@ public class User extends Timestamped implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
-    List<Interview> interviews = new ArrayList<>();
+    private List<Interview> interviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
-    List<Scrap> scraps = new ArrayList<>();
+    private List<Scrap> scraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
-    List<Comment> comments = new ArrayList<>();
-    //------------------------------------------------
-    //Scrap 과 Comment 구현 전
-//    public void addScrap(Scrap scrap) {
-//        this.scraps.add(scrap);
-//        scrap.setUser(this);
-//    }
-//
-//    public void addComment(Comment comment) {
-//        this.comments.add(commnet);
-//        comment.setUser(this);
-//    }
-    //-------------------------------------------
+    private List<Comment> comments = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
