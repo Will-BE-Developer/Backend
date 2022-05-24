@@ -71,7 +71,8 @@ public class UserMypageService {
         //파일첨부 했으면 크롭 후, 이미지 로컬 및 S3에 저장하기(첨부 안했으면 null->프론트에서 default이미지)
         if (requestDto.getProfileImage() != null) {
             //이미지 파일 여부
-            isImageFile(requestDto.getProfileImage());
+            //isImageFile(requestDto.getProfileImage());
+            isImageFile(requestDto.getProfileImage(), user.getId());
 
             //image 파일 받기(for 크롭)
             File getFile = convert(requestDto.getProfileImage());
@@ -155,12 +156,16 @@ public class UserMypageService {
         return convFile;
     }
 
-    //이미지 파일 여부 image/gif, image/png, image/jpeg, image/bmp, image/webp  //(jpg등 테스트예정)
-    private void isImageFile(MultipartFile profileImage) {
-        Boolean isImage = profileImage.getContentType().split("/")[0].equals("image");
-        Boolean isGif = profileImage.getContentType().equals("image/gif");
-        if ((isImage == false) || (isGif == true)) {
-            ErrorMessage.INVALID_IMAGE_FILE.throwError();
+    //이미지 파일 여부, 확장자 확인 image/gif, image/png, image/jpeg(=jpg) (image/bmp, image/webp 불가)
+    private void isImageFile(MultipartFile profileImage, Long userId) {
+        String contentType = profileImage.getContentType();
+
+        boolean isImage = contentType.split("/")[0].equals("image");
+        String extension = contentType.split("/")[1];
+
+        if ((isImage == false) || extension.equals("webp") || extension.equals("bmp")) {
+            log.error("프로필 이미지 파일 타입({}) 에러(userId: {})", contentType, userId);
+            throw ErrorMessage.INVALID_IMAGE_FILE.throwError();
         }
     }
 
@@ -197,7 +202,7 @@ public class UserMypageService {
         }
     }
 
-    private String sendToS3(File file, Long userId, String oldObjectKey, String fileName) throws IOException {
+    private String sendToS3(File file, Long userId, String oldObjectKey, String fileName) {
 
         String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss"));
         String s3Folder = "profileImg/";
