@@ -38,6 +38,7 @@ public enum ErrorMessage{
     UNABLE_UPLOAD_TO_S3(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 업로드가 실패하였습니다."),
     UNABLE_SAVE_PROFILE_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 저장 또는 업로드가 실패하였습니다."),
     FAIL_DELETE_INTERVIEW(HttpStatus.INTERNAL_SERVER_ERROR, "면접왕인 인터뷰 삭제가 실패하였습니다."),
+    UNABLE_DELETE_INTERVIEW_ON_WEEKLY(HttpStatus.BAD_REQUEST, "면접왕으로 선정된 인터뷰는 삭제가 불가합니다."),
     ;
 
     private final RestException exception;

@@ -27,8 +27,8 @@ public class WeeklyInterviewScheduler {
     private JobLauncher jobLauncher;
 
     //주간 면접왕
-    //@Scheduled(cron = "0 0 0 ? * MON")  //Mon 00:00:00 매주 -> 재실행시 실행되므로, Now() -> 날짜계산 해서 쿼리
-    @Scheduled(cron = "0 */5 * * * *")  //5분(테스트)
+    @Scheduled(cron = "0 0 0 ? * MON")  //Mon 00:00:00 매주 -> 재실행시 실행되므로, Now() -> 날짜계산 해서 쿼리
+    //@Scheduled(cron = "0 */30 * * * *")  //30분(테스트)
     public void runWeeklyInterviewJob() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         JobParameters jobParameters = new JobParameters(
                 Collections.singletonMap("requestTime", new JobParameter(System.currentTimeMillis()))

@@ -218,9 +218,12 @@ public class UserMypageService {
             s3Client.putObject(new PutObjectRequest(bucket, objectKey, file));
 
             //S3에서 기존 프로필 이미지 삭제
-            if (oldObjectKey != null){
-                s3Client.deleteObject(bucket, oldObjectKey);
-                log.error("S3에서 기존 프로필 이미지 삭제 에러(userId: {}, 기존 objectKey: {})", userId, oldObjectKey);
+            try{
+                if (oldObjectKey != null){
+                    s3Client.deleteObject(bucket, oldObjectKey);
+                }
+            } catch (Exception e) {
+                log.error("S3에서 기존 프로필 이미지 삭제 에러(userId: {}) - {}", userId, e.getMessage());
             }
             log.info("OBJECT KEY : {}, CREATED IN BUCKET : {}", objectKey, bucket);
         } catch (Exception e) {

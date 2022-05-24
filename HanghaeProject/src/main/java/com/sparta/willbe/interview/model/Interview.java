@@ -123,4 +123,8 @@ public class Interview extends Timestamped {
     public void makeScrapNullForDelete(){
         this.scraps = null;
     }
+
+    public void deleteVideoKey(){
+        this.videoKey = "";
+    }
 }
