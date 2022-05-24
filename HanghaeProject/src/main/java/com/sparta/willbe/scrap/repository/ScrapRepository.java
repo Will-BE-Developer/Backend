@@ -16,4 +16,6 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
     @Query(value = "delete from scrap where interview_id = ?1 ", nativeQuery=true)
     void deleteByInterviewId(Long interviewId);
 
+    @Modifying
+    void deleteAllByInterviewId(Long interviewId);
 }
