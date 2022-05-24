@@ -19,14 +19,15 @@ public interface WeeklyInterviewRepository extends JpaRepository<WeeklyInterview
             "SELECT interview_id, count(interview_id) as scrap_count FROM scrap " +
             "WHERE created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 WEEK ) AND NOW() " +
             "group by interview_id " +
-            "order by count(interview_id) DESC LIMIT 10 " +
+            "order by count(interview_id) DESC LIMIT 20 " +
             ") s " +
             "ON i.id IN (s.interview_id) " +
-            "WHERE i.is_public = 1 order by scrap_count DESC, created_at DESC ", nativeQuery = true)
+            "WHERE i.is_public = 1 order by scrap_count DESC, i.created_at DESC ", nativeQuery = true)
 
     List<WeeklyInterview> findWeeklyInterview(Pageable pageable);
 
     WeeklyInterview findByWeeklyBadge(String lowRank);
 
     WeeklyInterview findByInterviewId(Long interviewId);
+
 }
