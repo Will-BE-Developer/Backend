@@ -13,4 +13,4 @@ public interface TodayQuestionRepository extends JpaRepository<TodayQuestion, Lo
     void deleteAll();
     List<TodayQuestion> findAll();
     List<TodayQuestion> findTop3ByOrderByCreatedAtDesc();
-}
+

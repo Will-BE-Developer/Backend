@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @ToString
-@Entity(name="batch_weekly_interview")
+@Entity(name="weekly_interview")
 public class WeeklyInterview {
 
     @Id
