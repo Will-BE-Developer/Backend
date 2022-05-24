@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity(name="batch_weekly_interview")
-public class BATCH_WeeklyInterview {
+public class WeeklyInterview {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,14 +32,14 @@ public class BATCH_WeeklyInterview {
     @Column(name = "weekly_badge")
     private String weeklyBadge;
 
-    public BATCH_WeeklyInterview(BATCH_WeeklyInterview weeklyInterviewTop3, String badge, String weeklyBadge) {
+    public WeeklyInterview(WeeklyInterview weeklyInterviewTop3, String badge, String weeklyBadge) {
         this.interview = weeklyInterviewTop3.getInterview();
         this.scrapCount = weeklyInterviewTop3.getScrapCount();
         this.badge = badge;
         this.weeklyBadge = weeklyBadge;
     }
 
-    public BATCH_WeeklyInterview(Interview interview, Long ScrapCount, String badge, String weeklyBadge) {
+    public WeeklyInterview(Interview interview, Long ScrapCount, String badge, String weeklyBadge) {
         this.interview = interview;
         this.scrapCount = ScrapCount;
         this.badge = badge;

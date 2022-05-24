@@ -25,8 +25,8 @@ public class TodayQuestionsBatchScheduler {
     private final TodayQuestionsBatchConfig todayQuestionsBatchConfig;
 //    매일 3시에 실행
     @Scheduled(cron = "0 0 3 * * *")
-//    매 30초마다 실행 --테스트용
-//    @Scheduled(cron = "0/30 * * * * *")
+//    매 50초마다 실행 --테스트용
+//    @Scheduled(cron = "0/50 * * * * *")
     public void runJob() {
         Map<String, JobParameter> configMap = new HashMap<>();
         configMap.put("time", new JobParameter((System.currentTimeMillis())));

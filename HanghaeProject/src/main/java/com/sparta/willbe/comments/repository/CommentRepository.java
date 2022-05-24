@@ -28,7 +28,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query(value = "SELECT c.id FROM Comment c WHERE c.interview.id = ?1 and c.rootName = 'interview' ")
     List<Integer> rootCommentIdPerPage(Long interviewId, Pageable pageable);
 
-    List<Comment> findAllByRootNameOrderByCreatedAtDesc(String rootname, Pageable pageable);
+    List<Comment> findTop4ByRootNameOrderByCreatedAtDesc(String rootname);
 
     List<Comment> findByRootIdAndRootName(Long rootId, String rootName);
 }

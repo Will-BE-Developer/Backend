@@ -1,8 +1,8 @@
 package com.sparta.willbe.batch.config;
 
 
-import com.sparta.willbe.batch.BATCH_repository.BATCH_TopCategoriesRepository;
-import com.sparta.willbe.batch.tables.BATCH_TopCategories;
+import com.sparta.willbe.batch.repository.TopCategoriesRepository;
+import com.sparta.willbe.batch.tables.TopCategories;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class TopCategoriesBatchConfig {
     private final StepBuilderFactory stepBuilderFactory;
 
     private final InterviewRepository interviewRepository;
-    private final BATCH_TopCategoriesRepository batchTopCategoriesRepository;
+    private final TopCategoriesRepository batchTopCategoriesRepository;
 
     @Bean
     public Job jobTopCategoies(){
@@ -50,13 +50,10 @@ public class TopCategoriesBatchConfig {
                     List<CategoryEnum> topSix = interviewRepository.findCategoriesOrderedByCategoryCount(PageRequest.of(0,6));
                     log.info("category Eunm : {}",topSix);
 
-                    //기존에 있는 카테고리를 지운다.
-                    batchTopCategoriesRepository.deleteAll();
-
                     //카테고리를 등록한다.
                     for(CategoryEnum category : topSix){
                         log.info("topSix Eunm : {}",category.name());
-                        BATCH_TopCategories batch_topCategories = new BATCH_TopCategories(category);
+                        TopCategories batch_topCategories = new TopCategories(category);
                         batchTopCategoriesRepository.save(batch_topCategories);
                     };
                      return RepeatStatus.FINISHED;

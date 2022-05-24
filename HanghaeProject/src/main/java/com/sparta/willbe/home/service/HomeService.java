@@ -1,11 +1,11 @@
 package com.sparta.willbe.home.service;
 
 import com.sparta.willbe.advice.ErrorMessage;
-import com.sparta.willbe.batch.BATCH_repository.BATCH_TodayQuestionRepository;
-import com.sparta.willbe.batch.BATCH_repository.BATCH_TopCategoriesRepository;
-import com.sparta.willbe.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;
-import com.sparta.willbe.batch.tables.BATCH_TopCategories;
-import com.sparta.willbe.batch.tables.BATCH_WeeklyInterview;
+import com.sparta.willbe.batch.repository.TodayQuestionRepository;
+import com.sparta.willbe.batch.repository.TopCategoriesRepository;
+import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;
+import com.sparta.willbe.batch.tables.TopCategories;
+import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
@@ -15,7 +15,7 @@ import com.sparta.willbe.scrap.model.Scrap;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
-import com.sparta.willbe.batch.tables.BATCH_TodayQuestion;
+import com.sparta.willbe.batch.tables.TodayQuestion;
 import com.sparta.willbe.comments.dto.CommentResponseDto;
 import com.sparta.willbe.comments.model.Comment;
 import com.sparta.willbe.comments.repository.CommentRepository;
@@ -23,7 +23,6 @@ import com.sparta.willbe.question.dto.QuestionResponseDto;
 import com.sparta.willbe.question.model.Question;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -40,23 +39,23 @@ import java.util.Set;
 public class HomeService {
     private final UserRepository userRepository;
     private final InterviewGeneralService interviewGeneralService;
-    private final BATCH_WeeklyInterviewRepository batch_weeklyInterviewRepository;
+    private final WeeklyInterviewRepository batch_weeklyInterviewRepository;
     private final QuestionRepository questionRepository;
-    private final BATCH_TodayQuestionRepository batch_todayQuestionRepository;
-    private final BATCH_TopCategoriesRepository batch_topCategoriesRepository;
+    private final TodayQuestionRepository batch_todayQuestionRepository;
+    private final TopCategoriesRepository batch_topCategoriesRepository;
     private final CommentRepository commentRepository;
     private final InterviewRepository interviewRepository;
 
-    public List<BATCH_TopCategories> getTopCatetories() {
-        List<BATCH_TopCategories> topCategories = batch_topCategoriesRepository.findAll();
+    public List<TopCategories> getTopCatetories() {
+        List<TopCategories> topCategories = batch_topCategoriesRepository.findTop6ByOrderByCreatedAtDesc();
         return topCategories;
     }
 
     public List<QuestionResponseDto> getTodayQuestion() {
-        List<BATCH_TodayQuestion> todaysQuestions = batch_todayQuestionRepository.findAll();
+        List<TodayQuestion> todaysQuestions = batch_todayQuestionRepository.findTop3ByOrderByCreatedAtDesc();
         List<QuestionResponseDto> todaysQuestionsDto = new ArrayList<>();
-        for (BATCH_TodayQuestion todayQuestion : todaysQuestions) {
-            Question question = questionRepository.findById(todayQuestion.getQuestionId()).orElseThrow(
+        for (TodayQuestion todayQuestion : todaysQuestions) {
+            Question question = questionRepository.findById(todayQuestion.getQuestion().getId()).orElseThrow(
                     () -> ErrorMessage.NOT_FOUND_QUESTION.throwError()
             );
             QuestionResponseDto n = new QuestionResponseDto(new QuestionResponseDto.data(
@@ -71,7 +70,7 @@ public class HomeService {
     }
 
     public List<CommentResponseDto.ResponseComment> getLatestComments(User user) {
-        List<Comment> comments = commentRepository.findAllByRootNameOrderByCreatedAtDesc("interview", PageRequest.of(0, 4));
+        List<Comment> comments = commentRepository.findTop4ByRootNameOrderByCreatedAtDesc("interview");
 
         log.info("COMMENTS FOUND : {}", comments);
         List<CommentResponseDto.ResponseComment> commentResponseDtos = new ArrayList<>();
@@ -88,7 +87,7 @@ public class HomeService {
     }
 
     public List<InterviewInfoResponseDto.Data> getLatestInterview(User user) {
-        List<Interview> latstInterview = interviewRepository.findAllByIsDoneAndIsPublicOrderByCreatedAtDesc(true, true, PageRequest.of(0, 4));
+        List<Interview> latstInterview = interviewRepository.findTop4ByIsDoneTrueAndIsPublicTrueOrderByCreatedAtDesc();
         List<InterviewInfoResponseDto.Data> latestInterviewDto = new ArrayList<>();
         Boolean ismine = false;
         Boolean scrapMe = false;
@@ -108,12 +107,16 @@ public class HomeService {
                     .id(interview.getId())
                     .video(interviewGeneralService.generateProfileImageUrl(interview.getVideoKey()))
                     .thumbnail(interviewGeneralService.generateProfileImageUrl(interview.getThumbnailKey()))
-                    .question(new QuestionResponseDto.data(interview.getQuestion().getId(), interview.getQuestion().getCategory().name(), interview.getQuestion().getContents(), interview.getQuestion().getReference()))
+                    .question(new QuestionResponseDto.data(interview.getQuestion().getId(),
+                            interview.getQuestion().getCategory().name(),
+                            interview.getQuestion().getContents(),
+                            interview.getQuestion().getReference()))
                     .user(UserInfoResponseDto.UserBody.builder()
                             .githubLink(interview.getUser().getGithubLink())
                             .id(interview.getUser().getId())
                             .nickname(interview.getUser().getNickname())
-                            .profileImageUrl(interviewGeneralService.generateProfileImageUrl(interview.getUser().getProfileImageUrl()))
+                            .profileImageUrl(interviewGeneralService
+                                    .generateProfileImageUrl(interview.getUser().getProfileImageUrl()))
                             .introduce(interview.getUser().getIntroduce())
                             .build())
                     .badge(interview.getBadge())
@@ -134,12 +137,12 @@ public class HomeService {
 
     public List<InterviewInfoResponseDto.Data> getWeeklyInterview(User user) {
 
-        List<BATCH_WeeklyInterview> getInterviews = batch_weeklyInterviewRepository.findAll();
+        List<WeeklyInterview> getInterviews = batch_weeklyInterviewRepository.findAll();
         List<InterviewInfoResponseDto.Data> weeklyInterview = new ArrayList<>();
         Boolean ismine = false;
         Boolean scrapMe = false;
 
-        for (BATCH_WeeklyInterview interview : getInterviews) {
+        for (WeeklyInterview interview : getInterviews) {
 
             if (user != null) {
                 User loginUser = userRepository.getById(user.getId());

@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.sparta.willbe.batch.tables.BATCH_WeeklyInterview;
+import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
 import com.sparta.willbe.interview.dto.InterviewListResponseDto;
 import com.sparta.willbe.interview.dto.InterviewUpdateRequestDto;
@@ -16,7 +16,7 @@ import com.sparta.willbe.interview.repository.InterviewRepository;
 import com.sparta.willbe.scrap.repository.ScrapRepository;
 import com.sparta.willbe._global.pagination.dto.PaginationResponseDto;
 import com.sparta.willbe.advice.ErrorMessage;
-import com.sparta.willbe.batch.BATCH_repository.BATCH_WeeklyInterviewRepository;
+import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.scrap.model.Scrap;
@@ -41,7 +41,7 @@ import java.util.*;
 public class InterviewGeneralService {
     private final InterviewRepository interviewRepository;
     private final UserRepository userRepository;
-    private final BATCH_WeeklyInterviewRepository weeklyInterviewRepository;
+    private final WeeklyInterviewRepository weeklyInterviewRepository;
     private final ScrapRepository scrapRepository;
 
     private static final long ONE_HOUR = 1000 * 60 * 60; //1시간
@@ -137,7 +137,7 @@ public class InterviewGeneralService {
         String profilePresignedUrl = generateProfileImageUrl(interview.getUser().getProfileImageUrl());
 
         //5월 2째주 1등 -> 숫자만 추출
-        BATCH_WeeklyInterview Weekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
+        WeeklyInterview Weekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
         boolean itsWeekly = Weekly == null ? false : true;
         int month = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(0, 1)) : -1;
         int week = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(3, 4)) : -1;
@@ -249,7 +249,7 @@ public class InterviewGeneralService {
 
         InterviewInfoResponseDto response = createInterviewResponse(loginUserId, userScrapsId, interview);
 
-        BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
+        WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
 
 
         //인터뷰 삭제전 면접왕 뱃지(Gold,Silver,Bronze)가 있으면, 밑에 등수 수정
@@ -274,7 +274,7 @@ public class InterviewGeneralService {
                 for (int lowerRanking : lowerRankArray) { //면접왕이 4등까지만 있을때, 5등이 없어서 에러남
                     //기존 위클리 등수 정보로 위클리 row 뽑아와서
                     String lowerWeeklyRank = weeklyBadge.substring(0, 7) + lowerRanking + "등";
-                    BATCH_WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerWeeklyRank);
+                    WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerWeeklyRank);
                     //새로운 등수 부여
                     int lowerNewRanking = lowerRanking - 1;
                     String newWeeklyRank = weeklyBadge.substring(0, 7) + (lowerRanking - 1) + "등";

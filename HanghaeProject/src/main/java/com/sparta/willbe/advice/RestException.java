@@ -11,6 +11,7 @@ public class RestException extends RuntimeException {
 
     private HttpStatus httpStatus;
     private String message;
+    private static final String Msg="message";
 
     public RestException(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
@@ -18,7 +19,6 @@ public class RestException extends RuntimeException {
     }
 
     public RestException() {
-        this.httpStatus = null;
-        this.message = null;
+        super();
     }
 }

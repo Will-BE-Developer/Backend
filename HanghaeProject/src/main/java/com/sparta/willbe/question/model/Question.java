@@ -1,6 +1,7 @@
 package com.sparta.willbe.question.model;
 
 import com.sparta.willbe._global.timestamped.model.Timestamped;
+import com.sparta.willbe.batch.tables.TodayQuestion;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.interview.model.Interview;
 //import com.team7.project.category.model.Category;
@@ -35,6 +36,9 @@ public class Question extends Timestamped {
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Interview> interviews = new ArrayList<>();
+
+    @OneToMany(mappedBy ="question", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<TodayQuestion> todayQuestions = new ArrayList<>();
 
     public Question(String contents, String reference, CategoryEnum category){
         this.contents = contents;

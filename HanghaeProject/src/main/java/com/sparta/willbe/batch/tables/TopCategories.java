@@ -1,5 +1,6 @@
 package com.sparta.willbe.batch.tables;
 
+import com.sparta.willbe._global.timestamped.model.Timestamped;
 import com.sparta.willbe.category.model.CategoryEnum;
 import lombok.*;
 
@@ -9,7 +10,7 @@ import javax.persistence.*;
 @Getter
 @RequiredArgsConstructor
 @Entity
-public class BATCH_TopCategories {
+public class TopCategories extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +20,7 @@ public class BATCH_TopCategories {
     @Enumerated(EnumType.STRING)
     private CategoryEnum category;
 
-    public BATCH_TopCategories(CategoryEnum category){
+    public TopCategories(CategoryEnum category){
         this.category = category;
     }
 
