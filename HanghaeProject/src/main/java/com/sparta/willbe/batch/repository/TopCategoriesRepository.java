@@ -9,7 +9,8 @@ import java.util.List;
 @Repository
 public interface TopCategoriesRepository extends JpaRepository<TopCategories, Long> {
 
-    //   void deleteAllBatch(BATCH_TopCategories entity);
-    TopCategories save(TopCategories batch_topCategories);
-    List<TopCategories> findTop6ByOrderByCreatedAtDesc();
+//   void deleteAllBatch(BATCH_TopCategories entity);
+   TopCategories save(TopCategories batch_topCategories);
+   List<TopCategories> findTop6ByOrderByCreatedAtDesc();
 }
+
