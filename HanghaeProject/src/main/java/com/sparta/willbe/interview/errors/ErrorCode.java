@@ -1,5 +1,8 @@
 package com.sparta.willbe.interview.errors;
 
+import lombok.Getter;
+
+@Getter
 public enum ErrorCode {
 
     // Common
@@ -11,9 +14,12 @@ public enum ErrorCode {
     EMAIL_DUPLICATION(400, "M001", "Email is Duplication"),
     LOGIN_INPUT_INVALID(400, "M002", "Login input is invalid"),
 
+    // Interview
+    INTERVIEW_NOT_FOUND(404, "I001", "Cannot Found interview"),
+
     ;
 
-    private int status;
+    private final int status;
     private final String code;
     private final String message;
 

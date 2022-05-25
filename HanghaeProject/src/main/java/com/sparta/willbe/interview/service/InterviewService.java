@@ -7,6 +7,7 @@ import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
 import com.sparta.willbe.interview.dto.InterviewListResponseDto;
 import com.sparta.willbe.interview.dto.InterviewUpdateRequestDto;
+import com.sparta.willbe.interview.errors.custom.InterviewNotFoundException;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import com.sparta.willbe.scrap.repository.ScrapRepository;
 import com.sparta.willbe._global.pagination.dto.PaginationResponseDto;
@@ -169,7 +170,7 @@ public class InterviewService {
 
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(
-                        ErrorMessage.NOT_FOUND_INTERVIEW::throwError
+                        InterviewNotFoundException::new
                 );
 
 
