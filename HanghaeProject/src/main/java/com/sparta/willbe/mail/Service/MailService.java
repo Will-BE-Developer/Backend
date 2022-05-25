@@ -35,13 +35,13 @@ public class MailService implements EmailUtils{
     private MailTemplate mailTemplate = new MailTemplate();
     private String htmlTemplate;
 
-    @PostConstruct
-    public void init() throws IOException{
-        final File file = ResourceUtils.getFile("classpath:templates/mailtemplate.html");
-        final InputStream inputStream = new FileInputStream(file);
-        final byte[] byteData = FileCopyUtils.copyToByteArray(inputStream);
-        htmlTemplate = new String(byteData, StandardCharsets.UTF_8);
-    }
+//    @PostConstruct
+//    public void init() throws IOException{
+//        final File file = ResourceUtils.getFile("classpath:templates/mailtemplate.html");
+//        final InputStream inputStream = new FileInputStream(file);
+//        final byte[] byteData = FileCopyUtils.copyToByteArray(inputStream);
+//        htmlTemplate = new String(byteData, StandardCharsets.UTF_8);
+//    }
 
     private String createBodyMailText(String token, String email, String nickname){
         htmlTemplate.replaceAll("\\$\\{token}",token);

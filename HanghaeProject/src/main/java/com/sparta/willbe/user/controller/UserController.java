@@ -10,7 +10,7 @@ import com.sparta.willbe.security.jwt.TokenResponseDto;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
 import com.sparta.willbe.user.dto.request.LoginRequestDto;
 import com.sparta.willbe.user.dto.request.RegisterRequestDto;
-import com.sparta.willbe.user.errors.UserAlreadyExistException;
+import com.sparta.willbe.user.exception.UserAlreadyExistException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.service.registerService.KakaoUserService;
 import com.sparta.willbe.user.service.registerService.UserProfileService;
