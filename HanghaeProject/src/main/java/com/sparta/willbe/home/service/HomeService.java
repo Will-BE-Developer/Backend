@@ -9,7 +9,7 @@ import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
-import com.sparta.willbe.interview.service.InterviewGeneralService;
+import com.sparta.willbe.interview.service.InterviewService;
 import com.sparta.willbe.question.repostitory.QuestionRepository;
 import com.sparta.willbe.scrap.model.Scrap;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
@@ -38,7 +38,7 @@ import java.util.Set;
 @Transactional
 public class HomeService {
     private final UserRepository userRepository;
-    private final InterviewGeneralService interviewGeneralService;
+    private final InterviewService interviewService;
     private final WeeklyInterviewRepository batch_weeklyInterviewRepository;
     private final QuestionRepository questionRepository;
     private final TodayQuestionRepository batch_todayQuestionRepository;
@@ -105,8 +105,8 @@ public class HomeService {
 
             InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
                     .id(interview.getId())
-                    .video(interviewGeneralService.generateProfileImageUrl(interview.getVideoKey()))
-                    .thumbnail(interviewGeneralService.generateProfileImageUrl(interview.getThumbnailKey()))
+                    .video(interviewService.getProfileImageUrl(interview.getVideoKey()))
+                    .thumbnail(interviewService.getProfileImageUrl(interview.getThumbnailKey()))
                     .question(new QuestionResponseDto.data(interview.getQuestion().getId(),
                             interview.getQuestion().getCategory().name(),
                             interview.getQuestion().getContents(),
@@ -115,8 +115,8 @@ public class HomeService {
                             .githubLink(interview.getUser().getGithubLink())
                             .id(interview.getUser().getId())
                             .nickname(interview.getUser().getNickname())
-                            .profileImageUrl(interviewGeneralService
-                                    .generateProfileImageUrl(interview.getUser().getProfileImageUrl()))
+                            .profileImageUrl(interviewService
+                                    .getProfileImageUrl(interview.getUser().getProfileImageUrl()))
                             .introduce(interview.getUser().getIntroduce())
                             .build())
                     .badge(interview.getBadge())
@@ -160,8 +160,8 @@ public class HomeService {
 
             InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
                     .id(interview.getInterview().getId())
-                    .video(interviewGeneralService.generateProfileImageUrl(interview.getInterview().getVideoKey()))
-                    .thumbnail(interviewGeneralService.generateProfileImageUrl(interview.getInterview().getThumbnailKey()))
+                    .video(interviewService.getProfileImageUrl(interview.getInterview().getVideoKey()))
+                    .thumbnail(interviewService.getProfileImageUrl(interview.getInterview().getThumbnailKey()))
                     .question(new QuestionResponseDto.data(interview.getInterview().getQuestion().getId(),
                             interview.getInterview().getQuestion().getCategory().name(),
                             interview.getInterview().getQuestion().getContents(),
@@ -170,7 +170,7 @@ public class HomeService {
                             .githubLink(interview.getInterview().getUser().getGithubLink())
                             .id(interview.getInterview().getUser().getId())
                             .nickname(interview.getInterview().getUser().getNickname())
-                            .profileImageUrl(interviewGeneralService.generateProfileImageUrl(interview.getInterview().getUser().getProfileImageUrl()))
+                            .profileImageUrl(interviewService.getProfileImageUrl(interview.getInterview().getUser().getProfileImageUrl()))
                             .introduce(interview.getInterview().getUser().getIntroduce())
                             .build())
                     .badge(weeklyInterviewKing)

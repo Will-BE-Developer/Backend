@@ -45,6 +45,10 @@ public class InterviewInfoResponseDto {
 
         private String createdAt;
         private String updatedAt;
+
+        public void deleteVideoKey(){
+            this.video = "";
+        }
     }
 
     public InterviewInfoResponseDto(Interview interview, String videoUrl, String imageUrl,
@@ -134,6 +138,8 @@ public class InterviewInfoResponseDto {
                 .updatedAt(interview.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
     }
+
+
 
 
 }

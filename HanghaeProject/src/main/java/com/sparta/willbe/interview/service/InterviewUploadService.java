@@ -5,8 +5,11 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.sparta.willbe.advice.ErrorMessage;
-import com.sparta.willbe.interview.repository.InterviewRepository;
+import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
+import com.sparta.willbe.interview.dto.InterviewPostRequestDto;
 import com.sparta.willbe.interview.model.Interview;
+import com.sparta.willbe.interview.repository.InterviewRepository;
+import com.sparta.willbe.question.model.Question;
 import com.sparta.willbe.question.repostitory.QuestionRepository;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
@@ -16,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,12 +29,12 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
-public class InterviewPostService {
-    private final InterviewGeneralService interviewGeneralService;
+public class InterviewUploadService {
+    private final InterviewService interviewService;
     private final InterviewRepository interviewRepository;
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
-//    private final InterviewConvertService interviewConvertService;
+    private final InterviewConvertService interviewConvertService;
 
     private static final long ONE_HOUR = 1000 * 60 * 60; // 1시간
     private final AmazonS3Client amazonS3Client;
@@ -38,7 +42,7 @@ public class InterviewPostService {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;  // S3 버킷 이름
 
-    public String generatePresignedPost(String objectKey) {
+    public String getPresignedPost(String objectKey) {
         Date expireTime = new Date();
         expireTime.setTime(expireTime.getTime() + ONE_HOUR);
 
@@ -70,35 +74,35 @@ public class InterviewPostService {
 
         return interview;
     }
-//
-//    @Transactional
-//    public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) throws IOException {
-//
-//        Interview interview = interviewRepository.findById(interviewId)
-//                .orElseThrow(ErrorMessage.NOT_FOUND_DRAFT::throwError);
-//
-//        Question question = questionRepository.findById(requestDto.getQuestionId())
-//                .orElseThrow(ErrorMessage.NOT_FOUND_QUESTION::throwError);
-//
-//
-//        if (interview.getUser().getId() != loginUserId) {
-//            throw ErrorMessage.INVALID_INTERVIEW_POST.throwError();
-//        }
-//
-//        String convertedObjectkey = interviewConvertService.webmToMp4(interview.getVideoKey(), interview.getId());
-//        log.info(interview.getVideoKey() + " To " + convertedObjectkey);
-//
-//        interview.complete(requestDto.getNote(),
-//                requestDto.getIsPublic(),
-//                question,
-//                interview.getVideoKey().replace(".webm",".mp4"),
-//                "re" + interview.getThumbnailKey());
-//
-//        return new InterviewInfoResponseDto(interview,
-//                interviewGeneralService.generatePresignedUrl(interview.getVideoKey()),
-//                interviewGeneralService.generatePresignedUrl(interview.getThumbnailKey()),
-//                interviewGeneralService.generateProfileImageUrl(interview.getUser().getProfileImageUrl()),
-//                true, false, 0L, 0L);
-//    }
+
+    @Transactional
+    public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) throws IOException {
+
+        Interview interview = interviewRepository.findById(interviewId)
+                .orElseThrow(ErrorMessage.NOT_FOUND_DRAFT::throwError);
+
+        Question question = questionRepository.findById(requestDto.getQuestionId())
+                .orElseThrow(ErrorMessage.NOT_FOUND_QUESTION::throwError);
+
+
+        if (interview.getUser().getId() != loginUserId) {
+            throw ErrorMessage.INVALID_INTERVIEW_POST.throwError();
+        }
+
+        String convertedObjectkey = interviewConvertService.webmToMp4(interview.getVideoKey(), interview.getId());
+        log.info(interview.getVideoKey() + " To " + convertedObjectkey);
+
+        interview.complete(requestDto.getNote(),
+                requestDto.getIsPublic(),
+                question,
+                interview.getVideoKey().replace(".webm",".mp4"),
+                "re" + interview.getThumbnailKey());
+
+        return new InterviewInfoResponseDto(interview,
+                interviewService.getPresignedUrl(interview.getVideoKey()),
+                interviewService.getThumbnailImageUrl(interview),
+                interviewService.getProfileImageUrl(interview.getUser().getProfileImageUrl()),
+                true, false, 0L, 0L);
+    }
 
 }

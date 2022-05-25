@@ -7,7 +7,7 @@ import com.sparta.willbe.comments.model.Comment;
 import com.sparta.willbe.comments.repository.CommentRepository;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
-import com.sparta.willbe.interview.service.InterviewGeneralService;
+import com.sparta.willbe.interview.service.InterviewService;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final InterviewGeneralService interviewGeneralService;
+    private final InterviewService interviewService;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final InterviewRepository interviewRepository;
@@ -55,7 +55,7 @@ public class CommentService {
             if (user != null){
                 isMine = user.getId().equals(eachComment.getUser().getId());
             }
-            String profileUrl = interviewGeneralService.generateProfileImageUrl(eachComment.getUser().getProfileImageUrl());
+            String profileUrl = interviewService.getProfileImageUrl(eachComment.getUser().getProfileImageUrl());
             commentListDto.addComment(eachComment, isMine, profileUrl);
         }
 
@@ -81,7 +81,7 @@ public class CommentService {
                 if (parentComment.getId().equals(itsParentId)){
                     int index = commentListDto.getComments().indexOf(parentComment);
                     log.info("대댓글을 포함시킬 부모댓글의 index : {}", index);
-                    String childProfileUrl = interviewGeneralService.generateProfileImageUrl(eachChild.getUser().getProfileImageUrl());
+                    String childProfileUrl = interviewService.getProfileImageUrl(eachChild.getUser().getProfileImageUrl());
                     commentListDto.addNestedComment(index, eachChild, isMine, childProfileUrl);
                 }
             }

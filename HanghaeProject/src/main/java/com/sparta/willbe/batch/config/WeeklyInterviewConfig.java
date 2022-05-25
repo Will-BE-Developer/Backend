@@ -27,7 +27,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class WeeklyInterviewConfig {
 
-    private final WeeklyInterviewRepository batch_weeklyInterviewRepository;
+    private final WeeklyInterviewRepository weeklyInterviewRepository;
     private final InterviewRepository interviewRepository;
 
     private final JobBuilderFactory jobBuilderFactory;
@@ -58,7 +58,7 @@ public class WeeklyInterviewConfig {
         return (contribution, chunkContext) -> {
 
             //기존 인터뷰 뱃지 삭제
-            List<WeeklyInterview> lastWeeklyInterview = batch_weeklyInterviewRepository.findAll();
+            List<WeeklyInterview> lastWeeklyInterview = weeklyInterviewRepository.findAll();
             for (WeeklyInterview lastWeeklyInterviewEach : lastWeeklyInterview){
                 Interview lastInterview = lastWeeklyInterviewEach.getInterview();
                 lastInterview.updateBadge("NONE");
@@ -66,11 +66,11 @@ public class WeeklyInterviewConfig {
             }
 
             //이번주 면접왕 인터뷰 선정 + (추후 추가: 좋아요 숫자, 동점은 인터뷰 최신순)
-            List<WeeklyInterview> weeklyInterviews = batch_weeklyInterviewRepository.findWeeklyInterview(PageRequest.of(0,5));
+            List<WeeklyInterview> weeklyInterviews = weeklyInterviewRepository.findWeeklyInterview(PageRequest.of(0,5));
             log.info("weeklyInterview top 5 >> {}등까지 추출됨", weeklyInterviews.size());
 
-            //기존 위클리 면접왕 삭제
-            batch_weeklyInterviewRepository.deleteAll();
+            //기존 위클리 면접왕 삭제 -> 기록
+            //weeklyInterviewRepository.deleteAll();
 
             //위클리 면접왕 저장
             int ranking = 0;
@@ -102,13 +102,13 @@ public class WeeklyInterviewConfig {
                     //edit
                     WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), badge[ranking-1], weeklyBadge);
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
-                    batch_weeklyInterviewRepository.save(weeklyInterviewEach);
+                    weeklyInterviewRepository.save(weeklyInterviewEach);
                 }else{
                     Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
                             .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
                     WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), "NONE", weeklyBadge);
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
-                    batch_weeklyInterviewRepository.save(weeklyInterviewEach);
+                    weeklyInterviewRepository.save(weeklyInterviewEach);
                 }
 
                 //3등까지만 뱃지(골드,실버,브론즈) 저장(기존)
@@ -119,7 +119,7 @@ public class WeeklyInterviewConfig {
 //                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, "NONE", weeklyBadge);
 //                }
 //                    weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
-//                batch_weeklyInterviewRepository.save(weeklyInterviewEach);
+//                weeklyInterviewRepository.save(weeklyInterviewEach);
 
             }
 
