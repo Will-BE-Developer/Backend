@@ -27,7 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,20 +43,20 @@ import java.util.Set;
 public class HomeService {
     private final UserRepository userRepository;
     private final InterviewService interviewService;
-    private final WeeklyInterviewRepository batch_weeklyInterviewRepository;
+    private final WeeklyInterviewRepository weeklyInterviewRepository;
     private final QuestionRepository questionRepository;
-    private final TodayQuestionRepository batch_todayQuestionRepository;
-    private final TopCategoriesRepository batch_topCategoriesRepository;
+    private final TodayQuestionRepository todayQuestionRepository;
+    private final TopCategoriesRepository topCategoriesRepository;
     private final CommentRepository commentRepository;
     private final InterviewRepository interviewRepository;
 
     public List<TopCategories> getTopCatetories() {
-        List<TopCategories> topCategories = batch_topCategoriesRepository.findTop6ByOrderByCreatedAtDesc();
+        List<TopCategories> topCategories = topCategoriesRepository.findTop6ByOrderByCreatedAtDesc();
         return topCategories;
     }
 
     public List<QuestionResponseDto> getTodayQuestion() {
-        List<TodayQuestion> todaysQuestions = batch_todayQuestionRepository.findTop3ByOrderByCreatedAtDesc();
+        List<TodayQuestion> todaysQuestions = todayQuestionRepository.findTop3ByOrderByCreatedAtDesc();
         List<QuestionResponseDto> todaysQuestionsDto = new ArrayList<>();
         for (TodayQuestion todayQuestion : todaysQuestions) {
             Question question = questionRepository.findById(todayQuestion.getQuestion().getId()).orElseThrow(
@@ -138,11 +141,12 @@ public class HomeService {
 
     public List<InterviewInfoResponseDto.Data> getWeeklyInterview(User user) {
 
-        List<WeeklyInterview> getInterviews = batch_weeklyInterviewRepository.findAll();
+        final long WEEK = 1000L* 60 * 60* 24*7;
+        List<WeeklyInterview> getInterviews = weeklyInterviewRepository.findByCreatedAtBetween(LocalDateTime.now().minus(1, ChronoUnit.WEEKS),LocalDateTime.now());
         List<InterviewInfoResponseDto.Data> weeklyInterview = new ArrayList<>();
         Boolean ismine = false;
         Boolean scrapMe = false;
-
+        log.debug("WeeklyInterview HOMESERVICE >> get {} INTERVIEWS ",getInterviews.size());
         for (WeeklyInterview interview : getInterviews) {
 
             if (user != null) {

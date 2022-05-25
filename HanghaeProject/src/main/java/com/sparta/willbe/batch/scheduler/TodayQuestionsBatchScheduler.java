@@ -2,6 +2,7 @@ package com.sparta.willbe.batch.scheduler;
 
 
 import com.sparta.willbe.batch.config.TodayQuestionsBatchConfig;
+import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParameter;
@@ -38,7 +39,7 @@ public class TodayQuestionsBatchScheduler {
                 JobInstanceAlreadyCompleteException |
                 JobParametersInvalidException |
                 JobRestartException e) {
-            log.error(e.getMessage());
+            Sentry.captureException(e);
         }
     }
 }
