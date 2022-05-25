@@ -129,7 +129,9 @@ public class InterviewService {
         // -> query did not return a unique result -> 최신꺼 1개만
         //WeeklyInterview Weekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
         WeeklyInterview Weekly = weeklyInterviewRepository.findTopByInterviewIdOrderByIdDesc(interview.getId());
-        log.info("Weekly Interview 최신 top 1: {}", Weekly.getId());  //-> NullPointerException
+        if( Weekly != null){
+            log.info("Weekly Interview 최신 top 1: {}", Weekly.getId());
+        }
         boolean itsWeekly = Weekly != null;
         int month = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(0, 1)) : -1;
         int week = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(3, 4)) : -1;
