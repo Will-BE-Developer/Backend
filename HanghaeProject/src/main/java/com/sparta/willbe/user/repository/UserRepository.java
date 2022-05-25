@@ -11,6 +11,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailAndIsDeletedFalseAndIsValidTrue(String userEmail);
     //email register but not valid user
     Optional<User> findByEmailAndIsDeletedFalseAndIsValidFalse(String userEmail);
+    Optional<User> findByEmailAndIsDeletedTrue(String userEmail);
     Optional<User> findByEmailAndProviderAndIsDeletedFalse(String email, String provider);
-    Optional<User> findByEmailAndIsValid(String email, boolean isValid);
+    Optional<User> findByEmailAndIsValidTrueAndIsDeletedFalse(String email);
 }

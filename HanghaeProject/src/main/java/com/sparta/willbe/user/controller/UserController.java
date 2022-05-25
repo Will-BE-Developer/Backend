@@ -99,6 +99,9 @@ public class UserController {
         if(userRegistryService.isEmailExist(requestDto.getEmail())){
             throw ErrorMessage.CONFLICT_USER_EMAIL.throwError();
         }
+        if(userRegistryService.isUserDeleted(requestDto.getEmail())){
+            throw NOT_FOUND_USER.throwError();
+        }
         log.debug("SIGN_UP() >> 비밀번호와 비밀번호가 일치하는지 확인중...");
         //비밀번호와 비밀번호 확인이 일치
         if (!requestDto.getPassword().equals( requestDto.getPasswordCheck())) {
@@ -123,14 +126,18 @@ public class UserController {
     }
     @GetMapping("/signup/{email}")
     public ResponseEntity<Success> idCheck(@PathVariable String email){
-        //유저네임이 등록되어있지 않은경우 사용가능 하다
-        if(!userRegistryService.isEmailExist(email)){
-            log.debug("SIGN_UP() >> 중복확인 : 사용가능한 이메일 입니다.");
-            return new ResponseEntity<Success>(new Success(true, "사용 가능한 이메일 입니다."), HttpStatus.OK);
+
+        if(userRegistryService.isEmailExist(email)){
+            //유저네임이 등록되어있는경우 사용불가능 하다.
+            log.debug("SIGN_UP() >> 중복확인 : 사용 할 수 없는 이메일 입니다.");
+            return new ResponseEntity<Success>(new Success(false, "동일한 이메일 주소가 존재합니다."), HttpStatus.CONFLICT);
+        }else if(userRegistryService.isUserDeleted(email)){
+            log.debug("SIGN_UP() >> 중복확인 : 삭제된 이메일 입니다.");
+            return new ResponseEntity<Success>(new Success(false, "탈퇴한 이메일 입니다."), HttpStatus.CONFLICT);
         }
-        //유저네임이 등록되어있는경우 사용불가능 하다.
-        log.debug("SIGN_UP() >> 중복확인 : 사용 할 수 없는 이메일 입니다.");
-        return new ResponseEntity<Success>(new Success(false, "동일한 이메일 주소가 존재합니다."), HttpStatus.CONFLICT);
+        //유저네임이 등록되어있지 않은경우 사용가능 하다
+        log.debug("SIGN_UP() >> 중복확인 : 사용가능한 이메일 입니다.");
+        return new ResponseEntity<Success>(new Success(true, "사용 가능한 이메일 입니다."), HttpStatus.OK);
     }
 
     @PostMapping("/signout")
@@ -197,14 +204,18 @@ public class UserController {
         return new ResponseEntity<>(new Success(true,"회원삭제 성공"),HttpStatus.OK);
     }
 
+    // TODO : throw 던지는거 클라이언트한테 handler 로 처리해서 넘겨 주기
     @GetMapping("/user/kakao/callback")
     public ResponseEntity<UserInfoResponseDto> kakaoLogin(@AuthenticationPrincipal User users, @RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         //로그인 되는게 확인 될 경우에 에러를 반환한다.
         if(users != null){
             throw ErrorMessage.USER_AlREADY_FOUND.throwError();
         }
-        User user =  kakaoUserService.kakaoLogin(code);
 
+        User user =  kakaoUserService.kakaoLogin(code);
+        if(userRegistryService.isUserDeleted(user.getEmail())){
+            throw NOT_FOUND_USER.throwError();
+        }
         //로그인이 오류없이 처리 되었다면 Autorization 토큰을 헤더에 실어 보내준다.
         TokenResponseDto token = userProfileService.giveToken(user.getEmail());
         response.setHeader("Authorization", token.getAuthorization());
