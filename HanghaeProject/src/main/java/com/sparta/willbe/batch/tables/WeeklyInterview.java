@@ -21,8 +21,12 @@ public class WeeklyInterview extends Timestamped {
     private Long id;
 
     //@OneToOne(fetch = FetchType.LAZY)
-    @ManyToOne(fetch = FetchType.LAZY)
+    //@ManyToOne(fetch = FetchType.LAZY)
+    //@ManyToOne(cascade = CascadeType.ALL)
+    //@ManyToOne(optional = false)  //inner join
+    @ManyToOne
     @JoinColumn(name="interview_id")
+    //@Column(name="interview_id")
     private Interview interview;
 
     @Column(name = "scrap_count")

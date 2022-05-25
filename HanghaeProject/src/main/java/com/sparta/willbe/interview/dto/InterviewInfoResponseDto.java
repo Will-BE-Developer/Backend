@@ -139,6 +139,11 @@ public class InterviewInfoResponseDto {
                 .build();
     }
 
+//    Interview getTempInterview(){
+//        //Interview interview = this.getInterview();
+//        return interview;
+//    }
+
 
 
 

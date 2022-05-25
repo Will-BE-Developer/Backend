@@ -30,4 +30,8 @@ public interface WeeklyInterviewRepository extends JpaRepository<WeeklyInterview
 
     WeeklyInterview findByInterviewId(Long interviewId);
 
+    WeeklyInterview findTopByInterviewIdOrderByIdDesc(Long interviewId);
+
+    List<WeeklyInterview> findAllByInterviewId(Long interviewId);
+
 }
