@@ -3,6 +3,7 @@ package com.sparta.willbe.likes.controller;
 import com.sparta.willbe.likes.dto.LikeRequestDto;
 import com.sparta.willbe.likes.dto.LikesResponseDto;
 import com.sparta.willbe.likes.service.LikesService;
+import com.sparta.willbe.user.exception.UserUnauthorizedException;
 import com.sparta.willbe.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class LikesController {
                                                      @RequestBody LikeRequestDto likeRequestDto){
 
         if(user ==null){
-            throw UNAUTHORIZED_USER.throwError();
+            throw new UserUnauthorizedException();
         }
         log.info("Current user is {}" ,user.getNickname());
 

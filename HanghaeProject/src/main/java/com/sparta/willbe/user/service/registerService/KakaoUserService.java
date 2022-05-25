@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.willbe.advice.ErrorMessage;
+import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.dto.KakaoUserInfoDto;
 import com.sparta.willbe.user.model.Role;
@@ -163,7 +164,7 @@ public class KakaoUserService {
             }else {
                 //가입된 카카오 사용자가 있다면, 토큰을 갈아 끼워 준다.
                 kakaoUser = userRepository.findByEmailAndProviderAndIsDeletedFalse(email,provider).orElseThrow(
-                        ()-> ErrorMessage.NOT_FOUND_USER.throwError()
+                        ()-> new UserNotFoundException()
                 );
                 kakaoUser.updateInfo(accessToken);
             }
