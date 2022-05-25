@@ -52,14 +52,6 @@ public class InterviewService {
 
     private final AmazonS3Client amazonFullS3Client;
 
-    private final EntityManager entityManager;
-
-    @Value("${cloud.aws.credentials.access-key-upload}")
-    private String accessKey;
-
-    @Value("${cloud.aws.credentials.secret-key-upload}")
-    private String secretKey;
-
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
