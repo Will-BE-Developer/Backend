@@ -257,7 +257,8 @@ public class InterviewService {
                         .withRegion(Regions.AP_NORTHEAST_2)
                         .build();
                 if (interview.getVideoKey().equals("") == false){
-                    s3Client.deleteObject(bucket, interview.getVideoKey());
+                    amazonFullS3Client.deleteObject(bucket, interview.getVideoKey());
+                    //s3Client.deleteObject(bucket, interview.getVideoKey());
                     log.info("S3에서 인터뷰(ID:{}) 영상 삭제 성공(VideoKey:{})", interviewId, interview.getVideoKey());
                 }else{
                     log.error("이미 삭제 처리된 인터뷰(ID:{})", interviewId);
