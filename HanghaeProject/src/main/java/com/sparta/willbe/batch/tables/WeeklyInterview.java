@@ -20,14 +20,14 @@ public class WeeklyInterview extends Timestamped {
     @Column(unique = true, nullable = false)
     private Long id;
 
-    //@OneToOne(fetch = FetchType.LAZY)
     //@ManyToOne(fetch = FetchType.LAZY)
     //@ManyToOne(cascade = CascadeType.ALL)
     //@ManyToOne(optional = false)  //inner join
-    @ManyToOne
-    @JoinColumn(name="interview_id")
-    //@Column(name="interview_id")
-    private Interview interview;
+    //@ManyToOne
+    //@JoinColumn(name="interview_id")
+    //private Interview interview;
+    @Column(name="interview_id")
+    private Long interviewId;
 
     @Column(name = "scrap_count")
     private Long scrapCount;
@@ -38,15 +38,18 @@ public class WeeklyInterview extends Timestamped {
     @Column(name = "weekly_badge")
     private String weeklyBadge;
 
-    public WeeklyInterview(WeeklyInterview weeklyInterviewTop3, String badge, String weeklyBadge) {
-        this.interview = weeklyInterviewTop3.getInterview();
+    //public WeeklyInterview(WeeklyInterview weeklyInterviewTop3, String badge, String weeklyBadge) {
+    public WeeklyInterview(WeeklyInterview weeklyInterviewTop3, Long interviewId, String badge, String weeklyBadge) {
+        //this.interview = weeklyInterviewTop3.getInterview();
+        this.interviewId = interviewId;
         this.scrapCount = weeklyInterviewTop3.getScrapCount();
         this.badge = badge;
         this.weeklyBadge = weeklyBadge;
     }
 
-    public WeeklyInterview(Interview interview, Long ScrapCount, String badge, String weeklyBadge) {
-        this.interview = interview;
+    //public WeeklyInterview(Interview interview, Long ScrapCount, String badge, String weeklyBadge) {
+    public WeeklyInterview(Long interviewId, Long ScrapCount, String badge, String weeklyBadge) {
+        this.interviewId = interviewId;
         this.scrapCount = ScrapCount;
         this.badge = badge;
         this.weeklyBadge = weeklyBadge;

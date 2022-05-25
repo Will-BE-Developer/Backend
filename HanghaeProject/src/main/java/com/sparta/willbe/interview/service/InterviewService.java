@@ -247,38 +247,13 @@ public class InterviewService {
                 log.error("S3에서 인터뷰(ID:{}) 영상 삭제 에러 - {}", interviewId, e.getMessage());
             }
 
-//            List<WeeklyInterview> itsWeekly = weeklyInterviewRepository.findAllByInterviewId(interviewId);
-//            System.out.println("itsWeekly: " + itsWeekly);
-//            interview.getWeeklyInterviews().removeAll(itsWeekly);
-//            interview.makeWeeklyNullForDelete();
-
-            //Interview interview1 = entityManager.createNamedQuery("get_interview_by_id", Interview.class).setParameter("id", interviewId).getSingleResult();
-            Interview interview1 = entityManager.createQuery("select i from Interview i where i.id = :id", Interview.class).setParameter("id", interviewId).getSingleResult();
-
-            for (WeeklyInterview weekly : interview1.getWeeklyInterviews()) {
-                weekly.setInterview(null);
-                //weekly.setInterview(interviewId);
-            }
-            interview1.getWeeklyInterviews().clear();
-
-            //WeeklyInterview weekly = weeklyInterviewRepository.findTopByInterviewIdOrderByIdDesc(interviewId);
-            //interview.getWeeklyInterviews().remove(weekly);
+            //interview.makeWeeklyNullForDelete();
+            //interviewRepository.save(interview);
 
             scrapRepository.deleteByInterviewId(interviewId);
             interview.makeScrapNullForDelete();
+
             interviewRepository.deleteById(interviewId);
-
-            for (WeeklyInterview weekly : interview1.getWeeklyInterviews()) {
-                Interview tempInterview = weekly.getInterview();
-                weekly.setInterview(tempInterview);
-            }
-            //현재 코드 결과 -->> 위클리 테이블에서 interviewId가 null이 됨
-
-            try{
-                interviewRepository.findById(interviewId);
-            }catch (IllegalArgumentException e){
-                System.out.println("인터뷰 삭제됨");
-            }
 
         } catch (Exception e) {
             log.error("인터뷰 ID {}번 삭제 에러", interviewId, e);

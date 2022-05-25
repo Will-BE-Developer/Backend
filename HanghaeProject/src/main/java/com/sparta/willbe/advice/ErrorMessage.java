@@ -41,6 +41,7 @@ public enum ErrorMessage{
     UNABLE_SAVE_PROFILE_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 저장 또는 업로드가 실패하였습니다."),
     FAIL_DELETE_INTERVIEW(HttpStatus.INTERNAL_SERVER_ERROR, "면접왕인 인터뷰 삭제가 실패하였습니다."),
     UNABLE_DELETE_INTERVIEW_ON_WEEKLY(HttpStatus.BAD_REQUEST, "면접왕으로 선정된 인터뷰는 삭제가 불가합니다."),
+    NOT_FOUND_INTERVIEW_IN_WEEKLY(HttpStatus.GONE,"위클리 테이블에서 해당 인터뷰가 존재하지 않습니다."),
     ;
 
     private final RestException exception;
