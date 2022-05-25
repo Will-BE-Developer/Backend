@@ -1,6 +1,5 @@
 package com.sparta.willbe.batch.config;
 
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;
 import com.sparta.willbe.batch.jobListener.JobListener;
 import com.sparta.willbe.batch.tables.WeeklyInterview;
@@ -19,8 +18,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import javax.transaction.Transactional;
 import java.util.*;
-
-// run param: --spring.batch.job.names=weeklyInterviewJob
 
 @Slf4j
 @Configuration
@@ -100,8 +97,8 @@ public class WeeklyInterviewConfig {
 
                 //인터뷰 뱃지 저장(1,2,3등만)
                 if (ranking <= 3){
-                    //Interview interview = weeklyInterview.getInterview();
                     //interview레포지토리에서 새로 불러와서
+                    //Interview interview = weeklyInterview.getInterview();
                     //Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
 
                     Interview interview = interviewRepository.findById(weeklyInterview.getInterviewId())
@@ -109,31 +106,18 @@ public class WeeklyInterviewConfig {
 
                     interview.updateBadge(badge[ranking-1]);
                     interview = interviewRepository.save(interview);
-                    //edit
-                    //WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), badge[ranking-1], weeklyBadge);
+
                     WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview.getId(), weeklyInterview.getScrapCount(), badge[ranking-1], weeklyBadge);
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
                     weeklyInterviewRepository.save(weeklyInterviewEach);
                 }else{
-                    //Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
                     Interview interview = interviewRepository.findById(weeklyInterview.getInterviewId())
                             .orElseThrow(InterviewNotFoundException::new);
-                    //WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), "NONE", weeklyBadge);
                     WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview.getId(), weeklyInterview.getScrapCount(), "NONE", weeklyBadge);
 
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
                     weeklyInterviewRepository.save(weeklyInterviewEach);
                 }
-
-                //3등까지만 뱃지(골드,실버,브론즈) 저장(기존)
-//                BATCH_WeeklyInterview weeklyInterviewEach;
-//                if (ranking <= 3){
-//                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, badge[ranking-1], weeklyBadge);
-//                }else{
-//                    weeklyInterviewEach = new BATCH_WeeklyInterview(weeklyInterview, "NONE", weeklyBadge);
-//                }
-//                    weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
-//                weeklyInterviewRepository.save(weeklyInterviewEach);
 
             }
 

@@ -54,9 +54,13 @@ public enum ErrorMessage{
     //MOVED
     PASSWORD_MISMATCHED(HttpStatus.BAD_REQUEST, "비밀번호와 비밀번호확인이 일치하지 않습니다."),
 
+    //MOVED
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND,"해당 댓글은 존재하지 않습니다."),
+    //MOVED
     INVALID_ROOT_ID(HttpStatus.BAD_REQUEST, "수정하려는 댓글의 RootId가 일치하지 않습니다."),
+    //MOVED
     INVALID_ROOT_NAME(HttpStatus.BAD_REQUEST, "수정하려는 댓글의 RootName이 일치하지 않습니다."),
+
     INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST, "프로필 이미지는 png, jpg, gif 확장자만 가능합니다."),
     INVALID_IMAGE_SIZE_ZERO(HttpStatus.BAD_REQUEST, "프로필 이미지 파일이 0바이트 입니다."),
     INVALID_IMAGE_SIZE(HttpStatus.BAD_REQUEST, "프로필 이미지 파일은 5MB 이하만 가능합니다."),

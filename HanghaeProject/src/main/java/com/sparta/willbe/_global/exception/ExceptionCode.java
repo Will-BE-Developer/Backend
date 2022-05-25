@@ -52,6 +52,10 @@ public enum ExceptionCode {
     // must be fixed
     USER_PAYLOAD_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, "U1301", "프로필 이미지 파일은 5MB 이하만 가능합니다."),
 
+    // Comment
+    NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND,"C101", "해당 댓글은 존재하지 않습니다."),
+    INVALID_ROOT_ID(HttpStatus.BAD_REQUEST, "C102", "수정하려는 댓글의 RootId가 일치하지 않습니다."),
+    INVALID_ROOT_NAME(HttpStatus.BAD_REQUEST, "C103", "수정하려는 댓글의 RootName이 일치하지 않습니다."),
 
 
     ;
