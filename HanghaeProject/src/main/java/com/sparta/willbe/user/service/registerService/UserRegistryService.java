@@ -24,7 +24,7 @@ public class UserRegistryService {
 
         log.info("SIGN_UP() >> registerUser >> Nickname 유무확인 ");
 
-        if(requestDto.getNickname().isEmpty()) {
+        if(requestDto.getNickname() == null) {
             long number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
             String randomGenName = "윌비@" + number;
             log.info("SIGN_UP() >> registerUser >> Nickname 생성 {}", randomGenName.toString());
