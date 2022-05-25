@@ -27,7 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -138,7 +140,7 @@ public class HomeService {
 
     public List<InterviewInfoResponseDto.Data> getWeeklyInterview(User user) {
 
-        List<WeeklyInterview> getInterviews = weeklyInterviewRepository.findAll();
+        List<WeeklyInterview> getInterviews = weeklyInterviewRepository.findByCreatedAtBetween(LocalDateTime.now().minus(1, ChronoUnit.WEEKS),LocalDateTime.now());
         List<InterviewInfoResponseDto.Data> weeklyInterview = new ArrayList<>();
         Boolean ismine = false;
         Boolean scrapMe = false;
