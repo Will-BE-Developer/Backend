@@ -244,29 +244,20 @@ public class InterviewService {
         InterviewInfoResponseDto response = getInterviewResponse(loginUserId, userScrapsId, interview);
 
         //인터뷰 삭제시 -> (변경)인터뷰 삭제, 위클리테이블은 유지
-
-        try {
-            //S3에서 영상 삭제
-            try{
-                amazonFullS3Client.deleteObject(bucket, interview.getVideoKey());
-                log.info("S3에서 인터뷰(ID:{}) 영상 삭제 성공(VideoKey:{})", interviewId, interview.getVideoKey());
-
-            } catch (Exception e) {
-                log.error("S3에서 인터뷰(ID:{}) 영상 삭제 에러 - {}", interviewId, e.getMessage());
-                Sentry.captureException(e);
-            }
-
-            //interview.makeWeeklyNullForDelete();
-            //interviewRepository.save(interview);
-
-            scrapRepository.deleteByInterviewId(interviewId);
-            interview.makeScrapNullForDelete();
-
-            interviewRepository.deleteById(interviewId);
+        //S3에서 영상 삭제
+        try{
+            amazonFullS3Client.deleteObject(bucket, interview.getVideoKey());
+            log.info("S3에서 인터뷰(ID:{}) 영상 삭제 성공(VideoKey:{})", interviewId, interview.getVideoKey());
 
         } catch (Exception e) {
-            log.error("인터뷰 ID {}번 삭제 에러", interviewId, e);
+            log.error("S3에서 인터뷰(ID:{}) 영상 삭제 에러 - {}", interviewId, e.getMessage());
+            Sentry.captureException(e);
         }
+
+
+        scrapRepository.deleteByInterviewId(interviewId);
+        interview.makeScrapNullForDelete();
+        interviewRepository.deleteById(interviewId);
 
         return response;
     }

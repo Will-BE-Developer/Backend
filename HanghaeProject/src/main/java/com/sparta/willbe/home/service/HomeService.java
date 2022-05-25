@@ -40,7 +40,7 @@ import java.util.Set;
 public class HomeService {
     private final UserRepository userRepository;
     private final InterviewService interviewService;
-    private final WeeklyInterviewRepository batch_weeklyInterviewRepository;
+    private final WeeklyInterviewRepository weeklyInterviewRepository;
     private final QuestionRepository questionRepository;
     private final TodayQuestionRepository batch_todayQuestionRepository;
     private final TopCategoriesRepository batch_topCategoriesRepository;
@@ -138,15 +138,20 @@ public class HomeService {
 
     public List<InterviewInfoResponseDto.Data> getWeeklyInterview(User user) {
 
-        List<WeeklyInterview> getInterviews = batch_weeklyInterviewRepository.findAll();
+        List<WeeklyInterview> getInterviews = weeklyInterviewRepository.findAll();
         List<InterviewInfoResponseDto.Data> weeklyInterview = new ArrayList<>();
         Boolean ismine = false;
         Boolean scrapMe = false;
-
+        int ranking = 0;
         for (WeeklyInterview interview : getInterviews) {
 
             Interview interviewById = interviewRepository.findById(interview.getInterviewId())
-                    .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+                    .orElse(null);
+            if (interviewById == null) {
+                continue;
+            }
+            ranking++;
+
             if (user != null) {
                 User loginUser = userRepository.getById(user.getId());
                 ismine = interviewById.getUser().getEmail() == loginUser.getEmail();
@@ -157,9 +162,9 @@ public class HomeService {
             int commentsCount = commentRepository.countByInterview_Id(interviewById.getId());
 
             String weeklyBadge = interview.getWeeklyBadge();
-            String[] weekKorean = {"첫째주","둘째주","셋째주","넷째주","다섯째주"};
-            int week = Integer.parseInt(weeklyBadge.substring(3,4)) -1;
-            String weeklyInterviewKing = weeklyBadge.substring(0,3) + weekKorean[week] + " 면접왕" + weeklyBadge.substring(6,9);
+            String[] weekKorean = {"첫째주", "둘째주", "셋째주", "넷째주", "다섯째주"};
+            int week = Integer.parseInt(weeklyBadge.substring(3, 4)) - 1;
+            String weeklyInterviewKing = weeklyBadge.substring(0, 3) + weekKorean[week] + " 면접왕 " + ranking + "등";
 
             InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
                     .id(interviewById.getId())

@@ -5,6 +5,6 @@ import com.sparta.willbe._global.exception.ExceptionCode;
 
 public class PaginationCategoryInvalidException extends BusinessException {
     public PaginationCategoryInvalidException() {
-        super(ExceptionCode.QUESTION_NOT_FOUND);
+        super(ExceptionCode.PAGINATION_CATEGORY_INVALID);
     }
 }
