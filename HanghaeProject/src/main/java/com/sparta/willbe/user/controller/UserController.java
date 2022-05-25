@@ -10,7 +10,7 @@ import com.sparta.willbe.security.jwt.TokenResponseDto;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
 import com.sparta.willbe.user.dto.request.LoginRequestDto;
 import com.sparta.willbe.user.dto.request.RegisterRequestDto;
-import com.sparta.willbe.user.exception.UserAlreadyExistException;
+import com.sparta.willbe.user.exception.UserAlreadyFoundException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.service.registerService.KakaoUserService;
 import com.sparta.willbe.user.service.registerService.UserProfileService;
@@ -48,7 +48,7 @@ public class UserController {
                                                       HttpServletResponse response, Errors errors) {
         //이미 로그인되어 있다면 사용자는 로그인 할 수 없다.
         if(users !=null){
-            throw new UserAlreadyExistException();
+            throw new UserAlreadyFoundException();
         }
 
         //requestbody 에서 들어온 에러를 처리한다
