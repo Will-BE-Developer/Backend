@@ -32,12 +32,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(response, errorCode.getStatus());
     }
 
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-        log.error("handleHttpRequestMethodNotSupportedException: {}", e.getMessage());
-        final ErrorResponse response = new ErrorResponse(ExceptionCode.METHOD_NOT_ALLOWED);
-        return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
-    }
+//    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+//    protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+//        log.error("handleHttpRequestMethodNotSupportedException: {}", e.getMessage());
+//        final ErrorResponse response = new ErrorResponse(ExceptionCode.METHOD_NOT_ALLOWED);
+//        return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+//    }
 
 
 
