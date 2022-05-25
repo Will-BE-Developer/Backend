@@ -104,7 +104,7 @@ public class WeeklyInterviewConfig {
                     //interview레포지토리에서 새로 불러와서
                     //Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
 
-                    Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
+                    Interview interview = interviewRepository.findById(weeklyInterview.getInterviewId())
                             .orElseThrow(InterviewNotFoundException::new);
 
                     interview.updateBadge(badge[ranking-1]);
