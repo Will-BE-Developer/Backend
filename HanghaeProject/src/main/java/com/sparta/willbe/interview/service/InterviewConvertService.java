@@ -1,14 +1,9 @@
 package com.sparta.willbe.interview.service;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.sparta.willbe.advice.ErrorMessage;
+import com.sparta.willbe.interview.exception.DraftNotFoundException;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,7 +72,7 @@ public class InterviewConvertService {
         log.info("OBJECT KEY " + objectKey + " CONVERT IN " + newObjectKey);
 
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_DRAFT::throwError);
+                .orElseThrow(DraftNotFoundException::new);
         interview.convertVideo();
 
         return newObjectKey;

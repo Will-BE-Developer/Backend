@@ -1,10 +1,12 @@
 package com.sparta.willbe.comments.service;
 
+import com.sparta.willbe._global.pagination.exception.PaginationPerInvalidException;
 import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.comments.dto.CommentListDto;
 import com.sparta.willbe.comments.dto.CommentRequestDto;
 import com.sparta.willbe.comments.model.Comment;
 import com.sparta.willbe.comments.repository.CommentRepository;
+import com.sparta.willbe.interview.exception.InterviewNotFoundException;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import com.sparta.willbe.interview.service.InterviewService;
@@ -37,7 +39,7 @@ public class CommentService {
     //1개 인터뷰의 댓글 리스트 조회(댓글+대댓글)
     public CommentListDto makeCommentList(Long interviewId, User user, int per, int page){
         if (per < 1) {
-            throw ErrorMessage.INVALID_PAGINATION_SIZE.throwError();
+            throw new PaginationPerInvalidException();
         }
         // note that pageable start with 0
         Pageable pageable = PageRequest.of(page-1, per, Sort.by("createdAt").descending());
@@ -133,7 +135,7 @@ public class CommentService {
         Comment comment = new Comment();
         if (requestDto.getRootName().equals("interview")){
             Interview interview = interviewRepository.findById(requestDto.getRootId()).orElseThrow(
-                    () -> ErrorMessage.NOT_FOUND_INTERVIEW.throwError());
+                    InterviewNotFoundException::new);
             log.info("댓글 작성한 인터뷰 ID : {}", interview.getId());
 
             comment = new Comment(requestDto, user, interview);

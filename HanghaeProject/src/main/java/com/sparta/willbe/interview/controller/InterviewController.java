@@ -1,5 +1,7 @@
 package com.sparta.willbe.interview.controller;
 
+import com.sparta.willbe._global.pagination.exception.PaginationCategoryInvalidException;
+import com.sparta.willbe._global.pagination.exception.PaginationPerInvalidException;
 import com.sparta.willbe.interview.dto.*;
 import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.advice.RestException;
@@ -7,6 +9,7 @@ import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.service.InterviewService;
 import com.sparta.willbe.interview.service.InterviewUploadService;
+import com.sparta.willbe.user.exception.UserUnauthorizedException;
 import com.sparta.willbe.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,15 +47,15 @@ public class InterviewController {
         List<CategoryEnum> categoryEnums = Arrays.asList(CategoryEnum.values());
 
         if (per < 1) {
-            log.error(per + "(per)는 0보다 커야 합니다.");
-            throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
+            log.error("{}(per)는 0보다 커야 합니다.",per);
+            throw new PaginationPerInvalidException();
         }
 
         if(filter.equals("전체보기") == false){
             boolean isFilterValid = EnumUtils.isValidEnum(CategoryEnum.class, filter);
             if(isFilterValid == false){
-                log.error(filter + " 라는 잘못된 카테고리를 입력했습니다.");
-                throw ErrorMessage.INVALID_PAGINATION_CATEGORY.throwError();
+                log.error("{} 라는 잘못된 카테고리를 입력했습니다.",filter);
+                throw new PaginationCategoryInvalidException();
             }
         }
 
@@ -82,7 +85,7 @@ public class InterviewController {
     public ResponseEntity<InterviewDraftResponseDto> createInterviewDraft(@AuthenticationPrincipal User user) {
 
         if (user == null) {
-            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
+            throw new UserUnauthorizedException();
         }
         Long loginUserId = user.getId();
 
@@ -104,7 +107,7 @@ public class InterviewController {
                                                                       @RequestBody InterviewPostRequestDto requestDto,
                                                                       @AuthenticationPrincipal User user) throws IOException {
         if (user == null) {
-            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
+            throw new UserUnauthorizedException();
         }
         Long loginUserId = user.getId();
 
@@ -120,7 +123,7 @@ public class InterviewController {
                                                                     @RequestBody InterviewUpdateRequestDto requestDto,
                                                                     @AuthenticationPrincipal User user) {
         if (user == null) {
-            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
+            throw new UserUnauthorizedException();
         }
         Long loginUserId = user.getId();
 
@@ -135,7 +138,7 @@ public class InterviewController {
     public ResponseEntity<InterviewInfoResponseDto> deleteInterview(@PathVariable Long interviewId,
                                                                     @AuthenticationPrincipal User user) {
         if (user == null) {
-            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
+            throw new UserUnauthorizedException();
         }
         Long loginUserId = user.getId();
 
