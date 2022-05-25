@@ -48,6 +48,9 @@ public class UserMypageService {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
+    @Value("${spring.servlet.multipart.maxFileSize}")
+    private String maxFileSize = "";
+
     private String basicProfile = "profileImg/100.jpeg";
 
     boolean isStringEmpty(String nickname) {
@@ -71,7 +74,10 @@ public class UserMypageService {
         //파일첨부 했으면 크롭 후, 이미지 로컬 및 S3에 저장하기(첨부 안했으면 null->프론트에서 default이미지)
         if (requestDto.getProfileImage() != null) {
             //이미지 파일 여부
-            isImageFile(requestDto.getProfileImage());
+            isImageFile(requestDto.getProfileImage(), user.getId());
+
+            //이미지 용량 확인
+            checkFileSize(requestDto.getProfileImage(), user.getId());
 
             //image 파일 받기(for 크롭)
             File getFile = convert(requestDto.getProfileImage());
@@ -155,12 +161,32 @@ public class UserMypageService {
         return convFile;
     }
 
-    //이미지 파일 여부 image/gif, image/png, image/jpeg, image/bmp, image/webp  //(jpg등 테스트예정)
-    private void isImageFile(MultipartFile profileImage) {
-        Boolean isImage = profileImage.getContentType().split("/")[0].equals("image");
-        Boolean isGif = profileImage.getContentType().equals("image/gif");
-        if ((isImage == false) || (isGif == true)) {
-            ErrorMessage.INVALID_IMAGE_FILE.throwError();
+    //이미지 파일 여부, 확장자 확인 image/gif, image/png, image/jpeg(=jpg) (image/bmp, image/webp 불가)
+    private void isImageFile(MultipartFile profileImage, Long userId) {
+        String contentType = profileImage.getContentType();
+
+        boolean isImage = contentType.split("/")[0].equals("image");
+        String extension = contentType.split("/")[1];
+
+        if ((isImage == false) || extension.equals("webp") || extension.equals("bmp")) {
+            log.error("프로필 이미지 파일 타입({}) 에러(userId: {})", contentType, userId);
+            throw ErrorMessage.INVALID_IMAGE_FILE.throwError();
+        }
+    }
+
+    private void checkFileSize(MultipartFile profileImage, Long userId) {
+        if (profileImage.isEmpty()) {
+            log.error("프로필 이미지 파일 0 byte (userId: {})", userId);
+            throw ErrorMessage.INVALID_IMAGE_SIZE_ZERO.throwError();
+        }
+        double bytes = profileImage.getSize();
+        double kilobytes = Math.round(bytes / 1024*1000.0)/1000.0;
+        double megabytes = Math.round(kilobytes / 1024*1000.0)/1000.0;
+
+        if (megabytes >= 5.0) {
+            //handleMultipartException에서 Response되지만 더블체크
+            log.error("프로필 이미지 5MB 초과 :: userId: {}, 파일사이즈: {}MB", userId, megabytes);
+            throw ErrorMessage.INVALID_IMAGE_SIZE.throwError();
         }
     }
 
@@ -197,7 +223,7 @@ public class UserMypageService {
         }
     }
 
-    private String sendToS3(File file, Long userId, String oldObjectKey, String fileName) throws IOException {
+    private String sendToS3(File file, Long userId, String oldObjectKey, String fileName) {
 
         String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss"));
         String s3Folder = "profileImg/";
@@ -218,9 +244,12 @@ public class UserMypageService {
             s3Client.putObject(new PutObjectRequest(bucket, objectKey, file));
 
             //S3에서 기존 프로필 이미지 삭제
-            if (oldObjectKey != null){
-                s3Client.deleteObject(bucket, oldObjectKey);
-                log.error("S3에서 기존 프로필 이미지 삭제 에러(userId: {}, 기존 objectKey: {})", userId, oldObjectKey);
+            try{
+                if (oldObjectKey != null){
+                    s3Client.deleteObject(bucket, oldObjectKey);
+                }
+            } catch (Exception e) {
+                log.error("S3에서 기존 프로필 이미지 삭제 에러(userId: {}) - {}", userId, e.getMessage());
             }
             log.info("OBJECT KEY : {}, CREATED IN BUCKET : {}", objectKey, bucket);
         } catch (Exception e) {

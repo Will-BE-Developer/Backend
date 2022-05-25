@@ -159,7 +159,7 @@ public class UserController {
                         .id(id)
                         .profileImageUrl(profileImg)
                         .build())
-                .token(token)
+                .token("undefined")
                 .build(), HttpStatus.OK);
     }
 

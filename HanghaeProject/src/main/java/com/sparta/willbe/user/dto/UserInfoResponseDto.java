@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 public class UserInfoResponseDto {
     private UserBody user;
     private String token;
-    private LocalDateTime tokenExpires;
 
     @Builder
     public static class UserBody{
@@ -30,10 +29,9 @@ public class UserInfoResponseDto {
     }
 
     @Builder
-    public UserInfoResponseDto(UserBody user, String token, LocalDateTime tokenExpires){
+    public UserInfoResponseDto(UserBody user, String token){
         this.user = user ;
         this.token = token;
-        this.tokenExpires = null;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.sparta.willbe.batch.tables;
 
+import com.sparta.willbe._global.timestamped.model.Timestamped;
 import com.sparta.willbe.interview.model.Interview;
 import lombok.*;
 
@@ -11,10 +12,11 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity(name="weekly_interview")
-public class WeeklyInterview {
+public class WeeklyInterview extends Timestamped {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    //@GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Long id;
 

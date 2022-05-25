@@ -59,27 +59,15 @@ public class User extends Timestamped implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
-    List<Interview> interviews = new ArrayList<>();
+    private List<Interview> interviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
-    List<Scrap> scraps = new ArrayList<>();
+    private List<Scrap> scraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @Fetch(FetchMode.JOIN)
-    List<Comment> comments = new ArrayList<>();
-    //------------------------------------------------
-    //Scrap 과 Comment 구현 전
-//    public void addScrap(Scrap scrap) {
-//        this.scraps.add(scrap);
-//        scrap.setUser(this);
-//    }
-//
-//    public void addComment(Comment comment) {
-//        this.comments.add(commnet);
-//        comment.setUser(this);
-//    }
-    //-------------------------------------------
+    private List<Comment> comments = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -101,16 +89,6 @@ public class User extends Timestamped implements UserDetails {
         this.role=role;
     }
 
-    public User update(String nickname, String password,String githubLink,String introduce,String profileImageUrl,String token){
-        this.nickname = nickname;
-        this.password = password;
-        this.githubLink = githubLink;
-        this.introduce = introduce;
-        this.profileImageUrl = profileImageUrl;
-        this.token = token;
-
-        return this;
-    }
     public void setIsDeleted(boolean deleted){
         this.isDeleted = deleted;
     }
@@ -128,9 +106,8 @@ public class User extends Timestamped implements UserDetails {
         this.introduce = introduce;
         this.profileImageUrl = profileImageUrl;
     }
-    public void updateInfo(String nickname, String profileImageUrl){
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
+    public void updateInfo(String accessToken){
+        this.token = accessToken;
     }
 
     @Override

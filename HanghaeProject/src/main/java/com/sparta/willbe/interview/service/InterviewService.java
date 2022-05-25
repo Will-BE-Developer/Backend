@@ -1,7 +1,13 @@
 package com.sparta.willbe.interview.service;
 
 import com.amazonaws.HttpMethod;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
@@ -44,6 +50,12 @@ public class InterviewService {
 
     private final AmazonS3Client amazonS3Client;
     private final AmazonS3Client amazonFullS3Client;
+
+    @Value("${cloud.aws.credentials.access-key-upload}")
+    private String accessKey;
+
+    @Value("${cloud.aws.credentials.secret-key-upload}")
+    private String secretKey;
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
@@ -174,7 +186,7 @@ public class InterviewService {
                 );
 
 
-        if (interview.getIsPublic() == false & interview.getUser().getId() != loginUserId) {
+        if (interview.getIsPublic() == false && interview.getUser().getId() != loginUserId) {
             throw ErrorMessage.INVALID_INTERVIEW_VIEW.throwError();
         }
 
@@ -223,74 +235,75 @@ public class InterviewService {
 
         InterviewInfoResponseDto response = getInterviewResponse(loginUserId, userScrapsId, interview);
 
-        WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
+//        WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
 
 
         //인터뷰 삭제전 면접왕 뱃지(Gold,Silver,Bronze)가 있으면, 밑에 등수 수정
         //if (interview.getBadge().equals("NONE") == false) {
-        if (itsWeekly != null) {
-            try {
-                //인터뷰의 위클리 row 검색해서, 위클리뱃지를 가져오고
-                //BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
-                String weeklyBadge = itsWeekly.getWeeklyBadge(); //5월 2째주 1등
-                String itsBadge = interview.getBadge(); //Gold
-                int ranking = Integer.parseInt(weeklyBadge.substring(7, 8));
-
-                String[] badge = {"Gold", "Silver", "Bronze"};
-                int[] totalRank = {1, 2, 3, 4, 5};
-                //전체 랭킹을 현재 면접왕 숫자만큼만
-                int nowTotalRank = (int) weeklyInterviewRepository.count();
-                totalRank = Arrays.copyOf(totalRank, nowTotalRank);
-
-                //전체 5등 중에 하위 등수 애들만 배열
-                int[] lowerRankArray = Arrays.copyOfRange(totalRank, ranking, totalRank.length);
-                //하위 랭킹 for문, 뱃지 수정
-                for (int lowerRanking : lowerRankArray) { //면접왕이 4등까지만 있을때, 5등이 없어서 에러남
-                    //기존 위클리 등수 정보로 위클리 row 뽑아와서
-                    String lowerWeeklyRank = weeklyBadge.substring(0, 7) + lowerRanking + "등";
-                    WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerWeeklyRank);
-                    //새로운 등수 부여
-                    int lowerNewRanking = lowerRanking - 1;
-                    String newWeeklyRank = weeklyBadge.substring(0, 7) + (lowerRanking - 1) + "등";
-                    log.info("기존 랭킹: {}, 수정된 랭킹: {}", lowerWeeklyRank, newWeeklyRank);
-
-                    //위클리 테이블 랭링 수정 저장
-                    weekly.setWeeklyBadge(newWeeklyRank);
-                    if (lowerNewRanking <= 3) {
-                        weekly.setBadge(badge[lowerNewRanking - 1]);
-                    } else {
-                        weekly.setBadge("NONE");
-                    }
-                    weeklyInterviewRepository.save(weekly);
-
-                    //인터뷰 테이블 뱃지 수정 저장
-                    Interview lowInterview = weekly.getInterview();
-                    if (lowerNewRanking <= 3) {
-                        lowInterview.updateBadge(badge[lowerNewRanking - 1]);
-                    } else {
-                        lowInterview.updateBadge("NONE");
-                    }
-                    interviewRepository.save(lowInterview);
-                }
+//        if (itsWeekly != null) {
+//            try {
+//                //인터뷰의 위클리 row 검색해서, 위클리뱃지를 가져오고
+//                //BATCH_WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
+//                String weeklyBadge = itsWeekly.getWeeklyBadge(); //5월 2째주 1등
+//                String itsBadge = interview.getBadge(); //Gold
+//                int ranking = Integer.parseInt(weeklyBadge.substring(7, 8));
+//
+//                String[] badge = {"Gold", "Silver", "Bronze"};
+//                int[] totalRank = {1, 2, 3, 4, 5};
+//                //전체 랭킹을 현재 면접왕 숫자만큼만
+//                int nowTotalRank = (int) weeklyInterviewRepository.count();
+//                totalRank = Arrays.copyOf(totalRank, nowTotalRank);
+//
+//                //전체 5등 중에 하위 등수 애들만 배열
+//                int[] lowerRankArray = Arrays.copyOfRange(totalRank, ranking, totalRank.length);
+//                //하위 랭킹 for문, 뱃지 수정
+//                for (int lowerRanking : lowerRankArray) { //면접왕이 4등까지만 있을때, 5등이 없어서 에러남
+//                    //기존 위클리 등수 정보로 위클리 row 뽑아와서
+//                    String lowerWeeklyRank = weeklyBadge.substring(0, 7) + lowerRanking + "등";
+//                    WeeklyInterview weekly = weeklyInterviewRepository.findByWeeklyBadge(lowerWeeklyRank);
+//                    //새로운 등수 부여
+//                    int lowerNewRanking = lowerRanking - 1;
+//                    String newWeeklyRank = weeklyBadge.substring(0, 7) + (lowerRanking - 1) + "등";
+//                    log.info("기존 랭킹: {}, 수정된 랭킹: {}", lowerWeeklyRank, newWeeklyRank);
+//
+//                    //위클리 테이블 랭링 수정 저장
+//                    weekly.setWeeklyBadge(newWeeklyRank);
+//                    if (lowerNewRanking <= 3){
+//                        weekly.setBadge(badge[lowerNewRanking-1]);
+//                    }else{
+//                        weekly.setBadge("NONE");
+//                    }
+//                    weeklyInterviewRepository.save(weekly);
+//
+//                    //인터뷰 테이블 뱃지 수정 저장
+//                    Interview lowInterview = weekly.getInterview();
+//                    if (lowerNewRanking <= 3){
+//                        lowInterview.updateBadge(badge[lowerNewRanking-1]);
+//                    }else{
+//                        lowInterview.updateBadge("NONE");
+//                    }
+//                    interviewRepository.save(lowInterview);
+//                }
 
                 //스크랩 삭제
                 //scrapRepository.deleteByInterviewId(interviewId);
                 //interview.makeScrapNullForDelete();
-            } catch (Exception e) {
-                log.error("인터뷰(면접왕) ID {}번 삭제 에러", interviewId, e);
-                throw ErrorMessage.FAIL_DELETE_INTERVIEW.throwError();
-            }
-        }
+//            } catch (Exception e) {
+//                log.error("인터뷰(면접왕) ID {}번 삭제 에러", interviewId, e);
+//                throw ErrorMessage.FAIL_DELETE_INTERVIEW.throwError();
+//            }
+//        }
         //인터뷰 삭제(면접왕이면 위클리도 삭제됨)
-        try {
+        try{
             //스크랩 삭제
             scrapRepository.deleteByInterviewId(interviewId);
             //scrapRepository.deleteAllByInterviewId(interviewId);
-            interview.makeScrapNullForDelete();
-            interviewRepository.deleteById(interviewId);
-        } catch (Exception e) {
+//            interview.makeScrapNullForDelete();
+            interviewRepository.deleteById(interview.getId());
+        }catch(Exception e){
             log.error("인터뷰 ID {}번 삭제 에러", interviewId, e);
         }
+
         return response;
     }
 

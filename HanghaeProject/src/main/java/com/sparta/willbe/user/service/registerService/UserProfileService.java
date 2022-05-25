@@ -28,7 +28,7 @@ public class UserProfileService {
     //login 성공시에 TokenResponseDto를 반환하면 controller 에서 헤더에 실어 보내준다.
     public User login(LoginRequestDto requestDto) {
         //가입되지 않은 회원정보로 로그인 시도 하면 안됨
-        User user = userRepository.findByEmail(requestDto.getEmail())
+        User user = userRepository.findByEmailAndIsDeletedFalseAndIsValidTrue(requestDto.getEmail())
                 .orElseThrow(() -> ErrorMessage.NOT_FOUND_USER.throwError());
 
         //회원정보와 작성한 비밀번호가 일치하지 않으면 안됨!
@@ -58,14 +58,15 @@ public class UserProfileService {
     public User deleteUser(User user){
         log.info("DELETE_USER >> delete_user_(service) >> {}에 대해 deleted 접근 중... 현재 isDeleted : {}",
                 user.getNickname(),user.getIsDeleted());
-        User deleteThis = userRepository.findByEmail(user.getEmail())
+        User deleteThis = userRepository.findByEmailAndIsDeletedFalseAndIsValidTrue(user.getEmail())
                 .orElseThrow(() -> ErrorMessage.NOT_FOUND_USER.throwError());
-        userRepository.delete(deleteThis);
+        deleteThis.setIsDeleted(true);
+
         return deleteThis;
     }
     @Transactional
     public User validateUser(String email, String token){
-        User validatingUser = userRepository.findByEmail(email)
+        User validatingUser = userRepository.findByEmailAndIsDeletedFalseAndIsValidFalse(email)
                 .orElseThrow(() -> ErrorMessage.NOT_FOUND_USER.throwError());
         log.info("CONTORLLER >> SERVICE >> VALIDATE_USER : {} ", validatingUser.getNickname());
         if(validatingUser.getToken().equals(token)) {
