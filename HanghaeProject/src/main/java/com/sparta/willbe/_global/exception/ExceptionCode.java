@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum ExceptionCode {
 
     // Common
-    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "C001", " Invalid Input Value"),
+    INPUT_VALUE_INVALID(HttpStatus.BAD_REQUEST, "C001", "올바르지 않은 값입니다."),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "C002", " Invalid Input Value"),
     HANDLE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "C006", "Access is Denied"),
     // Member examples
