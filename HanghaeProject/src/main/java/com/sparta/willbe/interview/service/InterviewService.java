@@ -1,13 +1,7 @@
 package com.sparta.willbe.interview.service;
 
 import com.amazonaws.HttpMethod;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
@@ -38,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.net.URL;
 import java.util.*;
 
@@ -54,7 +49,10 @@ public class InterviewService {
     private static final long ONE_HOUR = 1000 * 60 * 60; //1시간
 
     private final AmazonS3Client amazonS3Client;
+
     private final AmazonS3Client amazonFullS3Client;
+
+    private final EntityManager entityManager;
 
     @Value("${cloud.aws.credentials.access-key-upload}")
     private String accessKey;
@@ -128,7 +126,10 @@ public class InterviewService {
         String profilePresignedUrl = getProfileImageUrl(interview.getUser().getProfileImageUrl());
 
         //5월 2째주 1등 -> 숫자만 추출
-        WeeklyInterview Weekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
+        // -> query did not return a unique result -> 최신꺼 1개만
+        //WeeklyInterview Weekly = weeklyInterviewRepository.findByInterviewId(interview.getId());
+        WeeklyInterview Weekly = weeklyInterviewRepository.findTopByInterviewIdOrderByIdDesc(interview.getId());
+        log.info("Weekly Interview 최신 top 1: {}", Weekly.getId());  //-> NullPointerException
         boolean itsWeekly = Weekly != null;
         int month = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(0, 1)) : -1;
         int week = itsWeekly ? Integer.parseInt(Weekly.getWeeklyBadge().substring(3, 4)) : -1;
@@ -240,42 +241,26 @@ public class InterviewService {
 
         InterviewInfoResponseDto response = getInterviewResponse(loginUserId, userScrapsId, interview);
 
-        //인터뷰 삭제시, 위클리 테이블에 있으면
-        //(기존)하위 랭킹 업그레이드 후 삭제 -> (변경)인터뷰 삭제X
-        WeeklyInterview itsWeekly = weeklyInterviewRepository.findByInterviewId(interviewId);
-        try {
-            if (itsWeekly != null) {
-                //throw 되었는데 200 으로 리턴됨 -> 클라이언트에게 400전달(추후 수정)
-                throw ErrorMessage.UNABLE_DELETE_INTERVIEW_ON_WEEKLY.throwError();
-            }
-        } catch (Exception e) {
-            log.error("{}번 인터뷰는 면접왕이여서 삭제 불가함", interviewId, e); //e안하면 로그 외 익셉션 정보 출력안됨
-        }
+        //인터뷰 삭제시 -> (변경)인터뷰 삭제, 위클리테이블은 유지
 
-        //위클리 테이블에 없으면, 인터뷰 삭제(S3에서 영상 삭제, 썸네일은 삭제X)
-        //  - 프론트에게 전달하기 위해, video_key컬럼에 "" 저장
         try {
             //S3에서 영상 삭제
             try{
-                AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-                AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                        .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                        .withRegion(Regions.AP_NORTHEAST_2)
-                        .build();
-                if (interview.getVideoKey().equals("") == false){
-                    s3Client.deleteObject(bucket, interview.getVideoKey());
-                    log.info("S3에서 인터뷰(ID:{}) 영상 삭제 성공(VideoKey:{})", interviewId, interview.getVideoKey());
-                }else{
-                    log.error("이미 삭제 처리된 인터뷰(ID:{})", interviewId);
-                }
+                amazonFullS3Client.deleteObject(bucket, interview.getVideoKey());
+                log.info("S3에서 인터뷰(ID:{}) 영상 삭제 성공(VideoKey:{})", interviewId, interview.getVideoKey());
+
             } catch (Exception e) {
                 log.error("S3에서 인터뷰(ID:{}) 영상 삭제 에러 - {}", interviewId, e.getMessage());
                 Sentry.captureException(e);
             }
 
-            //video_key에 "" 저장
-            interview.deleteVideoKey();
-            response.getInterview().deleteVideoKey();
+            //interview.makeWeeklyNullForDelete();
+            //interviewRepository.save(interview);
+
+            scrapRepository.deleteByInterviewId(interviewId);
+            interview.makeScrapNullForDelete();
+
+            interviewRepository.deleteById(interviewId);
 
         } catch (Exception e) {
             log.error("인터뷰 ID {}번 삭제 에러", interviewId, e);

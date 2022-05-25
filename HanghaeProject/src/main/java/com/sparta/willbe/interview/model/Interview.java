@@ -65,9 +65,10 @@ public class Interview extends Timestamped {
     List<Comment> comments = new ArrayList<>();
 
     //@OneToOne(mappedBy = "interview", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    //BATCH_WeeklyInterview weeklyInterviews ;
-    @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<WeeklyInterview> weeklyInterviews = new ArrayList<>();
+    //@OneToMany(mappedBy = "interview", cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    //@OneToMany(mappedBy = "interview", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    //@OneToMany
+    //List<WeeklyInterview> weeklyInterviews = new ArrayList<>();
 
     @OneToOne(cascade=CascadeType.ALL, mappedBy = "interview",orphanRemoval = true)
     @JoinColumn
@@ -126,5 +127,9 @@ public class Interview extends Timestamped {
 
     public void deleteVideoKey(){
         this.videoKey = "";
+    }
+
+    public void makeWeeklyNullForDelete(){
+        //this.weeklyInterviews = null;
     }
 }

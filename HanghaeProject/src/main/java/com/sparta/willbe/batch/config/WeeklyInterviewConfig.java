@@ -61,9 +61,15 @@ public class WeeklyInterviewConfig {
             //기존 인터뷰 뱃지 삭제
             List<WeeklyInterview> lastWeeklyInterview = weeklyInterviewRepository.findAll();
             for (WeeklyInterview lastWeeklyInterviewEach : lastWeeklyInterview){
-                Interview lastInterview = lastWeeklyInterviewEach.getInterview();
-                lastInterview.updateBadge("NONE");
-                interviewRepository.save(lastInterview);
+                //Interview lastInterview = lastWeeklyInterviewEach.getInterview();
+                Interview lastInterview = interviewRepository.findById(lastWeeklyInterviewEach.getInterviewId())
+                        //.orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+                        .orElse(null);
+
+                if (lastInterview != null){
+                    lastInterview.updateBadge("NONE");
+                    interviewRepository.save(lastInterview);
+                }
             }
 
             //이번주 면접왕 인터뷰 선정 + (추후 추가: 좋아요 숫자, 동점은 인터뷰 최신순)
@@ -90,24 +96,31 @@ public class WeeklyInterviewConfig {
                 String month = String.valueOf(calendar.get(Calendar.MONTH)+1);
                 String week = String.valueOf(calendar.get(Calendar.WEEK_OF_MONTH)-1);  //지난주
                 String weeklyBadge = month + "월 "+ week + "째주 " + ranking + "등";
-                log.info("New Weekly Interview >> {} (InterviewId: {})", weeklyBadge, weeklyInterview.getInterview().getId());
+                log.info("New Weekly Interview >> {} (InterviewId: {})", weeklyBadge, weeklyInterview.getInterviewId());
 
                 //인터뷰 뱃지 저장(1,2,3등만)
                 if (ranking <= 3){
                     //Interview interview = weeklyInterview.getInterview();
                     //interview레포지토리에서 새로 불러와서
+                    //Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
+
                     Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
                             .orElseThrow(InterviewNotFoundException::new);
+
                     interview.updateBadge(badge[ranking-1]);
                     interview = interviewRepository.save(interview);
                     //edit
-                    WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), badge[ranking-1], weeklyBadge);
+                    //WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), badge[ranking-1], weeklyBadge);
+                    WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview.getId(), weeklyInterview.getScrapCount(), badge[ranking-1], weeklyBadge);
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
                     weeklyInterviewRepository.save(weeklyInterviewEach);
                 }else{
-                    Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
+                    //Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
+                    Interview interview = interviewRepository.findById(weeklyInterview.getInterviewId())
                             .orElseThrow(InterviewNotFoundException::new);
-                    WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), "NONE", weeklyBadge);
+                    //WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), "NONE", weeklyBadge);
+                    WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview.getId(), weeklyInterview.getScrapCount(), "NONE", weeklyBadge);
+
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
                     weeklyInterviewRepository.save(weeklyInterviewEach);
                 }

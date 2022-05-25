@@ -145,14 +145,16 @@ public class HomeService {
 
         for (WeeklyInterview interview : getInterviews) {
 
+            Interview interviewById = interviewRepository.findById(interview.getInterviewId())
+                    .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
             if (user != null) {
                 User loginUser = userRepository.getById(user.getId());
-                ismine = interview.getInterview().getUser().getEmail() == loginUser.getEmail();
+                ismine = interviewById.getUser().getEmail() == loginUser.getEmail();
                 Set<Long> userScapId = createUserScrapIds(loginUser);
                 scrapMe = userScapId.contains(interview.getId());
             }
 
-            int commentsCount = commentRepository.countByInterview_Id(interview.getInterview().getId());
+            int commentsCount = commentRepository.countByInterview_Id(interviewById.getId());
 
             String weeklyBadge = interview.getWeeklyBadge();
             String[] weekKorean = {"첫째주","둘째주","셋째주","넷째주","다섯째주"};
@@ -160,30 +162,30 @@ public class HomeService {
             String weeklyInterviewKing = weeklyBadge.substring(0,3) + weekKorean[week] + " 면접왕" + weeklyBadge.substring(6,9);
 
             InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
-                    .id(interview.getInterview().getId())
-                    .video(interviewService.getProfileImageUrl(interview.getInterview().getVideoKey()))
-                    .thumbnail(interviewService.getProfileImageUrl(interview.getInterview().getThumbnailKey()))
-                    .question(new QuestionResponseDto.data(interview.getInterview().getQuestion().getId(),
-                            interview.getInterview().getQuestion().getCategory().name(),
-                            interview.getInterview().getQuestion().getContents(),
-                            interview.getInterview().getQuestion().getReference()))
+                    .id(interviewById.getId())
+                    .video(interviewService.getProfileImageUrl(interviewById.getVideoKey()))
+                    .thumbnail(interviewService.getProfileImageUrl(interviewById.getThumbnailKey()))
+                    .question(new QuestionResponseDto.data(interviewById.getQuestion().getId(),
+                            interviewById.getQuestion().getCategory().name(),
+                            interviewById.getQuestion().getContents(),
+                            interviewById.getQuestion().getReference()))
                     .user(UserInfoResponseDto.UserBody.builder()
-                            .githubLink(interview.getInterview().getUser().getGithubLink())
-                            .id(interview.getInterview().getUser().getId())
-                            .nickname(interview.getInterview().getUser().getNickname())
-                            .profileImageUrl(interviewService.getProfileImageUrl(interview.getInterview().getUser().getProfileImageUrl()))
-                            .introduce(interview.getInterview().getUser().getIntroduce())
+                            .githubLink(interviewById.getUser().getGithubLink())
+                            .id(interviewById.getUser().getId())
+                            .nickname(interviewById.getUser().getNickname())
+                            .profileImageUrl(interviewService.getProfileImageUrl(interviewById.getUser().getProfileImageUrl()))
+                            .introduce(interviewById.getUser().getIntroduce())
                             .build())
                     .badge(weeklyInterviewKing)
-                    .note(interview.getInterview().getMemo())
+                    .note(interviewById.getMemo())
                     .scrapsMe(scrapMe)
                     .scrapsCount(interview.getScrapCount())
                     .commentsCount((long) commentsCount)
                     .likesCount(0L)
-                    .isPublic(interview.getInterview().getIsPublic())
+                    .isPublic(interviewById.getIsPublic())
                     .isMine(ismine)
-                    .createdAt(interview.getInterview().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                    .updatedAt(interview.getInterview().getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                    .createdAt(interviewById.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                    .updatedAt(interviewById.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                     .build();
             weeklyInterview.add(n);
         }
