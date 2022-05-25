@@ -3,9 +3,7 @@ package com.sparta.willbe.comments.service;
 import com.sparta.willbe._global.pagination.exception.PaginationPerInvalidException;
 import com.sparta.willbe.comments.dto.CommentListDto;
 import com.sparta.willbe.comments.dto.CommentRequestDto;
-import com.sparta.willbe.comments.exception.CommentNotFoundException;
-import com.sparta.willbe.comments.exception.CommentRootIdException;
-import com.sparta.willbe.comments.exception.CommentRootNameException;
+import com.sparta.willbe.comments.exception.*;
 import com.sparta.willbe.comments.model.Comment;
 import com.sparta.willbe.comments.repository.CommentRepository;
 import com.sparta.willbe.interview.exception.InterviewNotFoundException;
@@ -162,6 +160,11 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new CommentNotFoundException());
 
+        //댓글 작성한 유저인지 확인
+        if (comment.getUser().getId() != user.getId()){
+            throw new CommentForbiddenUpdateException();
+        }
+
         //기존에 rootName과 일치하는지
         if (comment.getRootName().equals(requestDto.getRootName())){
             //기존 rootId와 일치하는지
@@ -186,6 +189,12 @@ public class CommentService {
         //삭제 전 response를 위해 조회
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new CommentNotFoundException());
+
+        //댓글 작성한 유저인지 확인
+        if (comment.getUser().getId() != user.getId()){
+            throw new CommentForbiddenDeleteException();
+        }
+
         //부모댓글이면 자식댓글도 삭제
         if (comment.getRootName().equals("interview")){
             List<Comment> childCommentList = commentRepository.findByRootIdAndRootName(comment.getId(), "comment");
@@ -239,7 +248,7 @@ public class CommentService {
             }
             log.info("getCurrentCommentPage() >> 페이지별 부모댓글 목록 : {}", list);
         }
-        log.info("getCurrentCommentPage() >> 등록/수정/삭제한 대댓글의 페이지 : {}", page);
+        log.info("getCurrentCommentPage() >> 수정/삭제한 댓글 또는 등록/수정/삭제한 대댓글의 페이지 : {}", page);
         return page;
     }
 }
