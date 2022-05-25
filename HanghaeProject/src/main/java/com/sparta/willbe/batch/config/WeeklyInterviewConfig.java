@@ -56,13 +56,25 @@ public class WeeklyInterviewConfig {
         return (contribution, chunkContext) -> {
 
             //기존 인터뷰 뱃지 삭제
-            List<WeeklyInterview> lastWeeklyInterview = weeklyInterviewRepository.findAll();
+            //인터뷰 테이블에서 기존 면접왕의 badge를 "NONE"으로 초기화하기 위한, 지지난주 주차 구하기
+            Date currentDate = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(currentDate);
+            String monthOfWeekBeforeLast = String.valueOf(calendar.get(Calendar.MONTH)+1);
+            String weekBeforeLast = String.valueOf(calendar.get(Calendar.WEEK_OF_MONTH)-2); //지지난주
+            String twoWeeksAgo = monthOfWeekBeforeLast + "월 "+ weekBeforeLast + "째주";
+            log.info("인터뷰 테이블에서 기존 면접왕의 badge를 초기화할 주차(지지난주): {}", twoWeeksAgo);
+            
+            //위클리 테이블에서 지난 면접왕(지지난주) 데이터 가져오기 
+            //List<WeeklyInterview> lastWeeklyInterview = weeklyInterviewRepository.findAll();
+            List<WeeklyInterview> lastWeeklyInterview = weeklyInterviewRepository.findByWeeklyBadgeContains(twoWeeksAgo);
             for (WeeklyInterview lastWeeklyInterviewEach : lastWeeklyInterview){
                 //Interview lastInterview = lastWeeklyInterviewEach.getInterview();
                 Interview lastInterview = interviewRepository.findById(lastWeeklyInterviewEach.getInterviewId())
                         //.orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
                         .orElse(null);
 
+                //해당 인터뷰가 삭제되지 않았으면
                 if (lastInterview != null){
                     lastInterview.updateBadge("NONE");
                     interviewRepository.save(lastInterview);
@@ -87,9 +99,6 @@ public class WeeklyInterviewConfig {
                 String[] rankArr = {"1등", "2등", "3등", "4등", "5등"};
 
                 //현재날짜의 지난주
-                Date currentDate = new Date();
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(currentDate);
                 String month = String.valueOf(calendar.get(Calendar.MONTH)+1);
                 String week = String.valueOf(calendar.get(Calendar.WEEK_OF_MONTH)-1);  //지난주
                 String weeklyBadge = month + "월 "+ week + "째주 " + ranking + "등";
@@ -100,7 +109,6 @@ public class WeeklyInterviewConfig {
                     //interview레포지토리에서 새로 불러와서
                     //Interview interview = weeklyInterview.getInterview();
                     //Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
-
                     Interview interview = interviewRepository.findById(weeklyInterview.getInterviewId())
                             .orElseThrow(InterviewNotFoundException::new);
 
@@ -118,7 +126,6 @@ public class WeeklyInterviewConfig {
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
                     weeklyInterviewRepository.save(weeklyInterviewEach);
                 }
-
             }
 
            return RepeatStatus.FINISHED;
