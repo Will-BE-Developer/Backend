@@ -27,7 +27,6 @@ public class QuestionRandomController {
 
         boolean isFilterValid = EnumUtils.isValidEnum(CategoryEnum.class, categoryName);
         if (isFilterValid == false) {
-            log.error(categoryName + " 라는 잘못된 카테고리를 입력했습니다.");
             throw ErrorMessage.INVALID_PAGINATION_CATEGORY.throwError();
         }
 

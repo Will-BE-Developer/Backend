@@ -13,7 +13,9 @@ public enum ErrorMessage{
     //    MOVED
     INVALID_INTERVIEW_DELETE(HttpStatus.BAD_REQUEST,"현재 사용자는 해당 인터뷰를 삭제 할 수 없습니다."),
 
+    //MOVED
     INVALID_PAGINATION_SIZE(HttpStatus.BAD_REQUEST,"한 페이지 단위(per)는 0보다 커야 합니다."),
+    //MOVED
     INVALID_PAGINATION_CATEGORY(HttpStatus.BAD_REQUEST,"잘못된 카테고리를 입력했습니다."),
 
     //MOVED
@@ -35,6 +37,7 @@ public enum ErrorMessage{
     //    MOVED
     NOT_FOUND_DRAFT(HttpStatus.NOT_FOUND,"해당 인터뷰의 초안이 존재하지 않습니다."),
 
+    //MOVED
     NOT_FOUND_QUESTION(HttpStatus.NOT_FOUND,"해당 면접 질문이 존재하지 않습니다."),
     //MOVED
     NOT_FOUND_PASSWORD(HttpStatus.NOT_FOUND,"비밀번호가 일치하지 않습니다."),
@@ -43,6 +46,7 @@ public enum ErrorMessage{
 
     CONFLICT_SCRAP_POST(HttpStatus.CONFLICT,"이미 스크랩한 게시글 입니다."),
     CONFLICT_SCRAP_DELETE(HttpStatus.CONFLICT,"해당 스크랩 정보가 존재하지 않습니다."),
+
     //MOVED
     CONFLICT_USER_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일 입니다."),
     //MOVED

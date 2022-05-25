@@ -13,6 +13,9 @@ import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
 import com.sparta.willbe.interview.dto.InterviewListResponseDto;
 import com.sparta.willbe.interview.dto.InterviewUpdateRequestDto;
+import com.sparta.willbe.interview.exception.InterviewForbiddenDeleteException;
+import com.sparta.willbe.interview.exception.InterviewForbiddenGetException;
+import com.sparta.willbe.interview.exception.InterviewForbiddenUpdateException;
 import com.sparta.willbe.interview.exception.InterviewNotFoundException;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import com.sparta.willbe.scrap.repository.ScrapRepository;
@@ -22,6 +25,7 @@ import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.scrap.model.Scrap;
+import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -139,7 +143,7 @@ public class InterviewService {
         User user = loginUserId == null ?
                 null :
                 userRepository.findById(loginUserId)
-                        .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
+                        .orElseThrow(UserNotFoundException::new);
 
         List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
 
@@ -178,7 +182,7 @@ public class InterviewService {
         User user = loginUserId == null ?
                 null :
                 userRepository.findById(loginUserId)
-                        .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
+                        .orElseThrow(UserNotFoundException::new);
 
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(
@@ -187,7 +191,7 @@ public class InterviewService {
 
 
         if (interview.getIsPublic() == false && interview.getUser().getId() != loginUserId) {
-            throw ErrorMessage.INVALID_INTERVIEW_VIEW.throwError();
+            throw new InterviewForbiddenGetException();
         }
 
         Set<Long> userScrapsId = getScrapedInterviewIds(user);
@@ -199,14 +203,14 @@ public class InterviewService {
     public InterviewInfoResponseDto updateInterview(Long loginUserId, Long interviewId, InterviewUpdateRequestDto requestDto) {
 
         User user = userRepository.findById(loginUserId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
+                .orElseThrow(UserNotFoundException::new);
 
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+                .orElseThrow(InterviewNotFoundException::new);
 
         Boolean isMine = Objects.equals(loginUserId, interview.getUser().getId());
         if (isMine == false) {
-            throw ErrorMessage.INVALID_INTERVIEW_UPDATE.throwError();
+            throw new InterviewForbiddenUpdateException();
         }
 
         interview.update(requestDto.getNote(), requestDto.getIsPublic());
@@ -221,14 +225,14 @@ public class InterviewService {
     public InterviewInfoResponseDto deleteInterview(Long loginUserId, Long interviewId) {
 
         User user = userRepository.findById(loginUserId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
+                .orElseThrow(UserNotFoundException::new);
 
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+                .orElseThrow(InterviewNotFoundException::new);
 
-        Boolean isMine = Objects.equals(user.getId(), interview.getUser().getId());
+        Boolean isMine = Objects.equals(loginUserId, interview.getUser().getId());
         if (isMine == false) {
-            throw ErrorMessage.INVALID_INTERVIEW_DELETE.throwError();
+            throw new InterviewForbiddenDeleteException();
         }
 
         Set<Long> userScrapsId = getScrapedInterviewIds(user);
