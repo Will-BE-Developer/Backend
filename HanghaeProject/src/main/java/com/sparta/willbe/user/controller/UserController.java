@@ -153,7 +153,7 @@ public class UserController {
         String provider = user.getProvider();
 
         //로그아웃시에 Conttext holder에 있는 사용자 정보 컨텐츠 값을 지줘준다.
-        userProfileService.logout(request);
+        userProfileService.logout();
 
         if(provider.equals("kakao")){
             log.debug("KAKAO_LOGOUT() >> 카카오 로그아웃시작 ");
@@ -243,7 +243,7 @@ public class UserController {
         //logout 되어있지 않다면 일단 로그아웃 시킨다.
         if(users !=null){
             log.info("USER CONTROLLER >> logging out current user");
-            userProfileService.logout(request);
+            userProfileService.logout();
         }
         //isvalid 값을 바꿔준다.
 
