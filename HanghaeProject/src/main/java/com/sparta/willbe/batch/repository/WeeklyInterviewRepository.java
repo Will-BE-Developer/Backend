@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -34,4 +35,5 @@ public interface WeeklyInterviewRepository extends JpaRepository<WeeklyInterview
 
     List<WeeklyInterview> findAllByInterviewId(Long interviewId);
 
+    List<WeeklyInterview> findByCreatedAtBetween(LocalDateTime minus, LocalDateTime now);
 }
