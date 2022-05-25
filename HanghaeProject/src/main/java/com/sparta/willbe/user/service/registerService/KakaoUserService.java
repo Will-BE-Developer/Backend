@@ -3,6 +3,7 @@ package com.sparta.willbe.user.service.registerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.dto.KakaoUserInfoDto;
 import com.sparta.willbe.user.model.Role;
@@ -132,13 +133,10 @@ public class KakaoUserService {
             log.info("Contorller : REGISTER_KAKAO_USER_IF_NEEDED >> 서버에 가입된 사용자가 있는지 조회중입니다...");
             String provider = kakaoUserInfo.getProvider();
             String email = kakaoUserInfo.getEmail();
-
-            //가입된 카카오 사용자가 있는지 조회한다.
-            User kakaoUser = userRepository.findByEmailAndProviderAndIsDeletedFalse(email,provider)
-                    .orElse(null);
+            User kakaoUser ;
 
             //가입된 카카오 사용자가 없다면, 가입을 진행한다
-            if (kakaoUser == null) {
+            if (!userRepository.findByEmailAndProviderAndIsDeletedFalse(email,provider).isPresent()) {
                 log.info("Contorller : REGISTER_KAKAO_USER_IF_NEEDED >> 카카오 가입자가 없으므로 회원가입을 진행합니다.");
                 // username: kakao nickname
                 String nickname = kakaoUserInfo.getNickname();
@@ -162,10 +160,13 @@ public class KakaoUserService {
                         .token(accessToken)
                         .build();
                 userRepository.save(kakaoUser);
+            }else {
+                //가입된 카카오 사용자가 있다면, 토큰을 갈아 끼워 준다.
+                kakaoUser = userRepository.findByEmailAndProviderAndIsDeletedFalse(email,provider).orElseThrow(
+                        ()-> ErrorMessage.NOT_FOUND_USER.throwError()
+                );
+                kakaoUser.updateInfo(accessToken);
             }
-            //가입된 카카오 사용자가 있다면, 토큰을 갈아 끼워 준다.
-            kakaoUser.updateInfo(accessToken);
-
             return kakaoUser;
         }
 
