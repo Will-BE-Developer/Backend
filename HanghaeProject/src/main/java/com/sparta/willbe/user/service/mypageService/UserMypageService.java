@@ -5,10 +5,10 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.interview.service.InterviewService;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
 import com.sparta.willbe.user.dto.UserRequestDto;
+import com.sparta.willbe.user.exception.*;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
 import io.sentry.Sentry;
@@ -63,7 +63,7 @@ public class UserMypageService {
         String profileImageUrl = null;
 
         userRepository.findById(user.getId()).orElseThrow(
-                () -> ErrorMessage.NOT_FOUND_USER.throwError());
+                () -> new UserNotFoundException());
 
         //닉네임을 입력 안했으면, 랜덤 닉네임 저장
         if(isStringEmpty(requestDto.getNickname())){
@@ -171,23 +171,22 @@ public class UserMypageService {
 
         if ((isImage == false) || extension.equals("webp") || extension.equals("bmp")) {
             log.error("프로필 이미지 파일 타입({}) 에러(userId: {})", contentType, userId);
-            throw ErrorMessage.INVALID_IMAGE_FILE.throwError();
+            throw new ImageFileTypeException();
         }
     }
 
     private void checkFileSize(MultipartFile profileImage, Long userId) {
         if (profileImage.isEmpty()) {
             log.error("프로필 이미지 파일 0 byte (userId: {})", userId);
-            throw ErrorMessage.INVALID_IMAGE_SIZE_ZERO.throwError();
+            throw new ImageFileSizeZeroException();
         }
         double bytes = profileImage.getSize();
         double kilobytes = Math.round(bytes / 1024*1000.0)/1000.0;
         double megabytes = Math.round(kilobytes / 1024*1000.0)/1000.0;
-
-        if (megabytes >= 5.0) {
-            //handleMultipartException에서 Response되지만 더블체크
+        int MaximumSize = Integer.parseInt(maxFileSize.replace("MB",""));
+        if (megabytes >= MaximumSize) {
             log.error("프로필 이미지 5MB 초과 :: userId: {}, 파일사이즈: {}MB", userId, megabytes);
-            throw ErrorMessage.INVALID_IMAGE_SIZE.throwError();
+            throw new ImageFileSizeOverException();
         }
     }
 
@@ -220,7 +219,7 @@ public class UserMypageService {
             return objectKey;
         } catch (Exception e) {
             log.error("saveFile() >> 프로필 이미지 수정 에러(userId: {}, fileName: {})", userId, fileName);
-            throw ErrorMessage.UNABLE_SAVE_PROFILE_IMAGE.throwError();
+            throw new ImageSaveFailException();
         }
     }
 
@@ -255,7 +254,7 @@ public class UserMypageService {
             log.info("OBJECT KEY : {}, CREATED IN BUCKET : {}", objectKey, bucket);
         } catch (Exception e) {
             Sentry.captureException(e);
-            throw ErrorMessage.UNABLE_UPLOAD_TO_S3.throwError();
+            throw new ImageSendToS3Exception();
         }
         return objectKey;
     }
