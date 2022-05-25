@@ -48,13 +48,20 @@ public class UserRegistryService {
     }
 
     public boolean isEmailExist(String email){
-        if( userRepository.findByEmailAndIsValid(email,true).isPresent()){
-            log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 불가능 ");
+        if( userRepository.findByEmailAndIsValidTrueAndIsDeletedFalse(email).isPresent()){
+            log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 불가능 : 사용중인 회원");
             return true;
         }else {
             log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 가능 ");
             return false;
         }
+    }
+    public boolean isUserDeleted(String email){
+        if(userRepository.findByEmailAndIsDeletedTrue(email).isPresent()){
+            log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 불가능 : 탈퇴된 회원 ");
+            return true;
+        }
+        return false;
     }
 
 }

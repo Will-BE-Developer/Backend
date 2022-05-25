@@ -21,12 +21,4 @@ public class ControllerAdvice {
         return new ResponseEntity<>(resBody, e.getHttpStatus());
     }
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    @ResponseStatus(value = HttpStatus.PAYLOAD_TOO_LARGE)
-    public ResponseEntity handleMultipartException(MaxUploadSizeExceededException e) {
-
-        Map<String, String> result = new HashMap<>();
-        result.put("message", "프로필 이미지 파일은 5MB 이하만 가능합니다.");
-        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(result);
-    }
 }

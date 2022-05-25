@@ -1,5 +1,6 @@
 package com.sparta.willbe.user.controller;
 
+import com.sparta.willbe._global.pagination.exception.PaginationPerInvalidException;
 import com.sparta.willbe.interview.dto.InterviewListResponseDto;
 import com.sparta.willbe.user.service.mypageService.UserMypageService;
 import com.sparta.willbe.advice.ErrorMessage;
@@ -58,7 +59,7 @@ public class UserMyPageController {
                                                                    @RequestParam(value = "sort", defaultValue = "new") String sort,
                                                                    @AuthenticationPrincipal User user) {
         if (per < 1) {
-            throw ErrorMessage.INVALID_PAGINATION_SIZE.throwError();
+            throw new PaginationPerInvalidException();
         }
 
         if (user == null) {

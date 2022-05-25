@@ -1,6 +1,10 @@
 package com.sparta.willbe.user.service.registerService;
 
 import com.sparta.willbe.advice.ErrorMessage;
+import com.sparta.willbe.user.exception.EmailInvalidException;
+import com.sparta.willbe.user.exception.PasswordNotFoundException;
+import com.sparta.willbe.user.exception.TokenInvalidException;
+import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.security.jwt.JwtTokenProvider;
 import com.sparta.willbe.security.jwt.TokenResponseDto;
@@ -33,10 +37,10 @@ public class UserProfileService {
 
         //회원정보와 작성한 비밀번호가 일치하지 않으면 안됨!
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw ErrorMessage.NOT_FOUND_PASSWORD.throwError();
+            throw new PasswordNotFoundException();
         }
         if(user.getIsValid() == false){
-            throw ErrorMessage.INVALID_EMAIL.throwError();
+            throw new EmailInvalidException();
         }
 
         return user;
@@ -59,7 +63,7 @@ public class UserProfileService {
         log.info("DELETE_USER >> delete_user_(service) >> {}에 대해 deleted 접근 중... 현재 isDeleted : {}",
                 user.getNickname(),user.getIsDeleted());
         User deleteThis = userRepository.findByEmailAndIsDeletedFalseAndIsValidTrue(user.getEmail())
-                .orElseThrow(() -> ErrorMessage.NOT_FOUND_USER.throwError());
+                .orElseThrow(() -> new UserNotFoundException());
         deleteThis.setIsDeleted(true);
 
         return deleteThis;
@@ -67,13 +71,13 @@ public class UserProfileService {
     @Transactional
     public User validateUser(String email, String token){
         User validatingUser = userRepository.findByEmailAndIsDeletedFalseAndIsValidFalse(email)
-                .orElseThrow(() -> ErrorMessage.NOT_FOUND_USER.throwError());
+                .orElseThrow(() -> new UserNotFoundException());
         log.info("CONTORLLER >> SERVICE >> VALIDATE_USER : {} ", validatingUser.getNickname());
         if(validatingUser.getToken().equals(token)) {
             validatingUser.isEmailvalidUser(true);
             log.info("CONTORLLER >> SERVICE >> VALIDATE_USER change is valid to : {} ", validatingUser.getIsValid());
         }else{
-            throw ErrorMessage.INVALID_TOKEN.throwError();
+            throw new TokenInvalidException();
         }
 
         return validatingUser;

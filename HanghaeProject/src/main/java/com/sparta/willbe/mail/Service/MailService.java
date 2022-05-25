@@ -3,6 +3,7 @@ package com.sparta.willbe.mail.Service;
 import com.sparta.willbe.advice.Success;
 import com.sparta.willbe.mail.template.MailTemplate;
 import com.sparta.willbe.mail.utils.EmailUtils;
+import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -35,13 +36,13 @@ public class MailService implements EmailUtils{
     private MailTemplate mailTemplate = new MailTemplate();
     private String htmlTemplate;
 
-    @PostConstruct
-    public void init() throws IOException{
-        final File file = ResourceUtils.getFile("classpath:templates/mailtemplate.html");
-        final InputStream inputStream = new FileInputStream(file);
-        final byte[] byteData = FileCopyUtils.copyToByteArray(inputStream);
-        htmlTemplate = new String(byteData, StandardCharsets.UTF_8);
-    }
+//    @PostConstruct
+//    public void init() throws IOException{
+//        final File file = ResourceUtils.getFile("classpath:templates/mailtemplate.html");
+//        final InputStream inputStream = new FileInputStream(file);
+//        final byte[] byteData = FileCopyUtils.copyToByteArray(inputStream);
+//        htmlTemplate = new String(byteData, StandardCharsets.UTF_8);
+//    }
 
     private String createBodyMailText(String token, String email, String nickname){
         htmlTemplate.replaceAll("\\$\\{token}",token);
@@ -70,6 +71,7 @@ public class MailService implements EmailUtils{
             result = new ResponseEntity<Success>(new Success(true, "메일 발송 성공!"),HttpStatus.OK);
         }catch (MessagingException e){
             e.printStackTrace();
+            Sentry.captureException(e);
             result = new ResponseEntity<Success>(new Success(false, "메일 발송 실패!"),HttpStatus.BAD_REQUEST);
         }
 

@@ -3,10 +3,10 @@ package com.sparta.willbe.interview.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
 import com.sparta.willbe._global.pagination.dto.PaginationResponseDto;
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.interview.dto.InterviewListResponseDto;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
+import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class InterviewMyPageService {
     public InterviewListResponseDto readAllMyInterviews(Pageable pageable, Long loginUserId) {
 
         User user = userRepository.findById(loginUserId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
+                .orElseThrow(UserNotFoundException::new);
 
         Page<Interview> interviews = interviewRepository.findAllByIsDoneAndUser_Id(true, loginUserId, pageable);
 
@@ -63,7 +63,7 @@ public class InterviewMyPageService {
     public InterviewListResponseDto readAllMyScraps(Pageable pageable, Long loginUserId) {
 
         User user = userRepository.findById(loginUserId)
-                .orElseThrow(ErrorMessage.UNAUTHORIZED_USER::throwError);
+                .orElseThrow(UserNotFoundException::new);
 
         Page<Interview> interviews = interviewRepository.findAllByIsDoneAndScraps_User_Id(true, loginUserId, pageable);
 

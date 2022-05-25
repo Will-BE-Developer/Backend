@@ -4,13 +4,16 @@ package com.sparta.willbe.interview.service;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
 import com.sparta.willbe.interview.dto.InterviewPostRequestDto;
+import com.sparta.willbe.interview.exception.DraftNotFoundException;
+import com.sparta.willbe.interview.exception.InterviewForbiddenPostException;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
+import com.sparta.willbe.question.exception.QuestionNotFoundException;
 import com.sparta.willbe.question.model.Question;
 import com.sparta.willbe.question.repostitory.QuestionRepository;
+import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +65,7 @@ public class InterviewUploadService {
     public Interview createInterviewDraft(Long loginUserId) {
 
         User user = userRepository.findById(loginUserId).orElseThrow(
-                ErrorMessage.NOT_FOUND_LOGIN_USER::throwError
+                UserNotFoundException::new
         );
 
         String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS"));
@@ -79,14 +82,14 @@ public class InterviewUploadService {
     public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) throws IOException {
 
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_DRAFT::throwError);
+                .orElseThrow(DraftNotFoundException::new);
 
         Question question = questionRepository.findById(requestDto.getQuestionId())
-                .orElseThrow(ErrorMessage.NOT_FOUND_QUESTION::throwError);
+                .orElseThrow(QuestionNotFoundException::new);
 
 
         if (interview.getUser().getId() != loginUserId) {
-            throw ErrorMessage.INVALID_INTERVIEW_POST.throwError();
+            throw new InterviewForbiddenPostException();
         }
 
         String convertedObjectkey = interviewConvertService.webmToMp4(interview.getVideoKey(), interview.getId());

@@ -10,7 +10,7 @@ import com.sparta.willbe.security.jwt.TokenResponseDto;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
 import com.sparta.willbe.user.dto.request.LoginRequestDto;
 import com.sparta.willbe.user.dto.request.RegisterRequestDto;
-import com.sparta.willbe.user.errors.UserAlreadyExistException;
+import com.sparta.willbe.user.exception.*;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.service.registerService.KakaoUserService;
 import com.sparta.willbe.user.service.registerService.UserProfileService;
@@ -48,13 +48,14 @@ public class UserController {
                                                       HttpServletResponse response, Errors errors) {
         //이미 로그인되어 있다면 사용자는 로그인 할 수 없다.
         if(users !=null){
-            throw new UserAlreadyExistException();
+            throw new UserAlreadyFoundException();
         }
 
+        //TODO: fieldErrors 처리하는거 한번 더 알아보기
         //requestbody 에서 들어온 에러를 처리한다
         if (errors.hasErrors()) {
             for (FieldError error : errors.getFieldErrors()) {
-                throw new RestException(HttpStatus.BAD_REQUEST, error.getDefaultMessage());
+                throw new InputValueInvalidException();
             }
         }
         log.debug("SIGN_IN() >> 로그인 되지 않은 사용자 입니다. 로그인을 시행하겠습니다");
@@ -85,24 +86,28 @@ public class UserController {
     public ResponseEntity<UserInfoResponseDto> userSignup(@AuthenticationPrincipal User users, @Valid @RequestBody RegisterRequestDto requestDto, Errors errors) {
         //이미 사용자가 로그인 되어있을 경우 회원가입을 할 수 없다.
         if(users !=null){
-            throw ErrorMessage.USER_AlREADY_FOUND.throwError();
+            throw new UserAlreadyFoundException();
         }
         log.debug("SIGN_UP() >> 로그인 되지 않은 사용자 입니다. 회원가입을 시행하겠습니다");
+        //TODO: FieldErrors
         //Request body에서 에러가 나면 에러를 보내준다
         if (errors.hasErrors()) {
             for (FieldError error : errors.getFieldErrors()) {
-                throw new RestException(HttpStatus.BAD_REQUEST, error.getDefaultMessage());
+                throw new InputValueInvalidException();
             }
         }
         log.debug("SIGN_UP() >> 이메일 중복검사 시행 중...");
         //중복된 이메일이 존재 한다
         if(userRegistryService.isEmailExist(requestDto.getEmail())){
-            throw ErrorMessage.CONFLICT_USER_EMAIL.throwError();
+            throw new EmailConflictException();
+        }
+        if(userRegistryService.isUserDeleted(requestDto.getEmail())){
+            throw new UserDeletedException();
         }
         log.debug("SIGN_UP() >> 비밀번호와 비밀번호가 일치하는지 확인중...");
         //비밀번호와 비밀번호 확인이 일치
         if (!requestDto.getPassword().equals( requestDto.getPasswordCheck())) {
-            throw ErrorMessage.PASSWORD_MISMATCHED.throwError();
+            throw new PasswordMismatchedException();
         } else {
             log.debug("SIGN_UP() >> 회원가입 진행중.. ");
             //모든 조건이 충족될경우에 회원가입을 진행한다.
@@ -123,14 +128,18 @@ public class UserController {
     }
     @GetMapping("/signup/{email}")
     public ResponseEntity<Success> idCheck(@PathVariable String email){
-        //유저네임이 등록되어있지 않은경우 사용가능 하다
-        if(!userRegistryService.isEmailExist(email)){
-            log.debug("SIGN_UP() >> 중복확인 : 사용가능한 이메일 입니다.");
-            return new ResponseEntity<Success>(new Success(true, "사용 가능한 이메일 입니다."), HttpStatus.OK);
+
+        if(userRegistryService.isEmailExist(email)){
+            //유저네임이 등록되어있는경우 사용불가능 하다.
+            log.debug("SIGN_UP() >> 중복확인 : 사용 할 수 없는 이메일 입니다.");
+            return new ResponseEntity<Success>(new Success(false, "동일한 이메일 주소가 존재합니다."), HttpStatus.CONFLICT);
+        }else if(userRegistryService.isUserDeleted(email)){
+            log.debug("SIGN_UP() >> 중복확인 : 삭제된 이메일 입니다.");
+            return new ResponseEntity<Success>(new Success(false, "탈퇴한 이메일 입니다."), HttpStatus.CONFLICT);
         }
-        //유저네임이 등록되어있는경우 사용불가능 하다.
-        log.debug("SIGN_UP() >> 중복확인 : 사용 할 수 없는 이메일 입니다.");
-        return new ResponseEntity<Success>(new Success(false, "동일한 이메일 주소가 존재합니다."), HttpStatus.CONFLICT);
+        //유저네임이 등록되어있지 않은경우 사용가능 하다
+        log.debug("SIGN_UP() >> 중복확인 : 사용가능한 이메일 입니다.");
+        return new ResponseEntity<Success>(new Success(true, "사용 가능한 이메일 입니다."), HttpStatus.OK);
     }
 
     @PostMapping("/signout")
@@ -169,7 +178,7 @@ public class UserController {
         //유저가 로그인 되어있지 않는 경우에는 유저정보를 반환하지 않는다
         log.info("GET_USER_INFO >> 유저 정보를 조회하는 중입니다.");
         if(user ==null){
-            throw UNAUTHORIZED_USER.throwError();
+            throw new UserUnauthorizedException();
         }
         log.info("GET_USER_INFO >> {}의 유저 정보를 반환 합니다 ",user.getNickname());
         //로그인 된 사용자의 이름과 닉네임을 반환한다.
@@ -189,7 +198,7 @@ public class UserController {
     @DeleteMapping("api/users/me")
     public ResponseEntity<Success> deleteUser(@AuthenticationPrincipal User user){
         if(user ==null){
-            throw UNAUTHORIZED_USER.throwError();
+            throw new UserUnauthorizedException();
         }
         log.info("DELETE_USER >> {} 의 유저정보 삭제를 요청합니다. ", user.getNickname());
         User deleting = userProfileService.deleteUser(user);
@@ -197,14 +206,18 @@ public class UserController {
         return new ResponseEntity<>(new Success(true,"회원삭제 성공"),HttpStatus.OK);
     }
 
+    // TODO : throw 던지는거 클라이언트한테 handler 로 처리해서 넘겨 주기
     @GetMapping("/user/kakao/callback")
     public ResponseEntity<UserInfoResponseDto> kakaoLogin(@AuthenticationPrincipal User users, @RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         //로그인 되는게 확인 될 경우에 에러를 반환한다.
         if(users != null){
-            throw ErrorMessage.USER_AlREADY_FOUND.throwError();
+            throw new UserAlreadyFoundException();
         }
-        User user =  kakaoUserService.kakaoLogin(code);
 
+        User user =  kakaoUserService.kakaoLogin(code);
+        if(userRegistryService.isUserDeleted(user.getEmail())){
+            throw new UserDeletedException();
+        }
         //로그인이 오류없이 처리 되었다면 Autorization 토큰을 헤더에 실어 보내준다.
         TokenResponseDto token = userProfileService.giveToken(user.getEmail());
         response.setHeader("Authorization", token.getAuthorization());

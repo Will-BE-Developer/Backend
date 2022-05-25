@@ -67,6 +67,9 @@ dependencies {
 //	implementation 'org.bytedeco:ffmpeg:5.0-1.5.7'
 //	implementation 'org.bytedeco:javacpp:1.5.7'
 //	implementation 'org.bytedeco:javacv-platform:1.5.7'
+
+	implementation 'io.sentry:sentry-spring-boot-starter:5.7.4'
+	implementation 'io.sentry:sentry-logback:5.7.4'
 }
 
 //github actions 위해 주석처리

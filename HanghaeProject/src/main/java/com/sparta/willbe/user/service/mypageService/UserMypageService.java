@@ -11,6 +11,7 @@ import com.sparta.willbe.user.dto.UserInfoResponseDto;
 import com.sparta.willbe.user.dto.UserRequestDto;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
+import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
@@ -253,6 +254,7 @@ public class UserMypageService {
             }
             log.info("OBJECT KEY : {}, CREATED IN BUCKET : {}", objectKey, bucket);
         } catch (Exception e) {
+            Sentry.captureException(e);
             throw ErrorMessage.UNABLE_UPLOAD_TO_S3.throwError();
         }
         return objectKey;

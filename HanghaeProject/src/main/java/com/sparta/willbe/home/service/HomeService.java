@@ -10,6 +10,7 @@ import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import com.sparta.willbe.interview.service.InterviewService;
+import com.sparta.willbe.question.exception.QuestionNotFoundException;
 import com.sparta.willbe.question.repostitory.QuestionRepository;
 import com.sparta.willbe.scrap.model.Scrap;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
@@ -56,7 +57,7 @@ public class HomeService {
         List<QuestionResponseDto> todaysQuestionsDto = new ArrayList<>();
         for (TodayQuestion todayQuestion : todaysQuestions) {
             Question question = questionRepository.findById(todayQuestion.getQuestion().getId()).orElseThrow(
-                    () -> ErrorMessage.NOT_FOUND_QUESTION.throwError()
+                    QuestionNotFoundException::new
             );
             QuestionResponseDto n = new QuestionResponseDto(new QuestionResponseDto.data(
                     question.getId(),
