@@ -25,6 +25,7 @@ import javax.transaction.Transactional;
 public class UserProfileService {
 
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -54,7 +55,7 @@ public class UserProfileService {
                 .build();
     }
     @Transactional
-    public void logout(HttpServletRequest request){
+    public void logout(){
         SecurityContextHolder.clearContext();
     }
 
@@ -65,6 +66,11 @@ public class UserProfileService {
         User deleteThis = userRepository.findByEmailAndIsDeletedFalseAndIsValidTrue(user.getEmail())
                 .orElseThrow(() -> new UserNotFoundException());
         deleteThis.setIsDeleted(true);
+        if(deleteThis.getProvider() =="kakao"){
+
+        }else {
+            this.logout();
+        }
 
         return deleteThis;
     }
