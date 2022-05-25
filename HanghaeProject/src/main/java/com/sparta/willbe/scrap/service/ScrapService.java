@@ -2,11 +2,15 @@ package com.sparta.willbe.scrap.service;
 
 
 import com.sparta.willbe.advice.ErrorMessage;
+import com.sparta.willbe.interview.exception.InterviewNotFoundException;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import com.sparta.willbe.scrap.dto.ScrapInfoResponseDto;
+import com.sparta.willbe.scrap.exception.ScrapDeleteConflictException;
+import com.sparta.willbe.scrap.exception.ScrapPostConflictException;
 import com.sparta.willbe.scrap.model.Scrap;
 import com.sparta.willbe.scrap.repository.ScrapRepository;
+import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +31,16 @@ public class ScrapService {
     public ScrapInfoResponseDto addScrap(User user, Long interviewId) {
 
         User loginUser = userRepository.findById(user.getId())
-                .orElseThrow(ErrorMessage.NOT_FOUND_LOGIN_USER::throwError);
+                .orElseThrow(UserNotFoundException::new);
 
         for (Scrap scrap : loginUser.getScraps()) {
             if (Objects.equals(scrap.getInterview().getId(), interviewId)) {
-                throw ErrorMessage.CONFLICT_SCRAP_POST.throwError();
+                throw new ScrapPostConflictException();
             }
         }
 
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+                .orElseThrow(InterviewNotFoundException::new);
 
         Long scrapCount = interview.getScraps().stream().count();
 
@@ -52,7 +56,7 @@ public class ScrapService {
     public ScrapInfoResponseDto removeScrap(User user, Long interviewId) {
 
         Scrap scrap = scrapRepository.findByUser_IdAndInterview_Id(user.getId(), interviewId)
-                .orElseThrow(ErrorMessage.CONFLICT_SCRAP_DELETE::throwError);
+                .orElseThrow(ScrapDeleteConflictException::new);
 
         scrapRepository.deleteById(scrap.getId());
 
@@ -61,7 +65,7 @@ public class ScrapService {
 
     public Long getScrapCount(Long interviewId) {
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+                .orElseThrow(InterviewNotFoundException::new);
 
         return interview.getScraps().stream().count();
     }

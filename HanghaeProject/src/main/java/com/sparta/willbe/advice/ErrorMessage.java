@@ -44,7 +44,9 @@ public enum ErrorMessage{
     //MOVED
     USER_AlREADY_FOUND(HttpStatus.BAD_REQUEST, "이미 로그인된 사용자 입니다."),
 
+    //MOVED
     CONFLICT_SCRAP_POST(HttpStatus.CONFLICT,"이미 스크랩한 게시글 입니다."),
+    //MOVED
     CONFLICT_SCRAP_DELETE(HttpStatus.CONFLICT,"해당 스크랩 정보가 존재하지 않습니다."),
 
     //MOVED

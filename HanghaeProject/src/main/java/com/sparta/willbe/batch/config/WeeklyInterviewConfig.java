@@ -4,6 +4,7 @@ import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;
 import com.sparta.willbe.batch.jobListener.JobListener;
 import com.sparta.willbe.batch.tables.WeeklyInterview;
+import com.sparta.willbe.interview.exception.InterviewNotFoundException;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +97,7 @@ public class WeeklyInterviewConfig {
                     //Interview interview = weeklyInterview.getInterview();
                     //interview레포지토리에서 새로 불러와서
                     Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
-                            .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+                            .orElseThrow(InterviewNotFoundException::new);
                     interview.updateBadge(badge[ranking-1]);
                     interview = interviewRepository.save(interview);
                     //edit
@@ -105,7 +106,7 @@ public class WeeklyInterviewConfig {
                     weeklyInterviewRepository.save(weeklyInterviewEach);
                 }else{
                     Interview interview = interviewRepository.findById(weeklyInterview.getInterview().getId())
-                            .orElseThrow(ErrorMessage.NOT_FOUND_INTERVIEW::throwError);
+                            .orElseThrow(InterviewNotFoundException::new);
                     WeeklyInterview weeklyInterviewEach = new WeeklyInterview(interview, weeklyInterview.getScrapCount(), "NONE", weeklyBadge);
                     weeklyInterviewEach.setWeeklyBadge(weeklyBadge);
                     weeklyInterviewRepository.save(weeklyInterviewEach);
