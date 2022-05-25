@@ -9,6 +9,7 @@ import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.dto.KakaoUserInfoDto;
 import com.sparta.willbe.user.model.Role;
 import com.sparta.willbe.user.repository.UserRepository;
+import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -201,6 +202,7 @@ public class KakaoUserService {
                 log.debug("result is {}",result);
 
             }catch(IOException e){
+                Sentry.captureException(e);
                 e.printStackTrace();
             }
 

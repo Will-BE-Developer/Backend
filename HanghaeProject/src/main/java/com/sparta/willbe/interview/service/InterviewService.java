@@ -28,6 +28,7 @@ import com.sparta.willbe.scrap.model.Scrap;
 import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
+import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -269,6 +270,7 @@ public class InterviewService {
                 }
             } catch (Exception e) {
                 log.error("S3에서 인터뷰(ID:{}) 영상 삭제 에러 - {}", interviewId, e.getMessage());
+                Sentry.captureException(e);
             }
 
             //video_key에 "" 저장
