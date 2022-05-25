@@ -160,8 +160,8 @@ public class InterviewService {
 
         } else {
             interviews = filter.equals("전체보기") ?
-                    interviewRepository.findAllByIsDoneAndIsPublic(true, true, pageable) :
-                    interviewRepository.findAllByIsDoneAndIsPublicAndQuestion_Category(true, true, CategoryEnum.valueOf(filter), pageable);
+                    interviewRepository.findAllByIsDoneAndIsPublicAndUser_IsDeleted(true, true, false,pageable) :
+                    interviewRepository.findAllByIsDoneAndIsPublicAndUser_IsDeletedAndQuestion_Category(true, true, false,CategoryEnum.valueOf(filter), pageable);
         }
 
         Set<Long> userScrapsId = getScrapedInterviewIds(user);
