@@ -1,8 +1,6 @@
 package com.sparta.willbe.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sparta.willbe.advice.ErrorMessage;
-import com.sparta.willbe.advice.RestException;
 import com.sparta.willbe.advice.Success;
 import com.sparta.willbe.interview.service.InterviewService;
 import com.sparta.willbe.mail.Service.MailService;
@@ -267,7 +265,7 @@ public class UserController {
                 .token(user.getToken())
                 .build(), HttpStatus.OK);
     }
-  
+
 
 }
 

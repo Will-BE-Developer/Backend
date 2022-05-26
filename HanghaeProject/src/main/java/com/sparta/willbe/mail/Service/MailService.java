@@ -1,7 +1,6 @@
 package com.sparta.willbe.mail.Service;
 
 import com.sparta.willbe.advice.Success;
-import com.sparta.willbe.mail.template.MailTemplate;
 import com.sparta.willbe.mail.utils.EmailUtils;
 import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
@@ -33,16 +32,11 @@ import java.util.HashMap;
 public class MailService implements EmailUtils{
 
     private final JavaMailSender sender;
-    private MailTemplate mailTemplate = new MailTemplate();
     private String htmlTemplate;
 
-    //TODO: 서버에 올릴때 클래스 패스 or 서버에 .html파일 넣어서 바로 읽던지 하기
     @PostConstruct
     public void init() throws IOException{
         final File file = ResourceUtils.getFile("./mail/mailtemplate.html");
-
-        log.info("JAVA  class path : {}",System.getProperty("java.class.path"));
-
         final InputStream inputStream = new FileInputStream(file);
         final byte[] byteData = FileCopyUtils.copyToByteArray(inputStream);
         htmlTemplate = new String(byteData, StandardCharsets.UTF_8);
@@ -69,7 +63,6 @@ public class MailService implements EmailUtils{
         ResponseEntity<Success> result ;
 
         try{
-            File f1 = new File("");
              MimeMessage message = sender.createMimeMessage();
              MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 

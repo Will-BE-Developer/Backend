@@ -104,7 +104,7 @@ public class HomeService {
                 scrapMe = userScapId.contains(interview.getId());
             }
 
-            int commentsCount = commentRepository.countByInterview_Id(interview.getId());
+            int commentsCount = commentRepository.countByInterview_IdAndUser_IsDeletedFalse(interview.getId());
 
             InterviewInfoResponseDto.Data n = InterviewInfoResponseDto.Data.builder()
                     .id(interview.getId())
@@ -161,7 +161,7 @@ public class HomeService {
                 scrapMe = userScapId.contains(interview.getId());
             }
 
-            int commentsCount = commentRepository.countByInterview_Id(interviewById.getId());
+            int commentsCount = commentRepository.countByInterview_IdAndUser_IsDeletedFalse(interviewById.getId());
 
             String weeklyBadge = interview.getWeeklyBadge();
             String[] weekKorean = {"첫째주", "둘째주", "셋째주", "넷째주", "다섯째주"};

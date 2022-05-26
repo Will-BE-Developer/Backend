@@ -3,8 +3,6 @@ package com.sparta.willbe.interview.controller;
 import com.sparta.willbe._global.pagination.exception.PaginationCategoryInvalidException;
 import com.sparta.willbe._global.pagination.exception.PaginationPerInvalidException;
 import com.sparta.willbe.interview.dto.*;
-import com.sparta.willbe.advice.ErrorMessage;
-import com.sparta.willbe.advice.RestException;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.service.InterviewService;
