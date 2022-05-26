@@ -39,12 +39,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    @Override
-    public void configure(WebSecurity web){
-        web
-                .ignoring()
-                .antMatchers("/h2-console/**");
-    }
+//    @Override
+//    public void configure(WebSecurity web){
+//        web
+//                .ignoring()
+//                .antMatchers("/h2-console/**");
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception{
@@ -66,7 +66,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-ui/**").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll()
                 .antMatchers("/v3/api-docs/**").permitAll()
-                .antMatchers(HttpMethod.DELETE,"/api/interviews/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout()
@@ -83,6 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedOrigin("http://willbedeveloper.com");
         configuration.addAllowedOrigin("https://willbedeveloper.com");
         configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
         configuration.addExposedHeader("Authorization");

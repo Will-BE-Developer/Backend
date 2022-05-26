@@ -5,6 +5,8 @@ import com.sparta.willbe.scrap.dto.ScrapInfoResponseDto;
 import com.sparta.willbe.scrap.service.ScrapService;
 import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.user.model.User;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,8 @@ public class ScrapController {
     private final ScrapService scrapService;
 
     @PostMapping("/api/scraps/{interviewId}")
+    @ApiOperation(value = "스크랩 추가")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity<ScrapInfoResponseDto> createScrap(@PathVariable Long interviewId,
                                                             @AuthenticationPrincipal User user) {
 
@@ -34,8 +38,10 @@ public class ScrapController {
     }
 
     @DeleteMapping("/api/scraps/{interviewId}")
+    @ApiOperation(value = "스크랩 삭제")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity<ScrapInfoResponseDto> deleteScrap(@PathVariable Long interviewId,
-                                                               @AuthenticationPrincipal User user) {
+                                                            @AuthenticationPrincipal User user) {
 
         if (user == null) {
             throw ErrorMessage.UNAUTHORIZED_USER.throwError();

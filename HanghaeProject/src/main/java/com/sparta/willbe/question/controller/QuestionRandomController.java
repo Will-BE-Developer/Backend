@@ -6,6 +6,8 @@ import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.question.dto.QuestionResponseDto;
 import com.sparta.willbe.question.model.Question;
 import com.sparta.willbe.question.service.QuestionRandomService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
@@ -22,6 +24,8 @@ public class QuestionRandomController {
     private final QuestionRandomService questionRandomService;
 
     //    need refactoring
+    @ApiOperation(value = "카테고리의 랜덤 질문 불러오기")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
     @GetMapping("/api/questions/{categoryName}")
     public ResponseEntity<QuestionResponseDto> getRandomQuestionFromCategory(@PathVariable String categoryName) {
         log.info("READ RANDOM QUESTION OF " + categoryName);

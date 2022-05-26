@@ -5,6 +5,8 @@ import com.sparta.willbe.comments.dto.CommentListDto;
 import com.sparta.willbe.comments.dto.CommentRequestDto;
 import com.sparta.willbe.comments.model.Comment;
 import com.sparta.willbe.user.model.User;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ public class CommentController {
     }
 
     @GetMapping("/api/comments/{interviewId}")
+    @ApiOperation(value = "댓글 목록 불러오기")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
     public ResponseEntity makeCommentList(@PathVariable Long interviewId,
                                           @AuthenticationPrincipal User user,
                                           @RequestParam(value = "per", defaultValue = "10") int per,
@@ -34,6 +38,8 @@ public class CommentController {
     }
 
     @PostMapping("/api/comments")
+    @ApiOperation(value = "댓글 쓰기")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity saveComment(@RequestBody CommentRequestDto requestDto,
                                       @AuthenticationPrincipal User user) {
 
@@ -49,6 +55,8 @@ public class CommentController {
     }
 
     @PutMapping("/api/comments/{commentId}")
+    @ApiOperation(value = "댓글 수정")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity editComment(@PathVariable Long commentId,
                                       @RequestBody CommentRequestDto requestDto,
                                       @AuthenticationPrincipal User user) {
@@ -65,6 +73,8 @@ public class CommentController {
     }
 
     @DeleteMapping("/api/comments/{commentId}")
+    @ApiOperation(value = "댓글 삭제")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity deleteComment(@PathVariable Long commentId,
                                         @AuthenticationPrincipal User user) {
 
