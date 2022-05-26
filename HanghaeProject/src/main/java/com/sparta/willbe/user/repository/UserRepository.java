@@ -9,9 +9,10 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     //active user
     Optional<User> findByEmailAndIsDeletedFalseAndIsValidTrue(String userEmail);
+    //kakao active user
+    Optional<User> findByEmailAndProviderAndIsDeletedFalse(String email, String provider);
     //email register but not valid user
     Optional<User> findByEmailAndIsDeletedFalseAndIsValidFalse(String userEmail);
+    //user deleted
     Optional<User> findByEmailAndIsDeletedTrue(String userEmail);
-    Optional<User> findByEmailAndProviderAndIsDeletedFalse(String email, String provider);
-    Optional<User> findByEmailAndIsValidTrueAndIsDeletedFalse(String email);
 }

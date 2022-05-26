@@ -1,10 +1,7 @@
 package com.sparta.willbe.user.service.registerService;
 
 import com.sparta.willbe.advice.ErrorMessage;
-import com.sparta.willbe.user.exception.EmailInvalidException;
-import com.sparta.willbe.user.exception.PasswordNotFoundException;
-import com.sparta.willbe.user.exception.TokenInvalidException;
-import com.sparta.willbe.user.exception.UserNotFoundException;
+import com.sparta.willbe.user.exception.*;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.security.jwt.JwtTokenProvider;
 import com.sparta.willbe.security.jwt.TokenResponseDto;
@@ -78,6 +75,11 @@ public class UserProfileService {
     }
     @Transactional
     public User validateUser(String email, String token){
+        //이미 인증 된 사용자
+        if(userRepository.findByEmailAndIsDeletedFalseAndIsValidTrue(email).isPresent()){
+            throw new UserAlreadyValidException();
+        }
+        //인증이 안되었지만, 가입되어있는 사용자를 찾는다.
         User validatingUser = userRepository.findByEmailAndIsDeletedFalseAndIsValidFalse(email)
                 .orElseThrow(() -> new UserNotFoundException());
         log.info("CONTORLLER >> SERVICE >> VALIDATE_USER : {} ", validatingUser.getNickname());

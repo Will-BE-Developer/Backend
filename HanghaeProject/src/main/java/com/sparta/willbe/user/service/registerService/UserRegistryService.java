@@ -48,7 +48,7 @@ public class UserRegistryService {
     }
 
     public boolean isEmailExist(String email){
-        if( userRepository.findByEmailAndIsValidTrueAndIsDeletedFalse(email).isPresent()){
+        if( userRepository.findByEmailAndIsDeletedFalseAndIsValidTrue(email).isPresent()){
             log.info("SIGN_UP() >> isEamilExist() >> 이메일 사용 불가능 : 사용중인 회원");
             return true;
         }else {

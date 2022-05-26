@@ -18,7 +18,7 @@ public enum ExceptionCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND,"U001","해당 유저가 존재하지 않습니다."),
     USER_AlREADY_FOUND(HttpStatus.BAD_REQUEST,"U002", "이미 로그인된 사용자 입니다."),
     USER_UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"U003","해당 요청은 로그인이 필요합니다."),
-
+    USER_ALREADY_VALID(HttpStatus.BAD_REQUEST,"U003","이미 인증 완료된 사용자 입니다."),
     USER_DELETED(HttpStatus.BAD_REQUEST,"U004","탈퇴 처리된 회원입니다."),
 
     //Login & Register
