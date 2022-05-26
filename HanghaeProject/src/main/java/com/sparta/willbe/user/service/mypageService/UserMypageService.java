@@ -124,7 +124,7 @@ public class UserMypageService {
 
         }
         
-        if (profileImageString.equals("undefined")) {
+        if (profileImageString != null && profileImageString.equals("undefined")) {
             user.updateInfo(requestDto.getNickname(), requestDto.getGithubLink(),
                     requestDto.getIntroduce(), user.getProfileImageUrl());
         // 프사 첨부 or 삭제시
@@ -138,7 +138,7 @@ public class UserMypageService {
 
         //프로필 이미지 첨부 안했으면(undefined or null)
         //프사 외 정보만 수정
-        if (profileImageString.equals("undefined")) {
+        if (profileImageString != null && profileImageString.equals("undefined")) {
             log.info("editUserInfo() >> save() >> 프로필 사진 외 정보만 수정합니다.(undefined)");
             return UserInfoResponseDto.builder()
                     .user(UserInfoResponseDto.UserBody.builder()
