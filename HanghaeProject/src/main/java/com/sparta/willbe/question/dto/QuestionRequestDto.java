@@ -12,9 +12,7 @@ import lombok.NoArgsConstructor;
 public class QuestionRequestDto {
 
     private String contents;
-
     private String reference;
-
     private String category;
 
 }

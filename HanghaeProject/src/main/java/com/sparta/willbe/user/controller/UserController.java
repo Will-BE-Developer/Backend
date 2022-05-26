@@ -51,7 +51,6 @@ public class UserController {
             throw new UserAlreadyFoundException();
         }
 
-        //TODO: fieldErrors 처리하는거 한번 더 알아보기
         //requestbody 에서 들어온 에러를 처리한다
         if (errors.hasErrors()) {
             for (FieldError error : errors.getFieldErrors()) {
@@ -228,9 +227,6 @@ public class UserController {
 
         User user =  kakaoUserService.kakaoLogin(code);
 
-//        if(userRegistryService.isUserDeleted(user.getEmail())){
-//            throw new UserDeletedException();
-//        }
         //로그인이 오류없이 처리 되었다면 Autorization 토큰을 헤더에 실어 보내준다.
         TokenResponseDto token = userProfileService.giveToken(user.getEmail());
         response.setHeader("Authorization", token.getAuthorization());

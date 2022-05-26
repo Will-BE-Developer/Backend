@@ -27,7 +27,6 @@ public class JwtTokenProvider {
 
     private static String SECRET_KEY = "4dW2Ri6fZjsSjgldfYe8soispI6QoqCnvi8oewMS2rvbeW5Swo";
 
-
     private static final long SEC = 1000L;
     private static final long MINUTE = 60 * SEC;
     private static final long HOUR = 60 * MINUTE;

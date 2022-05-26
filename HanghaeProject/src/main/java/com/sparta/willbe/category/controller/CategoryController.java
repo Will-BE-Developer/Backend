@@ -24,9 +24,7 @@ public class CategoryController {
     public ResponseEntity<CategoryResponseDto> getAllCategories() {
 
         log.info("READ ALL CATEGORY LIST");
-
         List<CategoryEnum> categoryEnumList = categoryService.getCategoryNames();
-
         CategoryResponseDto body = new CategoryResponseDto(categoryEnumList);
 
         return new ResponseEntity<>(body, HttpStatus.OK);

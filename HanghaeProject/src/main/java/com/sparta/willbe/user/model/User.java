@@ -58,15 +58,12 @@ public class User extends Timestamped implements UserDetails {
     private Boolean isDeleted;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Fetch(FetchMode.JOIN)
     private List<Interview> interviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Fetch(FetchMode.JOIN)
     private List<Scrap> scraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Fetch(FetchMode.JOIN)
     private List<Comment> comments = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

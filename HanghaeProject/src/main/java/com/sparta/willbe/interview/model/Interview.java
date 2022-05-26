@@ -55,7 +55,6 @@ public class Interview extends Timestamped {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    //@OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
     @OneToMany(mappedBy = "interview", cascade = CascadeType.REMOVE, orphanRemoval = true)
     List<Scrap> scraps = new ArrayList<>();
 

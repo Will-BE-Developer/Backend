@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 public class InterviewPostRequestDto {
 
     private String note;
-
     private Long questionId;
-
     private Boolean isPublic;
 
 }

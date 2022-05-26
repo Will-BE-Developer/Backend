@@ -27,13 +27,7 @@ public interface WeeklyInterviewRepository extends JpaRepository<WeeklyInterview
 
     List<WeeklyInterview> findWeeklyInterview(Pageable pageable);
 
-    WeeklyInterview findByWeeklyBadge(String lowRank);
-
-    WeeklyInterview findByInterviewId(Long interviewId);
-
     WeeklyInterview findTopByInterviewIdOrderByIdDesc(Long interviewId);
-
-    List<WeeklyInterview> findAllByInterviewId(Long interviewId);
 
     List<WeeklyInterview> findByCreatedAtBetween(LocalDateTime minus, LocalDateTime now);
 

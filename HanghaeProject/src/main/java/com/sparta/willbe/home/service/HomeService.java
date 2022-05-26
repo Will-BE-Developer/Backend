@@ -71,23 +71,6 @@ public class HomeService {
         return todaysQuestionsDto;
     }
 
-    public List<CommentResponseDto.ResponseComment> getLatestComments(User user) {
-        List<Comment> comments = commentRepository.findTop4ByRootNameOrderByCreatedAtDesc("interview");
-
-        log.info("COMMENTS FOUND : {}", comments);
-        List<CommentResponseDto.ResponseComment> commentResponseDtos = new ArrayList<>();
-        Boolean ismine = false;
-        for (Comment comment : comments) {
-            if (user != null) {
-                ismine = comment.getUser().getEmail() == user.getEmail();
-            }
-            commentResponseDtos.add(
-                    new CommentResponseDto.ResponseComment(comment, ismine)
-            );
-        }
-        return commentResponseDtos;
-    }
-
     public List<InterviewInfoResponseDto.Data> getLatestInterview(User user) {
         List<Interview> latstInterview = interviewRepository.findTop4ByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalseOrderByCreatedAtDesc();
         List<InterviewInfoResponseDto.Data> latestInterviewDto = new ArrayList<>();

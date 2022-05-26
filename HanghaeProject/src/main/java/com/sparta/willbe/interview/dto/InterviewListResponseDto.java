@@ -13,7 +13,6 @@ import java.util.List;
 public class InterviewListResponseDto {
 
     private List<InterviewInfoResponseDto.Data> interviews;
-
     private PaginationResponseDto pagination;
 
 }

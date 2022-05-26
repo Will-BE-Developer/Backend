@@ -37,10 +37,8 @@ public class LikesService {
                 InterviewNotFoundException::new
         );
 
-
         likes = likesRepository.findByInterviewId(videoId);
         Map<Integer, Integer> map = new HashMap<>();
-
 
         if (likes == null) {
             likes = likesRepository.save(Likes.builder()

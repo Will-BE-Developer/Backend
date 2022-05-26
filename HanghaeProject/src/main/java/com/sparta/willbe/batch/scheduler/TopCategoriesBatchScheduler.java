@@ -23,9 +23,7 @@ public class TopCategoriesBatchScheduler {
     private final JobLauncher jobLauncher;
     private final TopCategoriesBatchConfig topCategoriesBatchConfig;
 
-//    @Scheduled(cron = "0/50 * * * * *")
-//    매 3시간 실행
-        @Scheduled(cron = "0 0 0/3 * * *")
+    @Scheduled(cron = "0 0 0/3 * * *")
     public void runJob() {
         Map<String, JobParameter> configMap = new HashMap<>();
         configMap.put("time", new JobParameter((System.currentTimeMillis())));

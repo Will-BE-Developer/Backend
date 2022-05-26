@@ -19,11 +19,8 @@ public class ScrapInfoResponseDto {
     public static class Data{
 
         private Long interviewId;
-
         private Boolean scrapsMe;
-
         private Long scrapsCount;
-
         public void setScrapsCount(Long scrapsCount) {
             this.scrapsCount = scrapsCount;
         }

@@ -4,7 +4,6 @@ import com.sparta.willbe._global.pagination.exception.PaginationPerInvalidExcept
 import com.sparta.willbe.interview.dto.InterviewListResponseDto;
 import com.sparta.willbe.user.exception.UserUnauthorizedException;
 import com.sparta.willbe.user.service.mypageService.UserMypageService;
-import com.sparta.willbe.advice.RestException;
 import com.sparta.willbe.interview.service.InterviewMyPageService;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
 import com.sparta.willbe.user.dto.UserRequestDto;

@@ -39,12 +39,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-//    @Override
-//    public void configure(WebSecurity web){
-//        web
-//                .ignoring()
-//                .antMatchers("/h2-console/**");
-//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception{
