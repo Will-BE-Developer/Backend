@@ -36,4 +36,6 @@ public interface WeeklyInterviewRepository extends JpaRepository<WeeklyInterview
     List<WeeklyInterview> findAllByInterviewId(Long interviewId);
 
     List<WeeklyInterview> findByCreatedAtBetween(LocalDateTime minus, LocalDateTime now);
+
+    List<WeeklyInterview> findByWeeklyBadgeContains(String twoWeeksAgo);
 }

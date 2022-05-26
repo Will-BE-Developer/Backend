@@ -54,17 +54,25 @@ public enum ErrorMessage{
     //MOVED
     PASSWORD_MISMATCHED(HttpStatus.BAD_REQUEST, "비밀번호와 비밀번호확인이 일치하지 않습니다."),
 
+    //MOVED
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND,"해당 댓글은 존재하지 않습니다."),
+    //MOVED
     INVALID_ROOT_ID(HttpStatus.BAD_REQUEST, "수정하려는 댓글의 RootId가 일치하지 않습니다."),
+    //MOVED
     INVALID_ROOT_NAME(HttpStatus.BAD_REQUEST, "수정하려는 댓글의 RootName이 일치하지 않습니다."),
+    //MOVED
     INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST, "프로필 이미지는 png, jpg, gif 확장자만 가능합니다."),
+    //MOVED
     INVALID_IMAGE_SIZE_ZERO(HttpStatus.BAD_REQUEST, "프로필 이미지 파일이 0바이트 입니다."),
+    //MOVED
     INVALID_IMAGE_SIZE(HttpStatus.BAD_REQUEST, "프로필 이미지 파일은 5MB 이하만 가능합니다."),
+    //MOVED
     UNABLE_UPLOAD_TO_S3(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 업로드가 실패하였습니다."),
+    //MOVED
     UNABLE_SAVE_PROFILE_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지 저장 또는 업로드가 실패하였습니다."),
-    FAIL_DELETE_INTERVIEW(HttpStatus.INTERNAL_SERVER_ERROR, "면접왕인 인터뷰 삭제가 실패하였습니다."),
-    UNABLE_DELETE_INTERVIEW_ON_WEEKLY(HttpStatus.BAD_REQUEST, "면접왕으로 선정된 인터뷰는 삭제가 불가합니다."),
-    NOT_FOUND_INTERVIEW_IN_WEEKLY(HttpStatus.GONE,"위클리 테이블에서 해당 인터뷰가 존재하지 않습니다."),
+    //FAIL_DELETE_INTERVIEW(HttpStatus.INTERNAL_SERVER_ERROR, "면접왕인 인터뷰 삭제가 실패하였습니다."),
+    //UNABLE_DELETE_INTERVIEW_ON_WEEKLY(HttpStatus.BAD_REQUEST, "면접왕으로 선정된 인터뷰는 삭제가 불가합니다."),
+    //NOT_FOUND_INTERVIEW_IN_WEEKLY(HttpStatus.GONE,"위리 테이블에서 해당 인터뷰가 존재하지 않습니다."),
     ;
 
     private final RestException exception;

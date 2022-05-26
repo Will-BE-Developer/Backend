@@ -1,15 +1,16 @@
 package com.sparta.willbe.comments.service;
 
 import com.sparta.willbe._global.pagination.exception.PaginationPerInvalidException;
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.comments.dto.CommentListDto;
 import com.sparta.willbe.comments.dto.CommentRequestDto;
+import com.sparta.willbe.comments.exception.*;
 import com.sparta.willbe.comments.model.Comment;
 import com.sparta.willbe.comments.repository.CommentRepository;
 import com.sparta.willbe.interview.exception.InterviewNotFoundException;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import com.sparta.willbe.interview.service.InterviewService;
+import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +73,7 @@ public class CommentService {
             List<Comment> result = commentList.stream()
                     .filter(a -> Objects.equals(a.getId(), itsParentId))
                     .collect(Collectors.toList());
-            log.info("부모 댓글 조회 : {}", result);
+            log.info("makeCommentList() >> 부모 댓글 조회 : {}", result);
 
             if (user != null) {
                 isMine = user.getId().equals(eachChild.getUser().getId());
@@ -82,7 +83,7 @@ public class CommentService {
             for (CommentListDto.ResponseComment parentComment: commentListInDto){
                 if (parentComment.getId().equals(itsParentId)){
                     int index = commentListDto.getComments().indexOf(parentComment);
-                    log.info("대댓글을 포함시킬 부모댓글의 index : {}", index);
+                    log.info("makeCommentList() >> 대댓글을 포함시킬 부모댓글의 index : {}", index);
                     String childProfileUrl = interviewService.getProfileImageUrl(eachChild.getUser().getProfileImageUrl());
                     commentListDto.addNestedComment(index, eachChild, isMine, childProfileUrl);
                 }
@@ -128,7 +129,7 @@ public class CommentService {
     public Comment saveComment(CommentRequestDto requestDto, User user) {
 
         userRepository.findById(user.getId()).orElseThrow(
-                () -> ErrorMessage.NOT_FOUND_USER.throwError());
+                () -> new UserNotFoundException());
 
         //rootname이 인터뷰면, interview repo에서 rootId(=interview id)로 interview를 찾고, 없으면 에러
         //rootname이 댓글이면, comment repo에서 rootId(=comment id)로 comment를 찾고, 없으면 에러, 그 코멘트의 인터뷰를 get
@@ -136,13 +137,13 @@ public class CommentService {
         if (requestDto.getRootName().equals("interview")){
             Interview interview = interviewRepository.findById(requestDto.getRootId()).orElseThrow(
                     InterviewNotFoundException::new);
-            log.info("댓글 작성한 인터뷰 ID : {}", interview.getId());
+            log.info("saveComment() >> 댓글 작성한 인터뷰 ID : {}", interview.getId());
 
             comment = new Comment(requestDto, user, interview);
             commentRepository.save(comment);
         }else if(requestDto.getRootName().equals("comment")){
             Comment rootComment = commentRepository.findById(requestDto.getRootId()).orElseThrow(
-                    () -> ErrorMessage.NOT_FOUND_COMMENT.throwError());
+                    () -> new CommentNotFoundException());
             Interview interview = rootComment.getInterview();
             comment = new Comment(requestDto, user, interview);
             commentRepository.save(comment);
@@ -153,11 +154,16 @@ public class CommentService {
     @Transactional
     public Comment editComment(Long commentId, CommentRequestDto requestDto, User user) {
         userRepository.findById(user.getId()).orElseThrow(
-                () -> ErrorMessage.NOT_FOUND_USER.throwError());
+                () -> new UserNotFoundException());
 
         //수정하려는 댓글 id가 존재하는지
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> ErrorMessage.NOT_FOUND_COMMENT.throwError());
+                () -> new CommentNotFoundException());
+
+        //댓글 작성한 유저인지 확인
+        if (comment.getUser().getId() != user.getId()){
+            throw new CommentForbiddenUpdateException();
+        }
 
         //기존에 rootName과 일치하는지
         if (comment.getRootName().equals(requestDto.getRootName())){
@@ -166,10 +172,10 @@ public class CommentService {
                 //수정 실시
                 comment.update(requestDto);
             }else{
-                throw ErrorMessage.INVALID_ROOT_ID.throwError();
+                throw new CommentRootIdException();
             }
         }else{
-            throw ErrorMessage.INVALID_ROOT_NAME.throwError();
+            throw new CommentRootNameException();
         }
 
         return comment;
@@ -178,11 +184,17 @@ public class CommentService {
     @Transactional
     public Comment deleteComment(Long commentId, User user) {
         userRepository.findById(user.getId()).orElseThrow(
-                () -> ErrorMessage.NOT_FOUND_USER.throwError());
+                () -> new UserNotFoundException());
 
         //삭제 전 response를 위해 조회
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> ErrorMessage.NOT_FOUND_COMMENT.throwError());
+                () -> new CommentNotFoundException());
+
+        //댓글 작성한 유저인지 확인
+        if (comment.getUser().getId() != user.getId()){
+            throw new CommentForbiddenDeleteException();
+        }
+
         //부모댓글이면 자식댓글도 삭제
         if (comment.getRootName().equals("interview")){
             List<Comment> childCommentList = commentRepository.findByRootIdAndRootName(comment.getId(), "comment");
@@ -191,7 +203,7 @@ public class CommentService {
             }
         }
         commentRepository.deleteById(comment.getId());
-        log.info("{}번 댓글이 삭제 되었습니다", commentId);
+        log.info("deleteComment() >> {}번 댓글이 삭제 되었습니다", commentId);
 
         return comment;
     }
@@ -227,16 +239,16 @@ public class CommentService {
                 //각 페이지에서 부모댓글 리스트를 뽑고
                 Pageable pageable = PageRequest.of(i-1, per, Sort.by("createdAt").descending());
                 List<Integer> thisPageRootCommentIds = commentRepository.rootCommentIdPerPage(interviewId, pageable);
-                log.info("댓글 페이지번호: {}, 이 페이지의 부모댓글 리스트: {}", i, thisPageRootCommentIds);
+                log.info("getCurrentCommentPage() >> 댓글 페이지번호: {}, 이 페이지의 부모댓글 리스트: {}", i, thisPageRootCommentIds);
                 list.add(thisPageRootCommentIds);
                 //이 페이지 부모댓글 리스트에 찾으려는 댓글ID가 있으면
                 if (thisPageRootCommentIds.contains(commentIdNeedToKnowPage)){
                     page = i;
                 }
             }
-            log.info("페이지별 부모댓글 목록 : {}", list);
+            log.info("getCurrentCommentPage() >> 페이지별 부모댓글 목록 : {}", list);
         }
-        log.info("등록/수정/삭제한 대댓글의 페이지 : {}", page);
+        log.info("getCurrentCommentPage() >> 수정/삭제한 댓글 또는 등록/수정/삭제한 대댓글의 페이지 : {}", page);
         return page;
     }
 }

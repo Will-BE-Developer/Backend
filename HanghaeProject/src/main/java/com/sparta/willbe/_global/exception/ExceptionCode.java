@@ -49,9 +49,19 @@ public enum ExceptionCode {
     PAGINATION_CATEGORY_INVALID(HttpStatus.BAD_REQUEST,"P001","잘못된 카테고리를 입력했습니다."),
     PAGINATION_PER_INVALID(HttpStatus.BAD_REQUEST,"P002","한 페이지 단위(per)는 0보다 커야 합니다."),
 
-    // must be fixed
-    USER_PAYLOAD_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, "U1301", "프로필 이미지 파일은 5MB 이하만 가능합니다."),
+    // Comment
+    NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND,"C101", "해당 댓글은 존재하지 않습니다."),
+    INVALID_ROOT_ID(HttpStatus.BAD_REQUEST, "C102", "수정하려는 댓글의 RootId가 일치하지 않습니다."),
+    INVALID_ROOT_NAME(HttpStatus.BAD_REQUEST, "C103", "수정하려는 댓글의 RootName이 일치하지 않습니다."),
+    COMMENT_FORBIDDEN_DELETE(HttpStatus.FORBIDDEN,"C104","현재 사용자는 해당 댓글을 삭제할 수 없습니다."),
+    COMMENT_FORBIDDEN_UPDATE(HttpStatus.FORBIDDEN,"C105","현재 사용자는 해당 댓글을 수정할 수 없습니다."),
 
+    // Profile Image File
+    INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST, "F101","프로필 이미지는 png, jpg, gif 확장자만 가능합니다."),
+    INVALID_IMAGE_SIZE_ZERO(HttpStatus.BAD_REQUEST,"F102", "프로필 이미지 파일이 0바이트 입니다."),
+    INVALID_IMAGE_SIZE(HttpStatus.PAYLOAD_TOO_LARGE, "F103","프로필 이미지 파일은 5MB 이하만 가능합니다."),
+    UNABLE_UPLOAD_TO_S3(HttpStatus.INTERNAL_SERVER_ERROR, "F104","프로필 이미지 업로드가 실패하였습니다."),
+    UNABLE_SAVE_PROFILE_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR,"F105", "프로필 이미지 저장 또는 업로드가 실패하였습니다."),
 
 
     ;

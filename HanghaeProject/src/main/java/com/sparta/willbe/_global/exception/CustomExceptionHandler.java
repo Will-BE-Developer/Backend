@@ -17,14 +17,6 @@ import java.util.Map;
 @Slf4j
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
-//    MUST BE FIXED
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    @ResponseStatus(value = HttpStatus.PAYLOAD_TOO_LARGE)
-    public ResponseEntity<ErrorResponse> handleMultipartException(MaxUploadSizeExceededException e) {
-        final ErrorResponse response = new ErrorResponse(ExceptionCode.USER_PAYLOAD_TOO_LARGE);
-        return new ResponseEntity<>(response, ExceptionCode.USER_PAYLOAD_TOO_LARGE.getStatus());
-    }
-
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ErrorResponse> handleBusinessException(final BusinessException e) {
         final ExceptionCode errorCode = e.getErrorCode();
