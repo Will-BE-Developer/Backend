@@ -34,7 +34,6 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class MailService implements EmailUtils{
 
-
     private final JavaMailSender sender;
     private MailTemplate mailTemplate = new MailTemplate();
     private String htmlTemplate;
