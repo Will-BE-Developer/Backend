@@ -14,8 +14,8 @@ import java.util.List;
 @Repository
 public interface InterviewRepository extends JpaRepository<Interview, Long> {
     //인터뷰 전체보기
-    Page<Interview> findAllByIsDoneAndIsPublicAndUser_IsDeleted(Boolean isDone, Boolean isPublic, Boolean isDeleted, Pageable pageable);
-    Page<Interview> findAllByIsDoneAndIsPublicAndUser_IsDeletedAndQuestion_Category(Boolean isDone, Boolean isPublic, Boolean isDeleted, CategoryEnum categoryEnum, Pageable pageable);
+    Page<Interview> findAllByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalse(Pageable pageable);
+    Page<Interview> findAllByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalseAndQuestion_Category(CategoryEnum categoryEnum, Pageable pageable);
     List<Interview> findTop4ByIsDoneTrueAndIsPublicTrueOrderByCreatedAtDesc();
 
     @Query(value = "select p from Interview p JOIN p.user u where p.isDone = true and p.isPublic = true and u.isDeleted = false Order By size(p.scraps) desc")

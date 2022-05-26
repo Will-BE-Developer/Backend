@@ -52,14 +52,6 @@ public class InterviewService {
 
     private final AmazonS3Client amazonFullS3Client;
 
-    private final EntityManager entityManager;
-
-    @Value("${cloud.aws.credentials.access-key-upload}")
-    private String accessKey;
-
-    @Value("${cloud.aws.credentials.secret-key-upload}")
-    private String secretKey;
-
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
@@ -160,8 +152,8 @@ public class InterviewService {
 
         } else {
             interviews = filter.equals("전체보기") ?
-                    interviewRepository.findAllByIsDoneAndIsPublicAndUser_IsDeleted(true, true, false,pageable) :
-                    interviewRepository.findAllByIsDoneAndIsPublicAndUser_IsDeletedAndQuestion_Category(true, true, false,CategoryEnum.valueOf(filter), pageable);
+                    interviewRepository.findAllByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalse(pageable) :
+                    interviewRepository.findAllByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalseAndQuestion_Category(CategoryEnum.valueOf(filter), pageable);
         }
 
         Set<Long> userScrapsId = getScrapedInterviewIds(user);
@@ -253,7 +245,6 @@ public class InterviewService {
             log.error("S3에서 인터뷰(ID:{}) 영상 삭제 에러 - {}", interviewId, e.getMessage());
             Sentry.captureException(e);
         }
-
 
         scrapRepository.deleteByInterviewId(interviewId);
         interview.makeScrapNullForDelete();
