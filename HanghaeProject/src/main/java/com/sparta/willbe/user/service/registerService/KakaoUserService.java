@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.willbe.advice.ErrorMessage;
+import com.sparta.willbe.user.exception.UserDeletedException;
 import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.dto.KakaoUserInfoDto;
@@ -137,6 +138,11 @@ public class KakaoUserService {
             String email = kakaoUserInfo.getEmail();
             User kakaoUser ;
 
+            //탈퇴된 회원이라면 가입을 중지한다.
+            if(userRepository.findByEmailAndIsDeletedTrue(email).isPresent()){
+                log.info("Contorller : REGISTER_KAKAO_USER_IF_NEEDED >> 카카오 탈퇴된 회원입니다.");
+                throw new UserDeletedException();
+            }
             //가입된 카카오 사용자가 없다면, 가입을 진행한다
             if (!userRepository.findByEmailAndProviderAndIsDeletedFalse(email,provider).isPresent()) {
                 log.info("Contorller : REGISTER_KAKAO_USER_IF_NEEDED >> 카카오 가입자가 없으므로 회원가입을 진행합니다.");

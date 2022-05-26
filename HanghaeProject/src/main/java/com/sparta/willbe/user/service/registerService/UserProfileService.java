@@ -34,7 +34,7 @@ public class UserProfileService {
     public User login(LoginRequestDto requestDto) {
         //가입되지 않은 회원정보로 로그인 시도 하면 안됨
         User user = userRepository.findByEmailAndIsDeletedFalseAndIsValidTrue(requestDto.getEmail())
-                .orElseThrow(() -> ErrorMessage.NOT_FOUND_USER.throwError());
+                .orElseThrow(() -> new UserNotFoundException());
 
         //회원정보와 작성한 비밀번호가 일치하지 않으면 안됨!
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {

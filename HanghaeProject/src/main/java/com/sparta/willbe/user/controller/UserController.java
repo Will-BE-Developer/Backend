@@ -215,9 +215,10 @@ public class UserController {
         }
 
         User user =  kakaoUserService.kakaoLogin(code);
-        if(userRegistryService.isUserDeleted(user.getEmail())){
-            throw new UserDeletedException();
-        }
+
+//        if(userRegistryService.isUserDeleted(user.getEmail())){
+//            throw new UserDeletedException();
+//        }
         //로그인이 오류없이 처리 되었다면 Autorization 토큰을 헤더에 실어 보내준다.
         TokenResponseDto token = userProfileService.giveToken(user.getEmail());
         response.setHeader("Authorization", token.getAuthorization());

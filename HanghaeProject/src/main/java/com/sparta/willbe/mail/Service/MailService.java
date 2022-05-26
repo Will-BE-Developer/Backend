@@ -53,9 +53,6 @@ public class MailService implements EmailUtils{
     }
 
     private String createBodyMailText(String token, String email, String nickname) throws Exception {
-//        htmlTemplate.replaceAll("\\$\\{token}",token);
-//        htmlTemplate.replaceAll("\\$\\{email}",email);
-//        htmlTemplate.replaceAll("username",nickname);
 
         HashMap mailParamMap = new HashMap();
         mailParamMap.put("USER_NAME", nickname);
@@ -75,7 +72,7 @@ public class MailService implements EmailUtils{
             File f1 = new File("");
              MimeMessage message = sender.createMimeMessage();
              MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-//            String body=mailTemplate.getTemplate(token,toEmail,nickname);
+
             String body = createBodyMailText(token,toEmail,nickname);
             helper.setTo(toEmail);
             helper.setSubject("WILL_BE : 이메일 인증을 완료해 주세요\uD83D\uDE18");
@@ -94,7 +91,6 @@ public class MailService implements EmailUtils{
             Sentry.captureException(e);
             result = new ResponseEntity<Success>(new Success(false, "메일 발송 실패!"),HttpStatus.BAD_REQUEST);
         }
-
 
         return result;
     }
