@@ -89,7 +89,7 @@ public class CommentService {
                 }
             }
         }
-        int totalCounts = commentRepository.countByInterview_Id(interviewId); //총댓글수(대댓글 포함)
+        int totalCounts = commentRepository.countByInterview_IdAndUser_IsDeletedFalse(interviewId); //총댓글수(대댓글 포함)
         int totalPages = commentListPage.getTotalPages();
         int totalCountsInThisPage = commentListPage.getNumberOfElements();
 
@@ -111,7 +111,7 @@ public class CommentService {
     // 1개 인터뷰의 전체 댓글 조회(대댓글 미포함)
     public Page<Comment> getListOfCommentOfInterview(Long interviewId, Pageable pageable) {
 
-        Page<Comment> commentListPage = commentRepository.findAllByInterviewIdAndRootName(interviewId, "interview", pageable);
+        Page<Comment> commentListPage = commentRepository.findAllByInterviewIdAndRootNameAndUser_IsDeletedFalse(interviewId, "interview", pageable);
 
         return commentListPage;
     }
@@ -120,7 +120,7 @@ public class CommentService {
     //지금은 인터뷰에 있는 대댓글을 모두 조회 (추후 -> 해당 페이지에 있는 댓글만 조회)
     public List<Comment> getListOfCommentOfComment(Long interviewId) {
 
-        List<Comment> commentList = commentRepository.findAllNestedCommentInInterview(interviewId, "comment");
+        List<Comment> commentList = commentRepository.findAllNestedCommentInInterviewAndUser_IsDeletedFalse(interviewId, "comment");
 
         return commentList;
     }
@@ -229,7 +229,7 @@ public class CommentService {
             }else{ 
                 commentIdNeedToKnowPage = Math.toIntExact(comment.getRootId());
             }
-            int totalComment = commentRepository.countByInterview_IdAndRootName(interviewId,"interview"); //대댓글 제외
+            int totalComment = commentRepository.countByInterview_IdAndRootNameAndUser_IsDeletedFalse(interviewId,"interview"); //대댓글 제외
             int per = 10;
             int totalPage = totalComment/per + 1;
             List<List<Integer>> list = new ArrayList<>();

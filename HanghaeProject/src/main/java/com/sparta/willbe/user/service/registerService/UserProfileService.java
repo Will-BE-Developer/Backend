@@ -56,7 +56,6 @@ public class UserProfileService {
         SecurityContextHolder.clearContext();
     }
 
-    //TODO: UserNotFoundException() 을 클라이언트에게 넘길때 어떻게 넘길건지 , 인터뷰는 어떻게 지워줄건지 -> 내일할일
     @Transactional
     public User deleteUser(User user){
         log.info("DELETE_USER >> delete_user_(service) >> {}에 대해 deleted 접근 중... 현재 isDeleted : {}",
