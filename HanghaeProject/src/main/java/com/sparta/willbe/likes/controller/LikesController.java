@@ -13,8 +13,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import static com.sparta.willbe.advice.ErrorMessage.UNAUTHORIZED_USER;
-
 @Slf4j
 @RequiredArgsConstructor
 @Controller

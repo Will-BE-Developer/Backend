@@ -1,6 +1,5 @@
 package com.sparta.willbe.user.service.registerService;
 
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.user.exception.*;
 import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.security.jwt.JwtTokenProvider;
@@ -13,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 @Slf4j

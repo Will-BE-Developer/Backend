@@ -14,7 +14,6 @@ import com.sparta.willbe.interview.exception.InterviewNotFoundException;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import com.sparta.willbe.scrap.repository.ScrapRepository;
 import com.sparta.willbe._global.pagination.dto.PaginationResponseDto;
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.interview.model.Interview;

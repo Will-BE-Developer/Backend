@@ -1,6 +1,6 @@
 package com.sparta.willbe.security;
 
-import com.sparta.willbe.advice.ErrorMessage;
+import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +18,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public UserDetails loadUserByUsername(String username) {
        return userRepository.findByEmailAndIsDeletedFalseAndIsValidTrue(username)
-               .orElseThrow(() -> ErrorMessage.NOT_FOUND_USER.throwError());
+               .orElseThrow(() -> new UserNotFoundException());
     }
 }

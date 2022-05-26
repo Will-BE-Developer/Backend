@@ -3,7 +3,6 @@ package com.sparta.willbe.likes.service;
 import com.sparta.willbe.interview.exception.InterviewNotFoundException;
 import com.sparta.willbe.likes.model.Likes;
 import com.sparta.willbe.likes.repository.LikesRepository;
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import com.sparta.willbe.likes.dto.LikesResponseDto;

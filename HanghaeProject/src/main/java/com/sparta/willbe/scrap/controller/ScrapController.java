@@ -3,7 +3,7 @@ package com.sparta.willbe.scrap.controller;
 
 import com.sparta.willbe.scrap.dto.ScrapInfoResponseDto;
 import com.sparta.willbe.scrap.service.ScrapService;
-import com.sparta.willbe.advice.ErrorMessage;
+import com.sparta.willbe.user.exception.UserUnauthorizedException;
 import com.sparta.willbe.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class ScrapController {
                                                             @AuthenticationPrincipal User user) {
 
         if (user == null) {
-            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
+            throw new UserUnauthorizedException();
         }
         Long loginUserId = user.getId();
 
@@ -38,7 +38,7 @@ public class ScrapController {
                                                                @AuthenticationPrincipal User user) {
 
         if (user == null) {
-            throw ErrorMessage.UNAUTHORIZED_USER.throwError();
+            throw new UserUnauthorizedException();
         }
         Long loginUserId = user.getId();
 

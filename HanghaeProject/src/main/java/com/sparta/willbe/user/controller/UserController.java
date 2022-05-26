@@ -27,8 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import static com.sparta.willbe.advice.ErrorMessage.*;
-
 @Slf4j
 @RequiredArgsConstructor
 @Controller

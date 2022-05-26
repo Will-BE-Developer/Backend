@@ -1,7 +1,6 @@
 package com.sparta.willbe.question.controller;
 
 import com.sparta.willbe._global.pagination.exception.PaginationCategoryInvalidException;
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.question.dto.QuestionResponseDto;
 import com.sparta.willbe.question.model.Question;

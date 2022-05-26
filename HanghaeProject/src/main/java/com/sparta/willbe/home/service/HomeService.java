@@ -1,6 +1,5 @@
 package com.sparta.willbe.home.service;
 
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.batch.repository.TodayQuestionRepository;
 import com.sparta.willbe.batch.repository.TopCategoriesRepository;
 import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;

@@ -1,7 +1,6 @@
 package com.sparta.willbe.scrap.service;
 
 
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.interview.exception.InterviewNotFoundException;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;

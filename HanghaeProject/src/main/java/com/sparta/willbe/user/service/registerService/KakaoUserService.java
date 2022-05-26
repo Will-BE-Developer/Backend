@@ -3,7 +3,6 @@ package com.sparta.willbe.user.service.registerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.user.exception.UserDeletedException;
 import com.sparta.willbe.user.exception.UserNotFoundException;
 import com.sparta.willbe.user.model.User;

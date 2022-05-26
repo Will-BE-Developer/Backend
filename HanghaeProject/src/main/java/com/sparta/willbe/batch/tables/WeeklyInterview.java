@@ -19,9 +19,6 @@ public class WeeklyInterview extends Timestamped {
     @Column(unique = true, nullable = false)
     private Long id;
 
-    //@ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name="interview_id")
-    //private Interview interview;
     @Column(name="interview_id")
     private Long interviewId;
 
@@ -34,16 +31,6 @@ public class WeeklyInterview extends Timestamped {
     @Column(name = "weekly_badge")
     private String weeklyBadge;
 
-    //public WeeklyInterview(WeeklyInterview weeklyInterviewTop3, String badge, String weeklyBadge) {
-    public WeeklyInterview(WeeklyInterview weeklyInterviewTop3, Long interviewId, String badge, String weeklyBadge) {
-        //this.interview = weeklyInterviewTop3.getInterview();
-        this.interviewId = interviewId;
-        this.scrapCount = weeklyInterviewTop3.getScrapCount();
-        this.badge = badge;
-        this.weeklyBadge = weeklyBadge;
-    }
-
-    //public WeeklyInterview(Interview interview, Long ScrapCount, String badge, String weeklyBadge) {
     public WeeklyInterview(Long interviewId, Long ScrapCount, String badge, String weeklyBadge) {
         this.interviewId = interviewId;
         this.scrapCount = ScrapCount;

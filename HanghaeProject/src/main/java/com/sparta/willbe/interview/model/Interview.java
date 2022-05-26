@@ -1,6 +1,5 @@
 package com.sparta.willbe.interview.model;
 
-import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.likes.model.Likes;
 import com.sparta.willbe._global.timestamped.model.Timestamped;
 import com.sparta.willbe.comments.model.Comment;
@@ -9,18 +8,17 @@ import com.sparta.willbe.scrap.model.Scrap;
 import com.sparta.willbe.user.model.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 
-@Getter // get 함수를 일괄적으로 만들어줍니다.
-@NoArgsConstructor // 기본 생성자를 만들어줍니다.
+@Getter
+@NoArgsConstructor
 @Entity
 public class Interview extends Timestamped {
-    // ID가 자동으로 생성 및 증가합니다.
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -63,12 +61,6 @@ public class Interview extends Timestamped {
 
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Comment> comments = new ArrayList<>();
-
-    //@OneToOne(mappedBy = "interview", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    //@OneToMany(mappedBy = "interview", cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
-    //@OneToMany(mappedBy = "interview", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    //@OneToMany
-    //List<WeeklyInterview> weeklyInterviews = new ArrayList<>();
 
     @OneToOne(cascade=CascadeType.ALL, mappedBy = "interview",orphanRemoval = true)
     @JoinColumn
@@ -120,16 +112,8 @@ public class Interview extends Timestamped {
     public void updateBadge(String badge) {
         this.badge = badge;
     }
-
     public void makeScrapNullForDelete(){
         this.scraps = null;
     }
 
-    public void deleteVideoKey(){
-        this.videoKey = "";
-    }
-
-    public void makeWeeklyNullForDelete(){
-        //this.weeklyInterviews = null;
-    }
 }
