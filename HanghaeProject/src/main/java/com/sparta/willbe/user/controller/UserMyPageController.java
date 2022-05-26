@@ -88,11 +88,14 @@ public class UserMyPageController {
     @PutMapping(value = "/api/users/me", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiOperation(value = "내 정보 수정")
     @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
-    public ResponseEntity editUserInfo2 (@RequestPart(value="nickname", required = false) String nickname,
-                                         @RequestPart(value="githubLink", required = false) String githubLink,
-                                         @RequestPart(value="introduce", required = false) String introduce,
-                                         @RequestPart(value="profileImage", required = false) MultipartFile profileImage,
-                                         @AuthenticationPrincipal User user) throws IOException {
+    public ResponseEntity editUserInfo (@RequestPart(value="nickname", required = false) String nickname,
+                                        @RequestPart(value="githubLink", required = false) String githubLink,
+                                        @RequestPart(value="introduce", required = false) String introduce,
+                                        @RequestPart(value="profileImage", required = false) MultipartFile profileImage,
+                                        @RequestPart(value="profileImage", required = false) String profileImageString,
+                                        @AuthenticationPrincipal User user) throws IOException {
+
+        log.info("profileImageString: {}", profileImageString);
 
         if(nickname != null){
             nickname = nickname.replaceAll("^\"|\"$", "");
@@ -109,7 +112,7 @@ public class UserMyPageController {
         UserRequestDto requestDto = new UserRequestDto(nickname, githubLink, profileImage, introduce);
         requestDto.setProfileImage(profileImage);
 
-        UserInfoResponseDto userInfoResponseDto = userMypageService.save(requestDto, user);
+        UserInfoResponseDto userInfoResponseDto = userMypageService.save(requestDto, user, profileImageString);
 
         return new ResponseEntity(userInfoResponseDto, HttpStatus.OK);
     }
