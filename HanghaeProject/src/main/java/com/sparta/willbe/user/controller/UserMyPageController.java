@@ -2,6 +2,7 @@ package com.sparta.willbe.user.controller;
 
 import com.sparta.willbe._global.pagination.exception.PaginationPerInvalidException;
 import com.sparta.willbe.interview.dto.InterviewListResponseDto;
+import com.sparta.willbe.user.exception.UserUnauthorizedException;
 import com.sparta.willbe.user.service.mypageService.UserMypageService;
 import com.sparta.willbe.advice.ErrorMessage;
 import com.sparta.willbe.advice.RestException;
@@ -36,11 +37,11 @@ public class UserMyPageController {
                                                                      @RequestParam(value = "sort", defaultValue = "new") String sort,
                                                                      @AuthenticationPrincipal User user) {
         if (per < 1) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
+            throw new PaginationPerInvalidException();
         }
 
         if (user == null) {
-            throw new RestException(HttpStatus.UNAUTHORIZED, "로그인을 해야합니다.");
+            throw new UserUnauthorizedException();
         }
         Long loginUserId = user.getId();
 
