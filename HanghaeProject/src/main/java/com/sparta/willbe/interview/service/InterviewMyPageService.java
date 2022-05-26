@@ -39,7 +39,7 @@ public class InterviewMyPageService {
         User user = userRepository.findById(loginUserId)
                 .orElseThrow(UserNotFoundException::new);
 
-        Page<Interview> interviews = interviewRepository.findAllByIsDoneAndUser_Id(true, loginUserId, pageable);
+        Page<Interview> interviews = interviewRepository.findAllByIsDoneAndUser_IdAndUser_IsDeleted(true, loginUserId, false, pageable);
 
         List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
 
@@ -65,7 +65,7 @@ public class InterviewMyPageService {
         User user = userRepository.findById(loginUserId)
                 .orElseThrow(UserNotFoundException::new);
 
-        Page<Interview> interviews = interviewRepository.findAllByIsDoneAndScraps_User_Id(true, loginUserId, pageable);
+        Page<Interview> interviews = interviewRepository.findAllByIsDoneAndScraps_User_IdAndUser_IsDeleted(true, loginUserId, false,pageable);
 
         List<InterviewInfoResponseDto.Data> responses = new ArrayList<>();
 

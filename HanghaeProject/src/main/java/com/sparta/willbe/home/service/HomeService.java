@@ -90,7 +90,7 @@ public class HomeService {
     }
 
     public List<InterviewInfoResponseDto.Data> getLatestInterview(User user) {
-        List<Interview> latstInterview = interviewRepository.findTop4ByIsDoneTrueAndIsPublicTrueOrderByCreatedAtDesc();
+        List<Interview> latstInterview = interviewRepository.findTop4ByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalseOrderByCreatedAtDesc();
         List<InterviewInfoResponseDto.Data> latestInterviewDto = new ArrayList<>();
         Boolean ismine = false;
         Boolean scrapMe = false;
