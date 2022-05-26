@@ -14,18 +14,19 @@ import java.util.List;
 @Repository
 public interface InterviewRepository extends JpaRepository<Interview, Long> {
     //인터뷰 전체보기
-    Page<Interview> findAllByIsDoneAndIsPublic(Boolean isDone, Boolean isPublic, Pageable pageable);
-    Page<Interview> findAllByIsDoneAndIsPublicAndQuestion_Category(Boolean isDone, Boolean isPublic, CategoryEnum categoryEnum, Pageable pageable);
+    Page<Interview> findAllByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalse(Pageable pageable);
+    Page<Interview> findAllByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalseAndQuestion_Category(CategoryEnum categoryEnum, Pageable pageable);
     List<Interview> findTop4ByIsDoneTrueAndIsPublicTrueOrderByCreatedAtDesc();
-    @Query(value = "select p from Interview p where p.isDone = true and p.isPublic = true Order By size(p.scraps) desc")
+
+    @Query(value = "select p from Interview p JOIN p.user u where p.isDone = true and p.isPublic = true and u.isDeleted = false Order By size(p.scraps) desc")
     Page<Interview> findAllOrderByScrapsCountDesc(Pageable pageable);
 
-    @Query(value = "select p from Interview p where p.isDone = true and p.isPublic = true and p.question.category = ?1 Order By size(p.scraps) desc")
+    @Query(value = "select p from Interview p JOIN p.user u where p.isDone = true and p.isPublic = true and u.isDeleted = false and p.question.category = ?1 Order By size(p.scraps) desc")
     Page<Interview> findAllByQuestion_CategoryOrderByScrapsCountDesc(CategoryEnum categoryEnum, Pageable pageable);
 
-    Page<Interview> findAllByIsDoneAndUser_Id(Boolean isDone, Long userId, Pageable pageable);
+    Page<Interview> findAllByIsDoneAndUser_IdAndUser_IsDeleted(Boolean isDone, Long userId, Boolean isDeleted, Pageable pageable);
 
-    Page<Interview> findAllByIsDoneAndScraps_User_Id(Boolean isDone, Long userId, Pageable pageable);
+    Page<Interview> findAllByIsDoneAndScraps_User_IdAndUser_IsDeleted(Boolean isDone, Long userId, Boolean isDeleted, Pageable pageable);
 
     @Query("SELECT q.category FROM Interview i LEFT JOIN i.question q WHERE i.question.id = q.id GROUP BY q.category ORDER BY COUNT(q.category ) DESC ")
     List<CategoryEnum> findCategoriesOrderedByCategoryCount(Pageable pageable);

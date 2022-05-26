@@ -152,8 +152,8 @@ public class InterviewService {
 
         } else {
             interviews = filter.equals("전체보기") ?
-                    interviewRepository.findAllByIsDoneAndIsPublic(true, true, pageable) :
-                    interviewRepository.findAllByIsDoneAndIsPublicAndQuestion_Category(true, true, CategoryEnum.valueOf(filter), pageable);
+                    interviewRepository.findAllByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalse(pageable) :
+                    interviewRepository.findAllByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalseAndQuestion_Category(CategoryEnum.valueOf(filter), pageable);
         }
 
         Set<Long> userScrapsId = getScrapedInterviewIds(user);
@@ -245,7 +245,6 @@ public class InterviewService {
             log.error("S3에서 인터뷰(ID:{}) 영상 삭제 에러 - {}", interviewId, e.getMessage());
             Sentry.captureException(e);
         }
-
 
         scrapRepository.deleteByInterviewId(interviewId);
         interview.makeScrapNullForDelete();
