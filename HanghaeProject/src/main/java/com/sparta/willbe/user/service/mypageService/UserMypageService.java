@@ -59,7 +59,7 @@ public class UserMypageService {
     }
 
     @Transactional
-    public UserInfoResponseDto save(UserRequestDto requestDto, User user) throws IOException {
+    public UserInfoResponseDto save(UserRequestDto requestDto, User user, String profileImageString) throws IOException {
         String profileImageUrl = null;
 
         userRepository.findById(user.getId()).orElseThrow(
@@ -71,6 +71,8 @@ public class UserMypageService {
             String randomGenName = "윌비@" + number;
             requestDto.setNickname(randomGenName);
         }
+
+        log.info("editUserInfo() >> 유저의 기존 프로필 이미지 URL : {}", user.getProfileImageUrl());
 
         //파일첨부 했으면 크롭 후, 이미지 로컬 및 S3에 저장하기(첨부 안했으면 null->프론트에서 default이미지)
         if (requestDto.getProfileImage() != null) {
@@ -121,16 +123,36 @@ public class UserMypageService {
             //profileImageUrl = saveFile(requestDto.getProfileImage(), user.getId());
 
         }
+        
+        if (profileImageString.equals("undefined")) {
+            user.updateInfo(requestDto.getNickname(), requestDto.getGithubLink(),
+                    requestDto.getIntroduce(), user.getProfileImageUrl());
+        // 프사 첨부 or 삭제시
+        } else {
+            user.updateInfo(requestDto.getNickname(), requestDto.getGithubLink(),
+                    requestDto.getIntroduce(), profileImageUrl);
 
-        user.updateInfo(requestDto.getNickname(), requestDto.getGithubLink(),
-                        requestDto.getIntroduce(), profileImageUrl);
-
-        log.info("user.getProfileImageUrl() : {}", user.getProfileImageUrl());
+        }
 
         userRepository.save(user);
 
-        //프로필 이미지 첨부 안했으면
-        if (requestDto.getProfileImage() == null){
+        //프로필 이미지 첨부 안했으면(undefined or null)
+        //프사 외 정보만 수정
+        if (profileImageString.equals("undefined")) {
+            log.info("editUserInfo() >> save() >> 프로필 사진 외 정보만 수정합니다.(undefined)");
+            System.out.println("..."+ interviewService.getProfileImageUrl(user.getProfileImageUrl()));
+            return UserInfoResponseDto.builder()
+                    .user(UserInfoResponseDto.UserBody.builder()
+                            .id(user.getId())
+                            .nickname(user.getNickname())
+                            .githubLink(user.getGithubLink())
+                            .profileImageUrl(interviewService.getProfileImageUrl(user.getProfileImageUrl()))
+                            .introduce(user.getIntroduce())
+                            .build())
+                    .build();
+        } else if (requestDto.getProfileImage() == null){
+            //프사 삭제 경우
+            log.info("editUserInfo() >> save() >> 프로필 사진 삭제 및 정보를 수정합니다.(null)");
             return UserInfoResponseDto.builder()
                     .user(UserInfoResponseDto.UserBody.builder()
                     .id(user.getId())
@@ -141,6 +163,8 @@ public class UserMypageService {
                     .build())
              .build();
         }else{
+            //다른 정보만 변경
+            log.info("editUserInfo() >> save() >> 프로필 사진 외 정보만 수정합니다.");
             return UserInfoResponseDto.builder()
                     .user(UserInfoResponseDto.UserBody.builder()
                     .id(user.getId())

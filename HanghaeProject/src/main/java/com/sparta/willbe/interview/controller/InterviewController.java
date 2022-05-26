@@ -9,6 +9,10 @@ import com.sparta.willbe.interview.service.InterviewService;
 import com.sparta.willbe.interview.service.InterviewUploadService;
 import com.sparta.willbe.user.exception.UserUnauthorizedException;
 import com.sparta.willbe.user.model.User;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
@@ -33,6 +37,8 @@ public class InterviewController {
     private final InterviewUploadService interviewUploadService;
 
     @GetMapping("/api/interviews")
+    @ApiOperation(value = "인터뷰 전체 조회")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
     public ResponseEntity<InterviewListResponseDto> readInterviews(@RequestParam(value = "per", defaultValue = "6") int per,
                                                                    @RequestParam(value = "page", defaultValue = "1") int page,
                                                                    @RequestParam(value = "sort", defaultValue = "최신순") String sort,
@@ -45,14 +51,14 @@ public class InterviewController {
         List<CategoryEnum> categoryEnums = Arrays.asList(CategoryEnum.values());
 
         if (per < 1) {
-            log.error("{}(per)는 0보다 커야 합니다.",per);
+            log.error("{}(per)는 0보다 커야 합니다.", per);
             throw new PaginationPerInvalidException();
         }
 
-        if(filter.equals("전체보기") == false){
+        if (filter.equals("전체보기") == false) {
             boolean isFilterValid = EnumUtils.isValidEnum(CategoryEnum.class, filter);
-            if(isFilterValid == false){
-                log.error("{} 라는 잘못된 카테고리를 입력했습니다.",filter);
+            if (isFilterValid == false) {
+                log.error("{} 라는 잘못된 카테고리를 입력했습니다.", filter);
                 throw new PaginationCategoryInvalidException();
             }
         }
@@ -68,6 +74,8 @@ public class InterviewController {
     }
 
     @GetMapping("/api/interviews/{interviewId}")
+    @ApiOperation(value = "특정 인터뷰 조회")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
     public ResponseEntity<InterviewInfoResponseDto> readOneInterview(@PathVariable Long interviewId,
                                                                      @AuthenticationPrincipal User user) {
 
@@ -80,6 +88,8 @@ public class InterviewController {
     }
 
     @PostMapping("/api/interviews/draft")
+    @ApiOperation(value = "인터뷰 초안 생성")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity<InterviewDraftResponseDto> createInterviewDraft(@AuthenticationPrincipal User user) {
 
         if (user == null) {
@@ -101,6 +111,8 @@ public class InterviewController {
     }
 
     @PostMapping("/api/interviews/{interviewId}")
+    @ApiOperation(value = "인터뷰 등록")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity<InterviewInfoResponseDto> completeInterview(@PathVariable Long interviewId,
                                                                       @RequestBody InterviewPostRequestDto requestDto,
                                                                       @AuthenticationPrincipal User user) throws IOException {
@@ -117,6 +129,8 @@ public class InterviewController {
     }
 
     @PutMapping("/api/interviews/{interviewId}")
+    @ApiOperation(value = "인터뷰 수정")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity<InterviewInfoResponseDto> updateInterview(@PathVariable Long interviewId,
                                                                     @RequestBody InterviewUpdateRequestDto requestDto,
                                                                     @AuthenticationPrincipal User user) {
@@ -133,6 +147,8 @@ public class InterviewController {
     }
 
     @DeleteMapping("/api/interviews/{interviewId}")
+    @ApiOperation(value = "인터뷰 삭제")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity<InterviewInfoResponseDto> deleteInterview(@PathVariable Long interviewId,
                                                                     @AuthenticationPrincipal User user) {
         if (user == null) {

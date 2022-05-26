@@ -9,6 +9,8 @@ import com.sparta.willbe.interview.service.InterviewMyPageService;
 import com.sparta.willbe.user.dto.UserInfoResponseDto;
 import com.sparta.willbe.user.dto.UserRequestDto;
 import com.sparta.willbe.user.model.User;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -31,16 +33,18 @@ public class UserMyPageController {
     private final InterviewMyPageService interviewMyPageService;
 
     @GetMapping("/api/users/me/interviews")
+    @ApiOperation(value = "내 인터뷰 목록 불러오기")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity<InterviewListResponseDto> readMyInterviews(@RequestParam(value = "per", defaultValue = "6") int per,
                                                                      @RequestParam(value = "page", defaultValue = "1") int page,
                                                                      @RequestParam(value = "sort", defaultValue = "new") String sort,
                                                                      @AuthenticationPrincipal User user) {
         if (per < 1) {
-            throw new RestException(HttpStatus.BAD_REQUEST, "한 페이지 단위(per)는 0보다 커야 합니다.");
+            throw new PaginationPerInvalidException();
         }
 
         if (user == null) {
-            throw new RestException(HttpStatus.UNAUTHORIZED, "로그인을 해야합니다.");
+            throw new UserUnauthorizedException();
         }
         Long loginUserId = user.getId();
 
@@ -54,6 +58,8 @@ public class UserMyPageController {
     }
 
     @GetMapping("/api/users/me/scraps")
+    @ApiOperation(value = "내 스크랩 목록 불러오기")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity<InterviewListResponseDto> readScrapInterviews(@RequestParam(value = "per", defaultValue = "6") int per,
                                                                    @RequestParam(value = "page", defaultValue = "1") int page,
                                                                    @RequestParam(value = "sort", defaultValue = "new") String sort,
@@ -79,11 +85,16 @@ public class UserMyPageController {
     //마이페이지 - 사용자 프로필 정보 수정
     @ResponseBody
     @PutMapping(value = "/api/users/me", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity editUserInfo2 (@RequestPart(value="nickname", required = false) String nickname,
-                                         @RequestPart(value="githubLink", required = false) String githubLink,
-                                         @RequestPart(value="introduce", required = false) String introduce,
-                                         @RequestPart(value="profileImage", required = false) MultipartFile profileImage,
-                                         @AuthenticationPrincipal User user) throws IOException {
+    @ApiOperation(value = "내 정보 수정")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
+    public ResponseEntity editUserInfo (@RequestPart(value="nickname", required = false) String nickname,
+                                        @RequestPart(value="githubLink", required = false) String githubLink,
+                                        @RequestPart(value="introduce", required = false) String introduce,
+                                        @RequestPart(value="profileImage", required = false) MultipartFile profileImage,
+                                        @RequestPart(value="profileImage", required = false) String profileImageString,
+                                        @AuthenticationPrincipal User user) throws IOException {
+
+        log.info("profileImageString: {}", profileImageString);
 
         if(nickname != null){
             nickname = nickname.replaceAll("^\"|\"$", "");
@@ -100,7 +111,7 @@ public class UserMyPageController {
         UserRequestDto requestDto = new UserRequestDto(nickname, githubLink, profileImage, introduce);
         requestDto.setProfileImage(profileImage);
 
-        UserInfoResponseDto userInfoResponseDto = userMypageService.save(requestDto, user);
+        UserInfoResponseDto userInfoResponseDto = userMypageService.save(requestDto, user, profileImageString);
 
         return new ResponseEntity(userInfoResponseDto, HttpStatus.OK);
     }

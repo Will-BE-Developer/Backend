@@ -3,6 +3,7 @@ package com.sparta.willbe.category.controller;
 import com.sparta.willbe.category.dto.CategoryResponseDto;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.category.service.CategoryService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping("/api/categories")
+    @ApiOperation(value = "카테고리 목록 불러오기")
     public ResponseEntity<CategoryResponseDto> getAllCategories() {
 
         log.info("READ ALL CATEGORY LIST");

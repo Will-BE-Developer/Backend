@@ -14,10 +14,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findAllByInterviewId(Long interviewId);
 
     // 1개 인터뷰의 전체 댓글 조회
-    @Query(value = "SELECT c FROM Comment c WHERE c.interview.id = ?1 and c.rootName = ?2 ")
+    //@Query(value = "SELECT c FROM Comment c WHERE c.interview.id = ?1 and c.rootName = ?2 ")
+    @Query(value = "SELECT c FROM Comment c JOIN c.user u WHERE u.isDeleted = false and c.interview.id = ?1 and c.rootName = ?2 ")
     Page<Comment> findAllByInterviewIdAndRootNameAndUser_IsDeletedFalse(Long interviewId, String rootName, Pageable pageable);
 
-    @Query(value = "SELECT c FROM Comment c WHERE c.interview.id = ?1  and c.rootName = ?2")
+    //@Query(value = "SELECT c FROM Comment c WHERE c.interview.id = ?1  and c.rootName = ?2")
+    @Query(value = "SELECT c FROM Comment c JOIN c.user u WHERE u.isDeleted = false and c.interview.id = ?1  and c.rootName = ?2")
     List<Comment> findAllNestedCommentInInterviewAndUser_IsDeletedFalse(Long interviewId, String rootName);
 
     Optional<Comment> findByIdAndUser_IsDeletedFalse(Long id);
@@ -28,7 +30,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     //1개 인터뷰의 댓글 총 갯수(대댓글 포함)
     int countByInterview_IdAndUser_IsDeletedFalse(Long interviewId);
 
-    @Query(value = "SELECT c.id FROM Comment c WHERE c.interview.id = ?1 and c.rootName = 'interview' ")
+    //@Query(value = "SELECT c.id FROM Comment c WHERE c.interview.id = ?1 and c.rootName = 'interview' ")
+    @Query(value = "SELECT c.id FROM Comment c JOIN c.user u WHERE u.isDeleted = false and c.interview.id = ?1 and c.rootName = 'interview' ")
     List<Integer> rootCommentIdPerPage(Long interviewId, Pageable pageable);
 
     List<Comment> findTop4ByRootNameOrderByCreatedAtDesc(String rootname);

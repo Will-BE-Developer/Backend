@@ -13,6 +13,8 @@ import com.sparta.willbe.user.model.User;
 import com.sparta.willbe.user.service.registerService.KakaoUserService;
 import com.sparta.willbe.user.service.registerService.UserProfileService;
 import com.sparta.willbe.user.service.registerService.UserRegistryService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,6 +41,8 @@ public class UserController {
     private final InterviewService interviewService;
 
     @PostMapping("/signin")
+    @ApiOperation(value = "로그인")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
     public ResponseEntity<UserInfoResponseDto> Signin(@RequestBody LoginRequestDto requestDto,
                                                       @AuthenticationPrincipal User users,
                                                       HttpServletResponse response, Errors errors) {
@@ -79,6 +83,8 @@ public class UserController {
 
 
     @PostMapping("/signup")
+    @ApiOperation(value = "회원가입")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
     public ResponseEntity<UserInfoResponseDto> userSignup(@AuthenticationPrincipal User users, @Valid @RequestBody RegisterRequestDto requestDto, Errors errors) {
         //이미 사용자가 로그인 되어있을 경우 회원가입을 할 수 없다.
         if(users !=null){
@@ -122,7 +128,9 @@ public class UserController {
                     .build(), HttpStatus.OK);
         }
     }
+
     @GetMapping("/signup/{email}")
+    @ApiOperation(value = "이메일 중복확인")
     public ResponseEntity<Success> idCheck(@PathVariable String email){
 
         if(userRegistryService.isEmailExist(email)){
@@ -139,6 +147,8 @@ public class UserController {
     }
 
     @PostMapping("/signout")
+    @ApiOperation(value = "로그아웃")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity<UserInfoResponseDto> logout(HttpServletRequest request ,@AuthenticationPrincipal User user) {
         String nickname = user.getNickname();
         String gitHubLink = user.getGithubLink();
@@ -170,6 +180,8 @@ public class UserController {
 
 
     @GetMapping("api/users/me")
+    @ApiOperation(value = "유저 정보 불러오기")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
     public ResponseEntity<UserInfoResponseDto> getUserInfo(@AuthenticationPrincipal User user){
         //유저가 로그인 되어있지 않는 경우에는 유저정보를 반환하지 않는다
         log.info("GET_USER_INFO >> 유저 정보를 조회하는 중입니다.");
@@ -192,6 +204,8 @@ public class UserController {
     }
 
     @DeleteMapping("api/users/me")
+    @ApiOperation(value = "회원 탈퇴")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token", required = true)
     public ResponseEntity<Success> deleteUser(@AuthenticationPrincipal User user){
         if(user ==null){
             throw new UserUnauthorizedException();
@@ -204,6 +218,8 @@ public class UserController {
 
     // TODO : throw 던지는거 클라이언트한테 handler 로 처리해서 넘겨 주기
     @GetMapping("/user/kakao/callback")
+    @ApiOperation(value = "카카오 callback")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
     public ResponseEntity<UserInfoResponseDto> kakaoLogin(@AuthenticationPrincipal User users, @RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         //로그인 되는게 확인 될 경우에 에러를 반환한다.
         if(users != null){
@@ -232,6 +248,8 @@ public class UserController {
     }
 
     @GetMapping("/signin/validation")
+    @ApiOperation(value = "회원 인증")
+    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
     public ResponseEntity<UserInfoResponseDto> emailValidationandLogin(@RequestParam String token,
                                                                        @RequestParam String email,
                                                                        HttpServletRequest request,
