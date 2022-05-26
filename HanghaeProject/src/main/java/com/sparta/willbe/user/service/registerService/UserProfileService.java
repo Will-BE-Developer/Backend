@@ -25,7 +25,7 @@ import javax.transaction.Transactional;
 public class UserProfileService {
 
     private final UserRepository userRepository;
-
+    private final KakaoUserService kakaoUserService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -59,6 +59,7 @@ public class UserProfileService {
         SecurityContextHolder.clearContext();
     }
 
+    //TODO: UserNotFoundException() 을 클라이언트에게 넘길때 어떻게 넘길건지 , 인터뷰는 어떻게 지워줄건지 -> 내일할일
     @Transactional
     public User deleteUser(User user){
         log.info("DELETE_USER >> delete_user_(service) >> {}에 대해 deleted 접근 중... 현재 isDeleted : {}",
@@ -66,8 +67,9 @@ public class UserProfileService {
         User deleteThis = userRepository.findByEmailAndIsDeletedFalseAndIsValidTrue(user.getEmail())
                 .orElseThrow(() -> new UserNotFoundException());
         deleteThis.setIsDeleted(true);
-        if(deleteThis.getProvider() =="kakao"){
 
+        if(deleteThis.getProvider() =="kakao"){
+            kakaoUserService.kakaoLogout(deleteThis.getToken());
         }else {
             this.logout();
         }
