@@ -93,8 +93,6 @@ public class UserMyPageController {
                                         @RequestPart(value="profileImage", required = false) String profileImageString,
                                         @AuthenticationPrincipal User user) throws IOException {
 
-        log.info("profileImageString: {}", profileImageString);
-
         if(nickname != null){
             nickname = nickname.replaceAll("^\"|\"$", "");
         }

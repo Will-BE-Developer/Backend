@@ -140,7 +140,6 @@ public class UserMypageService {
         //프사 외 정보만 수정
         if (profileImageString.equals("undefined")) {
             log.info("editUserInfo() >> save() >> 프로필 사진 외 정보만 수정합니다.(undefined)");
-            System.out.println("..."+ interviewService.getProfileImageUrl(user.getProfileImageUrl()));
             return UserInfoResponseDto.builder()
                     .user(UserInfoResponseDto.UserBody.builder()
                             .id(user.getId())
