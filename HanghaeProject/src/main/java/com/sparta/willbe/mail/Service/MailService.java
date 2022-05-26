@@ -39,7 +39,7 @@ public class MailService implements EmailUtils{
     //TODO: 서버에 올릴때 클래스 패스 or 서버에 .html파일 넣어서 바로 읽던지 하기
     @PostConstruct
     public void init() throws IOException{
-        final File file = ResourceUtils.getFile("classpath:templates/mailtemplate.html");
+        final File file = ResourceUtils.getFile("./mail/mailtemplate.html");
 
         log.info("JAVA  class path : {}",System.getProperty("java.class.path"));
 
@@ -81,7 +81,7 @@ public class MailService implements EmailUtils{
             helper.setSubject("WILL_BE : 이메일 인증을 완료해 주세요\uD83D\uDE18");
             helper.setText(body,true);
 
-            FileDataSource fileDataSource = new FileDataSource("./logo.png");
+            FileDataSource fileDataSource = new FileDataSource("./mail/logo.png");
             helper.addInline("logo",fileDataSource);
             sender.send(message);
             result = new ResponseEntity<Success>(new Success(true, "메일 발송 성공!"),HttpStatus.OK);
