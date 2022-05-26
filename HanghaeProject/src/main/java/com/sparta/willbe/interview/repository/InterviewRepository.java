@@ -16,7 +16,7 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     //인터뷰 전체보기
     Page<Interview> findAllByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalse(Pageable pageable);
     Page<Interview> findAllByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalseAndQuestion_Category(CategoryEnum categoryEnum, Pageable pageable);
-    List<Interview> findTop4ByIsDoneTrueAndIsPublicTrueOrderByCreatedAtDesc();
+    List<Interview> findTop4ByIsDoneTrueAndIsPublicTrueAndUser_IsDeletedFalseOrderByCreatedAtDesc();
 
     @Query(value = "select p from Interview p JOIN p.user u where p.isDone = true and p.isPublic = true and u.isDeleted = false Order By size(p.scraps) desc")
     Page<Interview> findAllOrderByScrapsCountDesc(Pageable pageable);
