@@ -2,6 +2,7 @@ package com.sparta.willbe.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.willbe.advice.Success;
+import com.sparta.willbe.home.service.HomeService;
 import com.sparta.willbe.interview.service.InterviewService;
 import com.sparta.willbe.mail.Service.MailService;
 import com.sparta.willbe.security.jwt.TokenResponseDto;
@@ -39,6 +40,7 @@ public class UserController {
     private final KakaoUserService kakaoUserService;
     private final MailService mailService;
     private final InterviewService interviewService;
+    private final HomeService homeService;
 
     @PostMapping("/signin")
     @ApiOperation(value = "로그인")
@@ -211,6 +213,7 @@ public class UserController {
         }
         log.info("DELETE_USER >> {} 의 유저정보 삭제를 요청합니다. ", user.getNickname());
         User deleting = userProfileService.deleteUser(user);
+        homeService.fixWeeklyInterviewRank();
         log.info("DELETE_USER >> {} 의 유저정보 삭제 처리를 완료 했습니다. 현제 isDeleted: {} ", deleting.getNickname(),deleting.getIsDeleted());
         return new ResponseEntity<>(new Success(true,"회원삭제 성공"),HttpStatus.OK);
     }

@@ -6,6 +6,7 @@ import com.sparta.willbe.batch.repository.WeeklyInterviewRepository;
 import com.sparta.willbe.batch.tables.TopCategories;
 import com.sparta.willbe.batch.tables.WeeklyInterview;
 import com.sparta.willbe.interview.dto.InterviewInfoResponseDto;
+import com.sparta.willbe.interview.exception.InterviewNotFoundException;
 import com.sparta.willbe.interview.model.Interview;
 import com.sparta.willbe.interview.repository.InterviewRepository;
 import com.sparta.willbe.interview.service.InterviewService;
@@ -23,16 +24,14 @@ import com.sparta.willbe.question.dto.QuestionResponseDto;
 import com.sparta.willbe.question.model.Question;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -122,7 +121,7 @@ public class HomeService {
 
     public List<InterviewInfoResponseDto.Data> getWeeklyInterview(User user) {
 
-        List<WeeklyInterview> getInterviews = weeklyInterviewRepository.findByCreatedAtBetween(LocalDateTime.now().minus(1, ChronoUnit.WEEKS),LocalDateTime.now());
+        List<WeeklyInterview> getInterviews = weeklyInterviewRepository.findByCreatedAtBetween(LocalDateTime.now().minus(1, ChronoUnit.WEEKS), LocalDateTime.now());
         List<InterviewInfoResponseDto.Data> weeklyInterview = new ArrayList<>();
         Boolean ismine = false;
         Boolean scrapMe = false;
@@ -132,6 +131,9 @@ public class HomeService {
             Interview interviewById = interviewRepository.findById(interview.getInterviewId())
                     .orElse(null);
             if (interviewById == null) {
+                continue;
+            }
+            else if(interviewById.getUser().getIsDeleted()){
                 continue;
             }
             ranking++;
@@ -147,6 +149,7 @@ public class HomeService {
 
             String weeklyBadge = interview.getWeeklyBadge();
             String[] weekKorean = {"첫째주", "둘째주", "셋째주", "넷째주", "다섯째주"};
+
             int week = Integer.parseInt(weeklyBadge.substring(3, 4)) - 1;
             String weeklyInterviewKing = weeklyBadge.substring(0, 3) + weekKorean[week] + " 면접왕 " + ranking + "등";
 
@@ -192,5 +195,36 @@ public class HomeService {
         return userScrapsId;
 
 
+    }
+
+    @Async
+    public void fixWeeklyInterviewRank() {
+        List<WeeklyInterview> getInterviews = weeklyInterviewRepository.findByCreatedAtBetween(LocalDateTime.now().minus(1, ChronoUnit.WEEKS), LocalDateTime.now());
+
+        int ranking = 0;
+        for (WeeklyInterview weeklyInterview : getInterviews) {
+
+            //인터뷰 뱃지 골드,실버,브론즈 저장
+            String[] badge = {"Gold", "Silver", "Bronze"};
+            Interview interviewById = interviewRepository.findById(weeklyInterview.getInterviewId())
+                    .orElse(null);
+            if (interviewById == null) {
+                continue;
+            }
+            else if(interviewById.getUser().getIsDeleted()){
+                continue;
+            }
+            ranking++;
+
+
+            String weeklyBadge = weeklyInterview.getWeeklyBadge().substring(0, 7) + ranking + "등";
+            log.info("CHANGE WEEKLY INTERVIEW >> {} (InterviewId: {})", weeklyBadge, weeklyInterview.getInterviewId());
+
+            if (ranking <= 3) {
+                interviewById.updateBadge(badge[ranking - 1]);
+                interviewRepository.save(interviewById);
+            }
+            weeklyInterview.setWeeklyBadge(weeklyBadge);
+        }
     }
 }

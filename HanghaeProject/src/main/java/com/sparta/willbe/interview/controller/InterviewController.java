@@ -2,6 +2,7 @@ package com.sparta.willbe.interview.controller;
 
 import com.sparta.willbe._global.pagination.exception.PaginationCategoryInvalidException;
 import com.sparta.willbe._global.pagination.exception.PaginationPerInvalidException;
+import com.sparta.willbe.home.service.HomeService;
 import com.sparta.willbe.interview.dto.*;
 import com.sparta.willbe.category.model.CategoryEnum;
 import com.sparta.willbe.interview.model.Interview;
@@ -35,6 +36,7 @@ import java.util.List;
 public class InterviewController {
     private final InterviewService interviewService;
     private final InterviewUploadService interviewUploadService;
+    private final HomeService homeService;
 
     @GetMapping("/api/interviews")
     @ApiOperation(value = "인터뷰 전체 조회")
@@ -159,6 +161,8 @@ public class InterviewController {
         log.info("UID " + loginUserId + " DELETE INTERVIEW " + interviewId);
 
         InterviewInfoResponseDto body = interviewService.deleteInterview(loginUserId, interviewId);
+
+        homeService.fixWeeklyInterviewRank();
 
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
