@@ -23,7 +23,8 @@ public interface WeeklyInterviewRepository extends JpaRepository<WeeklyInterview
             "order by count(interview_id) DESC LIMIT 20 " +
             ") s " +
             "ON i.id IN (s.interview_id) " +
-            "WHERE i.is_public = 1 order by scrap_count DESC, i.created_at DESC ", nativeQuery = true)
+            "JOIN user u ON u.id = i.user_id " +
+            "WHERE i.is_public = 1 AND u.is_deleted = 0 order by scrap_count DESC, i.created_at DESC ", nativeQuery = true)
 
     List<WeeklyInterview> findWeeklyInterview(Pageable pageable);
 
