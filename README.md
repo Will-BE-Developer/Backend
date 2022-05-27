@@ -1,4 +1,4 @@
-[![Willbe](https://user-images.githubusercontent.com/60756023/170621673-785e1cdb-ed6b-4dc0-ad25-82eb52001c40.png)](https://willbedeveloper.com)
+[![Willbe](https://user-images.githubusercontent.com/60756023/170623305-e2330ea2-2e45-4af6-8cf1-c70e8b784dff.png)](https://willbedeveloper.com)
 
 
 <b>개발자로 취업하고싶은 사람들을 위한 화상면접 연습 커뮤니티</b>
