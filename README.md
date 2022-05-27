@@ -24,7 +24,7 @@
 
 <table>
    <tr>
-    <td align="center"><b><a href="https://github.com/llama-ste">🐪 안동현</a></b></td>
+    <td align="center"><b><a href="https://github.com/llama-ste">🦙 안동현</a></b></td>
     <td align="center"><b><a href="https://github.com/AlgoRoots">🐰 박성혜</a></b></td>
     <td align="center"><b><a href="https://github.com/limjae">🐘 임재현</a></b></td>
     <td align="center"><b><a href="https://github.com/catalinakim">🐩 김경현</a></b></td>
