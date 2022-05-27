@@ -24,11 +24,11 @@
 
 ### 😎 Backend Members✨ 
 
-<table>
+<table align="center">
    <tr>
-    <td align="center"><b><a href="https://github.com/limjae">🐘임재현</a></b></td>
+    <td align="center"><b><a href="https://github.com/limjae">🐘 임재현</a></b></td>
     <td align="center"><b><a href="https://github.com/catalinakim">🐩 김경현</a></b></td>
-    <td align="center"><b><a href="https://github.com/Juri-Lee">🐬이주리</a></b></td>
+    <td align="center"><b><a href="https://github.com/Juri-Lee">🐬 이주리</a></b></td>
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/limjae"><img src="https://user-images.githubusercontent.com/90495580/169259387-0e3b59ad-5882-458a-9a2b-2ccac2d696ae.png" width="100px" /></a></td>
@@ -102,6 +102,7 @@
 <br>
 <br>
 ## ERD
+
 ![Will be](https://user-images.githubusercontent.com/60756023/170617716-62ecda77-34cd-4465-948a-18ed707fd0e5.png)
 
 ## 🔥 Trouble Shooting
