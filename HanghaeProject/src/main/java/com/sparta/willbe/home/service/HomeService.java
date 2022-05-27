@@ -205,7 +205,7 @@ public class HomeService {
         for (WeeklyInterview weeklyInterview : getInterviews) {
 
             //인터뷰 뱃지 골드,실버,브론즈 저장
-            String[] badge = {"Gold", "Silver", "Bronze"};
+            String[] badge = {"Gold", "Silver", "Bronze", "NONE", "NONE"};
             Interview interviewById = interviewRepository.findById(weeklyInterview.getInterviewId())
                     .orElse(null);
             if (interviewById == null) {
@@ -220,10 +220,8 @@ public class HomeService {
             String weeklyBadge = weeklyInterview.getWeeklyBadge().substring(0, 7) + ranking + "등";
             log.info("CHANGE WEEKLY INTERVIEW >> {} (InterviewId: {})", weeklyBadge, weeklyInterview.getInterviewId());
 
-            if (ranking <= 3) {
-                interviewById.updateBadge(badge[ranking - 1]);
-                interviewRepository.save(interviewById);
-            }
+            interviewById.updateBadge(badge[ranking - 1]);
+            interviewRepository.save(interviewById);
             weeklyInterview.setWeeklyBadge(weeklyBadge);
         }
     }
