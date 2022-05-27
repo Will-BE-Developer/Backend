@@ -23,7 +23,7 @@
 
 <br/>
 
-### 😎 Backend Members✨ 
+### 🌵 Backend Members 🌴
 
 <table align="center">
    <tr>
@@ -37,30 +37,30 @@
     <td align="center"><a href="https://github.com/Juri-Lee"><img src="https://user-images.githubusercontent.com/90495580/169259405-ba67e49d-8b01-405f-b0c8-12c6054b7577.png" width="100px" /></a></td>
   </tr>
   <tr>
-    <td align="center"><b>Spring</b></td>
-    <td align="center"><b>Spring</b></td>
-    <td align="center"><b>Spring</b></td>
+    <td align="center"><b>🌸Spring</b></td>
+    <td align="center"><b>🌸Spring</b></td>
+    <td align="center"><b>🌸Spring</b></td>
   </tr>
 </table>
 
 <br/>
 <br/>
 
-## 프로젝트 기능 소개
+## Backend 주요 기술 소개✨ 
 
-#### 🐰 로그인 : JWT 토큰 방식, Spring security, Java Mail sender
+#### 💎 로그인 : JWT 토큰 방식, Spring security, Java Mail sender
 
 - 카카오를 통한 소셜로그인으로 간단하게 가입할 수 있어요. 이메일 회원가입에서는 유효한 이메일만 가입할 수 있도록 중복확인과 더불어 이메일 인증 링크 방식을 도입했어요.
 
-#### 🦊 동영상 저장,변환 : S3, 
+#### 💎 동영상 저장,변환 : S3, 
 
 - 프로필 닉네임, 사진, github링크와 자기소개까지 개발자들의 공간이니만큼 나를 어필할 수 있어요. 유저의 닉네임을 클릭하면 해당 유저 모달창으로 정보가 보여지게 돼요.
 
-#### 🦊 동영상 업로드 비동기 처리 및 load balancing 
+#### 💎 동영상 업로드 비동기 처리 및 load balancing 
 
 - 프로필 닉네임, 사진, github링크와 자기소개까지 개발자들의 공간이니만큼 나를 어필할 수 있어요. 유저의 닉네임을 클릭하면 해당 유저 모달창으로 정보가 보여지게 돼요.
 
-#### 🐸 주간 면접왕, 오늘의 질문, 핫한 카테고리 관리 : spring batch
+#### 💎 주간 면접왕, 오늘의 질문, 핫한 카테고리 관리 : spring batch
 
 - 면접 연습도 실전처럼 해야 실력이 늘어요! WIllBe의 면접시스템은 카테고리에 맞는 랜덤질문과 3분의 제한시간이 주어집니다. 중간에 멈출 수는 없지만 재도전의 기회는 얼마든지 있답니다!
 
@@ -89,7 +89,6 @@
 
 <p>
   <img src="https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white" > 
-    <img src="https://img.shields.io/badge/amazones3-%#569A31.svg?style=for-the-badge&logo=amazon-s3&logoColor=white" > 
    <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
 </p>
 
