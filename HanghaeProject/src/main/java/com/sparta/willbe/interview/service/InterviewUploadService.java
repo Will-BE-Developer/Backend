@@ -81,6 +81,9 @@ public class InterviewUploadService {
     @Transactional
     public InterviewInfoResponseDto completeInterview(Long loginUserId, Long interviewId, InterviewPostRequestDto requestDto) throws IOException {
 
+        User user = userRepository.findById(loginUserId)
+                .orElseThrow(UserNotFoundException::new);
+
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(DraftNotFoundException::new);
 
@@ -88,7 +91,7 @@ public class InterviewUploadService {
                 .orElseThrow(QuestionNotFoundException::new);
 
 
-        if (interview.getUser().getId() != loginUserId) {
+        if (interview.getUser().getId() != user.getId()) {
             throw new InterviewForbiddenPostException();
         }
 
