@@ -87,25 +87,25 @@
 
 ## Backend 주요 기술 및 Flow chart✨ 
 
-#### 🔐 로그인 : JWT 토큰 방식, Spring security, Java Mail sender
+### 🔐 로그인 : JWT 토큰 방식, Spring security, Java Mail sender
 
-- 카카오를 통한 소셜로그인으로 간단하게 가입할 수 있어요. 이메일 회원가입에서는 유효한 이메일만 가입할 수 있도록 중복확인과 더불어 이메일 인증 링크 방식을 도입했어요. 또한 JWT 토큰 인증 방식을 통해 다중서버에서도 유저를 재인증할 필요가 없어요. 
+카카오를 통한 소셜로그인으로 간단하게 가입할 수 있어요. 이메일 회원가입에서는 유효한 이메일만 가입할 수 있도록 중복확인과 더불어 이메일 인증 링크 방식을 도입했어요. 또한 JWT 토큰 인증 방식을 통해 다중서버에서도 유저를 재인증할 필요가 없어요. 
 
   <img src="https://user-images.githubusercontent.com/22388388/170816612-1547cb9e-092a-400e-8422-2176eabb3a6f.png" width="90%" height="90%">
 <!--![detail structure](https://user-images.githubusercontent.com/22388388/170816612-1547cb9e-092a-400e-8422-2176eabb3a6f.png) -->
 
 
-#### 📹 📀 동영상 저장,변환 및 업로드 : S3,Lambda, Elastic Load balancer
+### 📹 📀 동영상 저장,변환 및 업로드 : S3,Lambda, Elastic Load balancer
 
-- 동영상 촬영후 업로드 버튼을 누르면 기다릴 필요없이 다른 서비스 이용이 가능해요. 유저가 기다리는 시간을 최소화하고 동영상 처리시간을 빠르게 할 수 있도록, 여러대의 서버를 loadbalancer를 통해 관리하고 있어요.
+동영상 촬영후 업로드 버튼을 누르면 기다릴 필요없이 다른 서비스 이용이 가능해요. 유저가 기다리는 시간을 최소화하고 동영상 처리시간을 빠르게 할 수 있도록, 여러대의 서버를 loadbalancer를 통해 관리하고 있어요.
 
   <img src="https://user-images.githubusercontent.com/22388388/170816567-6b35c99d-ab24-4951-a8ff-edc7b57207a5.png" width="90%" height="90%">
 <!-- ![detail structure (1)](https://user-images.githubusercontent.com/22388388/170816567-6b35c99d-ab24-4951-a8ff-edc7b57207a5.png) -->
 
 
-#### 👑 주간 면접왕, 오늘의 질문, 핫한 카테고리 관리 : spring batch
+### 👑 주간 면접왕, 오늘의 질문, 핫한 카테고리 관리 : spring batch
 
-- spring batch를 사용해, 효율적으로 필요한 서비스 데이터를 산출하고 있어요. 데이터들은 히스토리처럼 쌓여 서비스 통계📊에 사용할수 있답니다!
+spring batch를 사용해, 효율적으로 필요한 서비스 데이터를 산출하고 있어요. 데이터들은 히스토리처럼 쌓여 서비스 통계📊에 사용할수 있답니다!
 
 
 <br/>
@@ -117,13 +117,13 @@
 
 ## 🔥 Trouble Shooting
 
-#### Issue 1
-### 동영상, 썸네일 변환시 긴 대기시간
+#### 🚨 Issue 1
+### 동영상, 썸네일 변환시 긴 대기시간⌛
 
-1-1. 클라이언트에서 게시글 요청작성 POST /api/interviews 요청이 오고 다시 반환 될 때 까지 너무 긴 시간이 소요되는 문제가 발생 & <br>
-동영상이 처리 중일 때 다른 사용자들의 요청이 지연되는 현상이 발생했습니다.<br>
+1-1. 클라이언트에서 온 요청이 반횐될 때까지 대기시간 발생,
+동영상이 처리 중일 때 다른 사용자들의 요청이 지연되는 현상<br>
 <br>
-cause : <br>
+🛑 cause : <br>
 - 영상의 확장자를 변환하는 과정이 동기로 처리되고 있어 생기 문제
 - 사용중인 EC2 t2.micro의 사양의 한계 
 
@@ -132,21 +132,32 @@ cause : <br>
 - step 2: 동영상 처리 서버와 API서버를 분리 <br>
 <br>
 1-2. 썸네일 이미지의 크기가 일정하게 맞추기위해 crop 하는 과정에서 대기시간 발생<br>
-cause: <br>
+<br>
+
+🛑 cause: <br>
 - lambda 사용시 생기는 속도 문제 
 
 #### solution : 
 - 썸네일 이미지가 크롭이 완료 되지 않으면 클라이언트에 is_thumbnail_converted 항목을 만들어서 false로 응답 
 
-#### Issue 2
-### 서비스 차원에서 게시글 삭제 문제  
+<hr/>
+
+#### 🚨 Issue 2
+### 서비스 차원에서 게시글 삭제 문제 🚧  
 <br>
 사용자가 인터뷰 게시물 1개를 삭제할 경우, 인터뷰 테이블에서는 해당 인터뷰ID의 레코드는 삭제하면서<br> 
 그 인터뷰가 주간 면접왕인 경우, 주간 면접왕 테이블에서는 삭제하지 않으려 의도 하였으나 삭제가 실행되지 않음<br>
-cause: <br>
+<br> 
+
+🛑 cause: <br>
 - 주간 면접왕 테이블에 인터뷰ID가 @ManyToOne으로 연관관계 매핑
 
 #### solution :
 - 스택오버플로우에 나와있는 방법들을 다 해보았지만, 인터뷰 레코드 조차도 삭제가 안되는 등 인터뷰 테이블에서만 삭제 되지 않음
 - 면접왕 클래스의 인터뷰 필드를 인터뷰 타입에서 Long타입으로 바꿔주고, 연관관계 없이 인터뷰ID만 저장변경
+
+## 🚀 부록
+### ⭐ Error Code
+
+![에러코드 ](https://user-images.githubusercontent.com/60756023/170821316-029012e9-9baa-4ab0-b8fa-ffda6e4c0d44.png)
 
