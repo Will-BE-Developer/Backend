@@ -4,8 +4,8 @@ plugins {
 	id 'java'
 }
 
-group = 'com.team7'
-version = '0.0.1-SNAPSHOT'
+group = 'com.sparta'
+version = '1.0.0'
 sourceCompatibility = '1.8'
 
 configurations {
@@ -61,11 +61,17 @@ dependencies {
 	//json-type class
 	implementation 'com.vladmihalcea:hibernate-types-52:2.16.1'
 
-//	//ffmpeg cli wrapper
-//	implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
+	//ffmpeg cli wrapper
+	implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
+
 //	implementation 'org.bytedeco:ffmpeg:5.0-1.5.7'
 //	implementation 'org.bytedeco:javacpp:1.5.7'
 //	implementation 'org.bytedeco:javacv-platform:1.5.7'
+
+	implementation 'io.sentry:sentry-spring-boot-starter:5.7.4'
+	implementation 'io.sentry:sentry-logback:5.7.4'
+
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 }
 
 //github actions 위해 주석처리
@@ -79,6 +85,6 @@ jar {
 }
 
 wrapper {
-	gradleVersion = '7.1.1'
+	gradleVersion = '7.1.1' //재현님 빌드할때 에러
 	distributionUrl = distributionUrl.replace("bin", "all")
 }
