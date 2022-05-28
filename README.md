@@ -22,10 +22,10 @@
 <table>
    <tr>
     <td align="center"><b><a href="https://github.com/llama-ste">🦙 안동현</a></b></td>
-    <td align="center"><b><a href="https://github.com/AlgoRoots">🐰 박성혜</a></b></td>
-    <td align="center"><b><a href="https://github.com/limjae">🐘 임재현</a></b></td>
+    <td align="center"><b><a href="https://github.com/AlgoRoots">🦤 박성혜</a></b></td>
+    <td align="center"><b><a href="https://github.com/limjae">🦣 임재현</a></b></td>
     <td align="center"><b><a href="https://github.com/catalinakim">🐩 김경현</a></b></td>
-    <td align="center"><b><a href="https://github.com/Juri-Lee">🐬 이주리</a></b></td>
+    <td align="center"><b><a href="https://github.com/Juri-Lee">🦖 이주리</a></b></td>
   </tr>
   <tr>
      <td align="center"><a href="https://github.com/llama-ste"><img src="https://user-images.githubusercontent.com/90495580/169259372-a923afea-a898-4bca-9504-7d073d6ffab8.jpeg" width="100px" /></a></td>
@@ -122,18 +122,18 @@ spring batch를 사용해, 효율적으로 필요한 서비스 데이터를 산�
 #### 🚨 Issue 1
 ### 동영상, 썸네일 변환시 긴 대기시간⌛
 
-1-1. 사용자가 영상을 찍어 올리면 클라이언트에서 온 요청이 반횐될 때까지 대기시간 발생하고,
+A. 사용자가 영상을 찍어 올리면 클라이언트에서 온 요청이 반횐될 때까지 대기시간 발생하고,
 동영상이 처리 중일 때 다른 사용자들의 요청이 지연되는 현상이 발생했어요<br>
 <br>
 🛑 cause : <br>
 - 영상의 확장자를 변환하는 과정이 동기로 처리되고 있어 문제가 발생되고 있었어요.
 - 사용중인 EC2 t2.micro의 사양의 한계로 인해 정해진 속도 이상으로는 업로드 속도를 향상시킬 수 없었어요. 
 
-##### solution :
+#### 🚥 solution :
 - step 1: 동영상 변환 과정을 @async 어노테이션을 통해 비동기로 처리하여 변환 요청이 올 때 변환 과정을 기다리는 과정 생략했어요.
 - step 2: 동영상 처리 서버와 API서버를 분리 하여 동영상 처리시에 걸리는 부하를 최소화 시키려고 했어요.<br>
 <br>
-1-2. 썸네일 이미지의 크기가 일정하게 맞추기위해 이미지를 자르는 과정에서 대기시간 발생했어요.<br>
+B. 썸네일 이미지의 크기가 일정하게 맞추기위해 이미지를 자르는 과정에서 대기시간 발생했어요.<br>
 <br>
 
 🛑 cause: <br>
@@ -141,7 +141,7 @@ spring batch를 사용해, 효율적으로 필요한 서비스 데이터를 산�
 lambda는 이벤트를 받으면 이미지를 잘라줍니다. 하지만 이 과정이 즉각적으로 이루어지지 않아 대기시간이 발생합니다.
 
 
-#### solution : 
+#### 🚥 solution : 
 - 썸네일 이미지가 크롭이 완료 되지 않으면 클라이언트에 is_thumbnail_converted 항목을 만들어서 false로 응답하는 방식으로 수정했어요.
 
 <hr/>
@@ -157,7 +157,7 @@ lambda는 이벤트를 받으면 이미지를 잘라줍니다. 하지만 이 과
 🛑 cause: <br>
 - 주간 면접왕 테이블에 인터뷰ID가 @ManyToOne으로 연관관계 매핑되어 있었어요. 
 
-#### solution :
+#### 🚥 solution :
 - 스택오버플로우에 나와있는 방법들을 다 시도해 보았지만, 인터뷰 레코드 조차도 삭제가 안되는 등 인터뷰 테이블에서만 삭제되지 않았어요.
 - 면접왕 클래스의 인터뷰 필드를 인터뷰 타입에서 Long타입으로 바꿔주고, 연관관계 없이 인터뷰ID만 저장하게 변경했어요.
 
