@@ -90,7 +90,6 @@
 #### 🔐 로그인 : JWT 토큰 방식, Spring security, Java Mail sender
 
 - 카카오를 통한 소셜로그인으로 간단하게 가입할 수 있어요. 이메일 회원가입에서는 유효한 이메일만 가입할 수 있도록 중복확인과 더불어 이메일 인증 링크 방식을 도입했어요. 또한 JWT 토큰 인증 방식을 통해 다중서버에서도 유저를 재인증할 필요가 없어요. 
-
 ![detail structure](https://user-images.githubusercontent.com/22388388/170816612-1547cb9e-092a-400e-8422-2176eabb3a6f.png)
 
 #### 📹 📀 동영상 저장,변환 및 업로드 : S3,Lambda, Elastic Load balancer
