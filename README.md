@@ -59,9 +59,13 @@
 #### Backend
 
 <p>
-  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+  <img src="https://img.shields.io/badge/spring boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+   <img src="https://img.shields.io/badge/spring security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white">
    <img src="https://img.shields.io/badge/gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white">
-   <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white">
+   <br>
+   <img src="https://img.shields.io/badge/java 8-007396?style=for-the-badge&logo=java&logoColor=white">
+   <img src="https://img.shields.io/badge/FFmpeg-007808?style=for-the-badge&logo=FFmpeg&logoColor=white">
+   <img src="https://img.shields.io/badge/Json Web Tokens-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white">
 </p>
 
 #### Infrastructure
@@ -130,8 +134,8 @@ cause: <br>
 - 썸네일 이미지가 크롭되는 동안 유저 화면에는 로딩이미지를 보여줌
 
 #### Issue 2
-### 다중 서버에서 유저 인식 불가
-사용자가 비디오를 업로드를 할때 서버가 사용자를 인식하지 못해 업로드 실패 문제 발생 <br>
+### 이슈이슈
+
 
 #### solution :
 - 
