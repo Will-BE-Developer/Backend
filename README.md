@@ -187,4 +187,4 @@ AWS Lambda를 사용하여 해당 이미지를 4:3으로 crop하는 동안 사�
 
 ### ⭐ Error Code
 
-![에러코드-](https://user-images.githubusercontent.com/60756023/170940249-6a7ec37d-710b-4489-8367-acc450f60e43.png)
+![에러코드-](https://user-images.githubusercontent.com/22388388/170945770-699435a6-4a31-4ae6-b064-db34873f5d06.png)
