@@ -91,7 +91,7 @@
 
 카카오를 통한 소셜로그인으로 간단하게 가입할 수 있어요. 이메일 회원가입에서는 유효한 이메일만 가입할 수 있도록 중복확인과 더불어 이메일 인증 링크 방식을 도입했어요. 또한 JWT 토큰 인증 방식을 통해 다중서버에서도 유저를 재인증할 필요가 없어요. 
 
-  <img src="https://user-images.githubusercontent.com/22388388/170919933-2b964eeb-c5dd-4913-a083-94cf4e03dd3d.png" width="90%" height="90%">
+  <img src="https://user-images.githubusercontent.com/22388388/170816612-1547cb9e-092a-400e-8422-2176eabb3a6f.png" width="90%" height="90%">
 <!--![detail structure](https://user-images.githubusercontent.com/22388388/170816612-1547cb9e-092a-400e-8422-2176eabb3a6f.png) -->
 
 
@@ -99,7 +99,7 @@
 
 동영상 촬영후 업로드 버튼을 누르면 기다릴 필요없이 다른 서비스 이용이 가능해요. 유저가 기다리는 시간을 최소화하고 동영상 처리시간을 빠르게 할 수 있도록, 여러대의 서버를 loadbalancer를 통해 관리하고 있어요.
 
-  <img src="https://user-images.githubusercontent.com/22388388/170816567-6b35c99d-ab24-4951-a8ff-edc7b57207a5.png" width="90%" height="90%">
+  <img src="https://user-images.githubusercontent.com/22388388/170919933-2b964eeb-c5dd-4913-a083-94cf4e03dd3d.png" width="90%" height="90%">
 <!-- ![detail structure (1)](https://user-images.githubusercontent.com/22388388/170816567-6b35c99d-ab24-4951-a8ff-edc7b57207a5.png) -->
 
 
