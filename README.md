@@ -163,6 +163,7 @@ AWS Lambda를 사용하여 해당 이미지를 4:3으로 crop하는 동안 사�
 - 썸네일 이미지 크기 조정이 완료 되지 않으면클라이언트에 is_thumbnail_converted 항목을 만들어서 false로 응답해주도록 수정했어요.
 
 <hr/>
+
 #### 🚨 Issue 3
 ### 인터뷰 삭제 🚧  
 
