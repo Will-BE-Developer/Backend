@@ -111,4 +111,31 @@ public class InterviewUploadService {
                 true, false, 0L, 0L);
     }
 
+//    @Transactional
+//    public void dummyInterview(int seq) {
+//        User user = userRepository.findById(216L).orElseThrow(
+//                UserNotFoundException::new
+//        );
+//
+//        Question question = questionRepository.findById((long)(Math.random()*(100)+202))
+//                .orElseThrow(QuestionNotFoundException::new);
+//
+//        String objectKey = "dummy" + seq;
+//
+//
+//        Interview interview = new Interview("videos/" + objectKey+".webm", "thumbnails/" + objectKey +".png", user);
+//        interview.complete("DummyNote",
+//                true,
+//                question,
+//                interview.getVideoKey().replace(".webm",".mp4"),
+//                "re" + interview.getThumbnailKey());
+//        interview.convertVideo();
+//
+//        interviewRepository.save(interview);
+//
+//        user.getInterviews().add(interview);
+//
+//    }
+
+
 }

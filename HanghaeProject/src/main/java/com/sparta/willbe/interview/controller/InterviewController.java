@@ -38,6 +38,16 @@ public class InterviewController {
     private final InterviewUploadService interviewUploadService;
     private final HomeService homeService;
 
+//    @GetMapping("/api/interviews/dummy")
+//    @ApiOperation(value = "특정 인터뷰 조회")
+//    @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
+//    public ResponseEntity<String> dummyInterview() {
+//        for(int i = 4; i < 10001;++i){
+//            interviewUploadService.dummyInterview(i);
+//        }
+//        return new ResponseEntity<>("Dummy created", HttpStatus.OK);
+//    }
+
     @GetMapping("/api/interviews")
     @ApiOperation(value = "인터뷰 전체 조회")
     @ApiImplicitParam(name = "Authorization", value = "token", dataTypeClass = String.class, paramType = "header", example = "Bearer access_token")
