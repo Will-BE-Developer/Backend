@@ -109,11 +109,14 @@ public class InterviewService {
     public InterviewInfoResponseDto getInterviewResponse(Long loginUserId, Set<Long> userScrapsId, Interview interview) {
         Boolean isMine = loginUserId == null ? null : Objects.equals(interview.getUser().getId(), loginUserId);
         Boolean scrapsMe = loginUserId == null ? null : userScrapsId.contains(interview.getId());
+        //n+1 - complete
         Long scrapsCount = (long) interview.getScraps().size();
+        //n+1 - complete
         Long commentsCount = (long) interview.getComments().size();
 
         String videoPresignedUrl = interview.getIsVideoConverted() ? getPresignedUrl(interview.getVideoKey()) : null;
         String imagePresignedUrl = getThumbnailImageUrl(interview);
+        //n+1 - complete
         String profilePresignedUrl = getProfileImageUrl(interview.getUser().getProfileImageUrl());
 
         //5월 2째주 1등 -> 숫자만 추출

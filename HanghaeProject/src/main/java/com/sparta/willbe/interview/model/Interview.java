@@ -61,7 +61,7 @@ public class Interview extends Timestamped {
     @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Comment> comments = new ArrayList<>();
 
-    @OneToOne(cascade=CascadeType.ALL, mappedBy = "interview",orphanRemoval = true)
+    @OneToOne(cascade=CascadeType.ALL, mappedBy = "interview",orphanRemoval = true, optional = false, fetch = LAZY)
     @JoinColumn
     Likes likes;
 
