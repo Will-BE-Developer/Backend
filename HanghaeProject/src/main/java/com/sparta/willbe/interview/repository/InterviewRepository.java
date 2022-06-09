@@ -31,4 +31,5 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     @Query("SELECT q.category FROM Interview i LEFT JOIN i.question q WHERE i.question.id = q.id GROUP BY q.category ORDER BY COUNT(q.category ) DESC ")
     List<CategoryEnum> findCategoriesOrderedByCategoryCount(Pageable pageable);
 
+    List<Interview> findAllByIsVideoConvertedFalse();
 }
